@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NRK Evaluation PRO</title>
+
+<style>
+body { font-family: Arial; background:#f2f4f7; padding:15px; }
+.container { max-width:1200px; margin:auto; background:#fff; padding:20px; border-radius:8px; }
+h1,h2 { text-align:center; }
+select,input { font-size:16px; }
+table { width:100%; border-collapse:collapse; margin-top:15px; }
+th,td { border:1px solid #ccc; padding:6px; text-align:center; }
+th { background:#e9ecef; }
+.good{color:green;font-weight:bold;}
+.medium{color:orange;font-weight:bold;}
+.bad{color:red;font-weight:bold;}
+button { padding:10px 15px; font-size:16px; margin:5px; }
+.result { margin-top:20px; padding:15px; background:#eef2f5; border-radius:6px; }
+</style>
+</head>
+
+<body>
+<div class="container">
+
+<h1>Оцінювання НРК — PRO</h1>
+
+<label>Назва НРК:
+<input id="nrkName" placeholder="Напр. ГУЛІВЕР"></label>
+
+<h2>1️⃣ Основні критерії</h2>
+<table id="main">
+<tr><th>Критерій</th><th>Вага</th><th>Бал 0–10</th></tr>
+<tr><td>Управління / C2</td><td>30</td><td><input type="number" min="0" max="10"></td></tr>
+<tr><td>Людський фактор</td><td>20</td><td><input type="number" min="0" max="10"></td></tr>
+<tr><td>Логістика і ремонт</td><td>15</td><td><input type="number" min="0" max="10"></td></tr>
+<tr><td>Ціна / комплектність</td><td>10</td><td><input type="number" min="0" max="10"></td></tr>
+</table>
+
+<h2>🔥 2️⃣ Бойові сценарії</h2>
+<table id="scenarios">
+<tr><th>Сценарій</th><th>Бал</th></tr>
+<script>
+[
+"Логістика 1 км під завадами",
+"Втрата відео",
+"Fail-safe (втрата звʼязку)",
+"Відновлення після РЕБ",
+"Рух без оператора",
+"Евакуація з відмовою",
+"Мінус 1 двигун",
+"Бруд / дощ / мороз",
+"Помилка оператора",
+"Повернення всліпу"
+].forEach(s=>{
+document.write(`<tr><td>${s}</td><td><input type="number" min="0" max="10"></td></tr>`);
+});
+</script>
+</table>
+
+<div class="result">
+<h3>Загальний бал: <span id="total">0</span>%</h3>
+<h3>Висновок: <span id="verdict">—</span></h3>
+<p id="note"></p>
+</div>
+
+<button onclick="calculate()">Порахувати</button>
+<button onclick="save()">Зберегти НРК</button>
+<button onclick="compare()">Порівняти з іншими</button>
+
+<div id="compare"></div>
+
+</div>
+
+<script>
+function calculate(){
+let total=0, limit=100, note="";
+let rows=document.querySelectorAll("#main tr");
+rows.forEach((r,i)=>{
+if(i===0)return;
+let w=parseInt(r.cells[1].innerText);
+let v=parseInt(r.cells[2].children[0].value)||0;
+total+=(v/10)*w;
+if(i===1 && v<4){limit=0; note="C2 критично слабкий";}
+});
+
+let s=document.querySelectorAll("#scenarios input");
+let sum=0, zero=false;
+s.forEach(i=>{let v=i.value||0; sum+=+v; if(v==0)zero=true;});
+let avg=sum/s.length;
+total+=(avg/10)*25;
+
+if(s[2].value<5){limit=Math.min(limit,60); note="Fail-safe нижче норми";}
+if(zero){limit=Math.min(limit,70); note="Провал сценарію";}
+
+total=Math.min(total,limit);
+document.getElementById("total").innerText=total.toFixed(1);
+
+let v=document.getElementById("verdict");
+v.className="";
+if(limit===0){v.innerText="НЕ РЕКОМЕНДОВАНО";v.classList.add("bad");}
+else if(total>=85){v.innerText="РЕКОМЕНДОВАНО";v.classList.add("good");}
+else if(total>=70){v.innerText="ОБМЕЖЕНО";v.classList.add("medium");}
+else if(total>=50){v.innerText="ДОПРАЦЮВАТИ";v.classList.add("medium");}
+else{v.innerText="НЕ РЕКОМЕНДОВАНО";v.classList.add("bad");}
+
+document.getElementById("note").innerText=note;
+return total;
+}
+
+function save(){
+let name=document.getElementById("nrkName").value;
+if(!name)return alert("Вкажи назву НРК");
+let score=calculate();
+let data=JSON.parse(localStorage.getItem("nrk")||"[]");
+data.push({name,score});
+localStorage.setItem("nrk",JSON.stringify(data));
+alert("Збережено");
+}
+
+function compare(){
+let data=JSON.parse(localStorage.getItem("nrk")||"[]");
+let out="<h2>📊 Порівняння</h2><table><tr><th>НРК</th><th>Бал</th></tr>";
+data.forEach(d=>out+=`<tr><td>${d.name}</td><td>${d.score}</td></tr>`);
+out+="</table>";
+document.getElementById("compare").innerHTML=out;
+}
+</script>
+
+</body>
+</html>
