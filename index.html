@@ -4,66 +4,7 @@
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
   <title>НРК — оцінювання (2026 | порівняння + висновок)</title>
-  <style>
-    :root {
-      --bg: #0b1220; --card: #111b2e; --muted: #93a4c7; --text: #e7eefc;
-      --accent: #4da3ff; --ok: #2ee59d; --bad: #ff5c7a; --warn: #ffcc66;
-      --line: rgba(255,255,255,.10); --r: 14px;
-    }
-    * { box-sizing: border-box; }
-    body { margin: 0; background: linear-gradient(180deg,#071022,#0b1220); color: var(--text); font-family: system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif; }
-    header { position: sticky; top: 0; z-index: 5; background: rgba(7,16,34,.92); backdrop-filter: blur(10px); border-bottom: 1px solid var(--line); }
-    .wrap { max-width: 1100px; margin: 0 auto; padding: 12px 14px; }
-    h1 { font-size: 18px; margin: 6px 0 2px; }
-    .sub { font-size: 12px; color: var(--muted); margin: 0 0 8px; }
-    .tabs { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
-    .tab { border: 1px solid var(--line); background: transparent; color: var(--text); padding: 8px 10px; border-radius: 999px; font-size: 13px; cursor: pointer; }
-    .tab.active { background: rgba(77,163,255,.18); border-color: rgba(77,163,255,.45); }
-    main { padding: 14px; }
-    .grid { display: grid; gap: 12px; }
-    @media (min-width: 980px) { .grid.cols2 { grid-template-columns: 1fr 1fr; } }
-    .card { background: rgba(17,27,46,.92); border: 1px solid var(--line); border-radius: var(--r); padding: 12px; }
-    .card h2 { font-size: 14px; margin: 0 0 10px; color: #cfe0ff; }
-    label { display: block; font-size: 12px; color: var(--muted); margin: 10px 0 6px; }
-    input, select, textarea {
-      width: 100%; border-radius: 12px; border: 1px solid var(--line);
-      background: rgba(0,0,0,.18); color: var(--text); padding: 10px; font-size: 14px; outline: none;
-    }
-    textarea { min-height: 70px; resize: vertical; }
-    .row { display: flex; gap: 10px; }
-    .row > * { flex: 1; }
-    .btnrow { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 12px; }
-    button.primary { background: rgba(77,163,255,.22); border: 1px solid rgba(77,163,255,.55); color: var(--text); }
-    button.ghost { background: transparent; border: 1px solid var(--line); color: var(--text); }
-    button.danger { background: rgba(255,92,122,.18); border: 1px solid rgba(255,92,122,.5); color: var(--text); }
-    button { padding: 10px 14px; border-radius: 12px; cursor: pointer; font-size: 14px; }
-    .pill { display: inline-flex; align-items: center; gap: 6px; border: 1px solid var(--line); border-radius: 999px; padding: 6px 10px; font-size: 12px; color: var(--muted); }
-    .pill strong { color: var(--text); font-weight: 700; }
-    .small { font-size: 12px; color: var(--muted); }
-    .kpi { display: flex; gap: 10px; flex-wrap: wrap; }
-    .hide { display: none; }
-    .divider { height: 1px; background: var(--line); margin: 12px 0; }
-
-    .crit { border: 1px solid var(--line); border-radius: 14px; padding: 12px; margin: 12px 0; background: rgba(0,0,0,.10); }
-    .critTop { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
-    .critName b { font-size: 13px; color: var(--text); }
-    .critName span { font-size: 12px; color: var(--muted); }
-    .critActions { display: flex; align-items: center; gap: 8px; }
-    .helpBtn { padding: 7px 10px; border-radius: 999px; border: 1px solid rgba(77,163,255,.45); background: rgba(77,163,255,.14); color: var(--text); font-size: 12px; cursor: pointer; }
-    .weightTag { font-size: 12px; color: var(--muted); border: 1px solid var(--line); border-radius: 999px; padding: 6px 10px; }
-    .err { color: var(--warn); }
-
-    .modalOverlay { position: fixed; inset: 0; background: rgba(0,0,0,.65); display: none; align-items: center; justify-content: center; padding: 16px; z-index: 100; }
-    .modal { width: min(900px, 95%); max-height: 90vh; overflow-y: auto; background: rgba(17,27,46,.98); border: 1px solid var(--line); border-radius: 18px; padding: 20px; }
-    .modal h3 { margin: 0 0 12px; font-size: 17px; color: #cfe0ff; }
-    .modal .box { border: 1px solid var(--line); border-radius: 14px; padding: 14px; margin: 14px 0; background: rgba(0,0,0,.15); white-space: pre-wrap; line-height: 1.5; }
-    .modalCloseRow { display: flex; justify-content: flex-end; gap: 12px; margin-top: 16px; }
-
-    table { width: 100%; border-collapse: collapse; margin-top: 16px; font-size: 13px; }
-    th, td { padding: 8px 10px; border: 1px solid var(--line); text-align: center; }
-    th { background: rgba(0,0,0,.25); }
-    td.highlight { font-weight: bold; color: var(--accent); }
-  </style>
+  <link rel="stylesheet" href="styles.css"/>
 </head>
 <body>
 
@@ -71,8 +12,9 @@
   <div class="wrap">
     <h1>НРК — оцінювання (2026 | порівняння + висновок)</h1>
     <p class="sub">Обери модель → заповни бали + коментарі → сформуй висновок → порівняй → експорт.</p>
-    <div class="tabs">
-      <button class="tab active" data-tab="t1">1) Паспорт</button>
+
+    <div class="tabs" role="tablist">
+      <button class="tab active" data-tab="t1">1) Довідник</button>
       <button class="tab" data-tab="t2">2) Оцінка</button>
       <button class="tab" data-tab="t3">3) Чек-лист</button>
       <button class="tab" data-tab="t4">4) Експорт</button>
@@ -83,115 +25,185 @@
 
 <main class="wrap">
 
-  <!-- TAB 1 Паспорт -->
+  <!-- TAB 1 Довідник -->
   <section id="t1" class="grid cols2">
+
     <div class="card">
-      <h2>Автозаповнення (довідник)</h2>
-      <label>Вибери БеНК зі списку</label>
-      <div class="row">
-        <select id="presetSelect">
-          <option value="">— обрати модель —</option>
-        </select>
-        <button class="primary" type="button" id="applyPresetBtn">Заповнити</button>
+      <div class="stickyBox">
+        <h2>Довідник моделей (автозаповнення)</h2>
+
+        <div class="row">
+  <div style="flex:2; min-width:280px">
+    <label>Пошук (виробник або назва)</label>
+
+    <div class="autocomplete">
+  <input id="presetSearch" placeholder="Пошук: виробник або назва НРК">
+  <input type="hidden" id="selectedPresetKey">
+  <div id="presetSuggestions" class="hide"></div>
+</div>
+
+
+    <div class="small" style="margin-top:6px">
+      Порада: пиши 2–3 символи — з’являться варіанти. Стрілки ↑↓ + Enter теж працюють.
+    </div>
+  </div>
+
+  <div class="btnCol">
+    <label>&nbsp;</label>
+    <button class="primary" type="button" id="applyPresetBtn" disabled>Заповнити</button>
+  </div>
+</div>
+
+<!-- приховане поле: тут зберігаємо обраний presetKey -->
+<input type="hidden" id="selectedPresetKey" value=""/>
+
+
+        <!-- KPI замість ID -->
+        <div class="kpiTop" id="kpiTop"></div>
+        <p class="small">
+          <b>Пояснення KPI:</b>
+          <br>• <b>грн/кг</b> — скільки коштує 1 кг корисного навантаження (чим менше — тим краще).
+          <br>• <b>грн/(кг·км)</b> — ціна за “перевезення” (навантаження × запас ходу). Це швидкий індикатор “ціна/ефект”, а не оцінка якості.
+        </p>
+
+        <div class="divider"></div>
+
+        <div class="photoBox">
+          <div class="photoFrame">
+            <img id="nrkPhoto" alt="Фото НРК" />
+            <div class="noPhoto" id="noPhoto">Фото</div>
+          </div>
+          <div class="photoMeta">
+            <div class="pill">Модель: <strong id="photoModel">—</strong></div>
+            <div class="pill">Виробник: <strong id="photoMaker">—</strong></div>
+          </div>
+        </div>
       </div>
 
       <div class="divider"></div>
 
       <h2>Основні характеристики</h2>
-      <label>ID (номер запису)</label>
-      <input id="id" type="number" min="1" placeholder="1,2,3..."/>
 
-      <label>Виробник</label>
-      <input id="maker"/>
+      <!-- Компактно: 2 колонки на десктопі -->
+      <div class="formGrid">
+        <div>
+          <label>Виробник</label>
+          <input id="maker"/>
+        </div>
 
-      <label>Назва БеНК</label>
-      <input id="model"/>
+        <div>
+          <label>Назва БеНК</label>
+          <input id="model"/>
+        </div>
 
-      <label>Орієнтовна ціна, грн</label>
-      <input id="price" type="number" min="0"/>
+        <div>
+          <label>Орієнтовна ціна, грн</label>
+          <input id="price" type="number" min="0"/>
+        </div>
 
-      <label>Силова установка</label>
-      <input id="power"/>
+        <div>
+          <label>Силова установка</label>
+          <input id="power"/>
+        </div>
 
-      <label>Маса, кг</label>
-      <input id="mass" type="number" min="0"/>
+        <div>
+          <label>Маса, кг</label>
+          <input id="mass" type="number" min="0"/>
+        </div>
 
-      <label>Розміри, мм (ДхШхВ)</label>
-      <input id="dims" placeholder="2155x1509x904"/>
+        <div>
+          <label>Розміри, мм (ДхШхВ)</label>
+          <input id="dims" placeholder="2155x1509x904"/>
+        </div>
 
-      <label>Корисне навантаження, кг</label>
-      <input id="payloadNom" type="number" min="0"/>
+        <div>
+          <label>Корисне навантаження, кг</label>
+          <input id="payloadNom" type="number" min="0"/>
+        </div>
 
-      <label>Макс швид., км/год</label>
-      <input id="maxSpeed" type="number" min="0"/>
+        <div>
+          <label>Макс швид., км/год</label>
+          <input id="maxSpeed" type="number" min="0"/>
+        </div>
 
-      <label>Запас ходу, км</label>
-      <input id="rangeRoad" type="number" min="0"/>
+        <div>
+          <label>Запас ходу, км</label>
+          <input id="rangeRoad" type="number" min="0"/>
+        </div>
 
-      <div class="row">
         <div>
           <label>Кліренс, мм</label>
           <input id="clearance" type="number" min="0"/>
         </div>
+
         <div>
           <label>Кут підйому, °</label>
           <input id="climb" type="number" min="0"/>
         </div>
-      </div>
 
-      <label>Кут крену, °</label>
-      <input id="tilt" type="number" min="0"/>
+        <div>
+          <label>Кут крену, °</label>
+          <input id="tilt" type="number" min="0"/>
+        </div>
 
-      <div class="row">
         <div>
           <label>Оптична</label>
           <select id="optical"><option value="-">-</option><option value="+">+</option></select>
         </div>
+
         <div>
           <label>Оптична з ІЧ</label>
           <select id="opticalIR"><option value="-">-</option><option value="+">+</option></select>
         </div>
-      </div>
 
-      <label>Тепловізійна</label>
-      <select id="thermal"><option value="-">-</option><option value="+">+</option></select>
+        <div>
+          <label>Тепловізійна</label>
+          <select id="thermal"><option value="-">-</option><option value="+">+</option></select>
+        </div>
 
-      <div class="row">
         <div>
           <label>Радіо, км</label>
           <input id="radioKm" type="number" step="0.1" min="0"/>
         </div>
+
         <div>
           <label>Starlink</label>
           <select id="starlink"><option value="-">-</option><option value="+">+</option></select>
         </div>
+
+        <div>
+          <label>LTE</label>
+          <select id="lte"><option value="-">-</option><option value="+">+</option></select>
+        </div>
       </div>
 
-      <label>LTE</label>
-      <select id="lte"><option value="-">-</option><option value="+">+</option></select>
-
       <label>Примітки</label>
-      <textarea id="notes" placeholder="додаткові деталі/комплектація..."></textarea>
+      <textarea id="notes" placeholder="Комплектація, обмеження, нюанси, що впливає на ціну..."></textarea>
 
       <div class="btnrow">
         <button class="primary" id="saveBtn">Зберегти</button>
         <button class="ghost" id="loadBtn">Завантажити</button>
         <button class="danger" id="clearBtn">Очистити форму</button>
       </div>
+
+      <p class="small">
+        <b>Як працює “Зберегти/Завантажити”:</b> дані зберігаються локально в браузері (localStorage).  
+        Для завантаження просто введи <b>Назву</b> (модель) і натисни “Завантажити” — система знайде останній запис.
+      </p>
     </div>
 
     <div class="card">
-      <h2>Швидкі KPI</h2>
+      <h2>Швидкі KPI (повтор)</h2>
       <div class="kpi" id="kpi"></div>
-      <p class="small">Це не “оцінка”, а лише індикатор: грн/кг та грн/(кг·км).</p>
+      <p class="small">Те саме, що зверху. Залишив тут як дубль для зручності.</p>
     </div>
   </section>
 
-  <!-- TAB 2 Оцінка + коментарі + висновок -->
+  <!-- TAB 2 Оцінка -->
   <section id="t2" class="grid cols2 hide">
     <div class="card">
       <h2>Критерії 0–5 + коментарі</h2>
-      <p class="small">Постав бали та додай текстові зауваження по кожному пункту.</p>
+      <p class="small">Постав бали та додай зауваження. Натисни “Довідка” біля критерію — там опис як ставити 0/3/5 і що питати.</p>
       <div id="criteriaList"></div>
       <div class="btnrow">
         <button class="primary" id="calcBtn">Порахувати</button>
@@ -223,6 +235,7 @@
   <section id="t3" class="grid hide">
     <div class="card">
       <h2>Чек-лист демонстрації (✔/✖)</h2>
+      <p class="small">Розширений список під 1–2 лінію (зв’язок/Fail-safe/РЕБ/навантаження/ходова/електрика/сервіс).</p>
       <div id="checklist"></div>
       <div class="btnrow">
         <button class="primary" id="saveChkBtn">Зберегти чек-лист</button>
@@ -263,7 +276,7 @@
   <div class="modal">
     <h3>Висновок за результатами оцінки</h3>
     <div class="meta" id="conclusionMeta"></div>
-    <div class="box" id="conclusionText" style="white-space:pre-wrap; line-height:1.5"></div>
+    <div class="box" id="conclusionText"></div>
     <div class="modalCloseRow">
       <button class="primary" id="copyConclusion">Копіювати в буфер</button>
       <button class="ghost" id="closeConclusion">Закрити</button>
@@ -285,645 +298,6 @@
   </div>
 </div>
 
-<script>
-const KEY = "nrk_app_v2026";
-
-// Ваги критеріїв
-const WEIGHTS = {
-  payload: 0.12, mob: 0.10, end: 0.10, link: 0.16, reb: 0.14, sens: 0.08, deploy: 0.06, ops: 0.08, value: 0.16
-};
-const KEY_CRITERIA = ["link", "reb"];
-
-// Довідник моделей
-const PRESETS = [
-  { group: "Важкі логістичні (колісні)", maker: 'ТОВ "РОВЕР-ТЕК"', model: "ЗМІЙ ЛОГІСТИЧНИЙ", price: 973409, power: "електричний", mass: 850, dims: "2155x1509x904", payload: 500, maxSpeed: 8, rangeRoad: 20, clearance: 30, climb: 30, tilt: 30, optical: "-", opticalIR: "+", thermal: "-", radioKm: 1, starlink: "+", lte: "+" },
-  { group: "Важкі логістичні (колісні)", maker: 'ТОВ "ДОДЖЕР НРК"', model: "DODGER", price: 1190000, power: "електричний", mass: 510, dims: "1590х1170х1300", payload: 250, maxSpeed: 10, rangeRoad: 20, clearance: 35, climb: 25, tilt: 25, optical: "-", opticalIR: "+", thermal: "-", radioKm: 2.5, starlink: "+", lte: "+" },
-  { group: "Важкі логістичні (колісні)", maker: 'ТОВ "МОРОЗ-ТЕХ"', model: "БНК MOROZ-02L", price: 1250000, power: "електричний", mass: 720, dims: "2250х1305х1905", payload: 400, maxSpeed: 22, rangeRoad: 45, clearance: 23, climb: 23, tilt: 23, optical: "-", opticalIR: "-", thermal: "-", radioKm: 1, starlink: "+", lte: "+" },
-  { group: "Важкі логістичні (колісні)", maker: 'ТОВ "ДЖЕЙКЕЙ ЛЕНД ВІКЛЗ"', model: "RATEL М", price: 1300000, power: "електричний", mass: 760, dims: "1800x1400x1820", payload: 300, maxSpeed: 8, rangeRoad: 32, clearance: 30, climb: 45, tilt: 45, optical: "-", opticalIR: "-", thermal: "-", radioKm: 1.1, starlink: "+", lte: "-" },
-  { group: "Важкі логістичні (колісні)", maker: 'ТОВ "КОТИГОРОШКО"', model: "TOR 800", price: 1308500, power: "електричний", mass: 700, dims: "2330x1680x1900", payload: 400, maxSpeed: 10, rangeRoad: 20, clearance: 30, climb: 30, tilt: 30, optical: "-", opticalIR: "+", thermal: "-", radioKm: 1, starlink: "+", lte: "-" },
-  { group: "Важкі логістичні (колісні)", maker: 'ТОВ "КОТИГОРОШКО"', model: "TOR 1000", price: 1677500, power: "електричний", mass: 1300, dims: "2544x1770x2215", payload: 700, maxSpeed: 10, rangeRoad: 30, clearance: 30, climb: 30, tilt: 30, optical: "-", opticalIR: "+", thermal: "-", radioKm: 1, starlink: "+", lte: "-" },
-  { group: "Важкі логістичні (колісні)", maker: 'ТОВ "ДЖЕЙКЕЙ ЛЕНД ВІКЛЗ"', model: "RATEL H", price: 2000000, power: "електричний", mass: 900, dims: "2480x1300x740", payload: 400, maxSpeed: 8, rangeRoad: 10, clearance: 30, climb: 30, tilt: 30, optical: "+", opticalIR: "+", thermal: "-", radioKm: 1.1, starlink: "+", lte: "-" },
-  { group: "Важкі логістичні (колісні)", maker: 'ТОВ "РІВА-СТАЛЬ"', model: "D-21", price: 2155350, power: "електричний", mass: 541, dims: "1390х1245х1363", payload: 200, maxSpeed: 10, rangeRoad: 14, clearance: 20, climb: 20, tilt: 20, optical: "-", opticalIR: "+", thermal: "-", radioKm: 1, starlink: "+", lte: "+" },
-  { group: "Важкі логістичні (колісні)", maker: 'ТОВ "УКРА ЇНСЬКІ БЕЗПІЛОТНІ ТЕХНОЛОГІ Ї"', model: "УМП-РАВЛИК-2", price: 2390000, power: "електричний", mass: 620, dims: "2114x1322x1647", payload: 200, maxSpeed: 6, rangeRoad: 12, clearance: 30, climb: 20, tilt: 20, optical: "-", opticalIR: "+", thermal: "-", radioKm: 0.5, starlink: "+", lte: "-" },
-  { group: "Важкі логістичні (колісні)", maker: 'ТОВ КВП "СИНЕРГІЯ"', model: "МИРОТВОРЕЦЬ", price: 3205000, power: "електричний", mass: 1050, dims: "3173x1602x1570", payload: 450, maxSpeed: 9, rangeRoad: 27, clearance: 30, climb: 20, tilt: 20, optical: "-", opticalIR: "+", thermal: "-", radioKm: 1, starlink: "-", lte: "-" },
-  { group: "Важкі логістичні (колісні)", maker: 'ТОВ "УКРА ЇНСЬКА БРОНЕТЕХНІКА"', model: "PROTECTOR", price: 3900000, power: "ДВЗ", mass: 2230, dims: "5070x1900x1564", payload: 700, maxSpeed: 40, rangeRoad: 200, clearance: 30, climb: 25, tilt: 25, optical: "+", opticalIR: "+", thermal: "-", radioKm: 7, starlink: "+", lte: "+" },
-
-  { group: "Важкі логістичні (гусеничні)", maker: 'ТОВ "ТЕНКОР"', model: "ТЕРМІТ", price: 895000, power: "електричний", mass: 569, dims: "1465х1220х1240", payload: 300, maxSpeed: 15, rangeRoad: 40, clearance: 30, climb: 25, tilt: 25, optical: "-", opticalIR: "+", thermal: "-", radioKm: 1.5, starlink: "+", lte: "-" },
-  { group: "Важкі логістичні (гусеничні)", maker: 'ТОВ "РОБОТИЗОВАНІ КОМПЛЕКСИ"', model: "МУРАХА", price: 970200, power: "електричний", mass: 630, dims: "1940х1260х1770", payload: 250, maxSpeed: 12, rangeRoad: 50, clearance: 35, climb: 20, tilt: 20, optical: "-", opticalIR: "+", thermal: "-", radioKm: 1, starlink: "+", lte: "-" },
-  { group: "Важкі логістичні (гусеничні)", maker: 'ТОВ "УКРПРОТОТИП"', model: "БУРЕВІЙ", price: 1433000, power: "електричний", mass: 1250, dims: "3000х1700х1240", payload: 600, maxSpeed: 12, rangeRoad: 40, clearance: 40, climb: 20, tilt: 20, optical: "+", opticalIR: "-", thermal: "+", radioKm: 2, starlink: "+", lte: "+" }
-];
-
-// Критерії оцінки
-const CRITERIA = [
-  { id:"payload", name:"Навантаження", short:"скільки реально везе і як стабільно", weight:WEIGHTS.payload,
-    scale:["0 — <50% від потреб або нестабільно під вантажем","3 — тягне/везе типові вантажі стабільно","5 — має запас + стабільний рух/поворот з вантажем"],
-    how:"Оцінюй на демо: рух 200–300 м з вантажем, поворот, старт/стоп, чи не просідає швидкість/керованість.",
-    questions:["Який номінал/максимум (підтверджено де)?","Покажіть рух з номінальним вантажем 2 рази підряд.","Що при перевищенні: захист/обмеження?"] },
-  { id:"mob", name:"Прохідність", short:"реальний ґрунт/ухили/колія", weight:WEIGHTS.mob,
-    scale:["0 — застрягає/зриває керування","3 — долає типові перешкоди","5 — стабільно на ухилах/багнюці/піску з вантажем"],
-    how:"Проси ділянку з колією/ухилом. Важлива повторюваність (2–3 проходи).",
-    questions:["Який кут підйому/крену підтверджено?","Покажіть колію/багнюку (2 проходи).","Є обмеження по швидкості на бездоріжжі?"] },
-  { id:"end", name:"Автономність", short:"час/дистанція в реальному режимі", weight:WEIGHTS.end,
-    scale:["0 — <1 год або <5 км (або нема підтвердження)","3 — 2–3 год або 10–20 км (підтверджено)","5 — ≥4 год або ≥30 км (підтверджено з вантажем)"],
-    how:"Не плутай паспорт і практику. Проси режим: вантаж+середня швидкість+температура.",
-    questions:["Реальний час з вантажем X кг при температурі Y?","Ресурс АКБ/цикли/час зарядки?","Захист при розряді/відсікання?"] },
-  { id:"link", name:"Зв’язок/керування", short:"стабільність керування і резерв", weight:WEIGHTS.link,
-    scale:["0 — один канал, нестабільний","3 — 1–2 канали, але слабкий резерв/перемикання","5 — ≥2 канали + резерв + зрозуміле перемикання + прийнятна затримка"],
-    how:"Ключовий критерій: дальність, latency, поведінка при втраті сигналу, відновлення керування.",
-    questions:["Які канали (основний/резервний) і як перемикається?","Покажіть втрату каналу і відновлення 2 рази.","Яка затримка і як міряли?"] },
-  { id:"reb", name:"РЕБ / Fail-safe", short:"поведінка при завадах/втраті", weight:WEIGHTS.reb,
-    scale:["0 — небезпечно: продовжує рух/не реагує","3 — безпечна зупинка при втраті зв’язку","5 — зупинка + відновлення/перехід на резерв + прозора логіка"],
-    how:"Вимагай демонстрацію: що через 1–3 секунди після втрати керування.",
-    questions:["Логіка fail-safe: стоп/режим очікування/повернення?","Час спрацювання?","Є лог подій?"] },
-  { id:"sens", name:"Сенсори", short:"камери/ніч/тепло + стабільність", weight:WEIGHTS.sens,
-    scale:["0 — мінімальна камера/поганий огляд","3 — 2+ камери або ІЧ","5 — огляд + тепловіз (за потреби) + стабільне відео в русі"],
-    how:"Оцінюй користь: огляд під колеса, перемикання камер, лаги.",
-    questions:["Де камери? Є огляд під колеса?","Перемикання камер під час руху?","Ніч/ІЧ/тепло (як заявлено) підтвердити."] },
-  { id:"deploy", name:"Розгортання", short:"час і простота підготовки", weight:WEIGHTS.deploy,
-    scale:["0 — >20 хв","3 — 5–10 хв","5 — ≤3 хв після транспортування"],
-    how:"Реально: витягли з авто → ввімкнули → поїхали. Таймер.",
-    questions:["Покажіть запуск з нуля з таймером.","Скільки людей потрібно?","Що в комплекті для швидкого розгортання?"] },
-  { id:"ops", name:"Експлуатація/сервіс", short:"ремонтопридатність і підтримка", weight:WEIGHTS.ops,
-    scale:["0 — ремонт тільки у виробника, нема ЗІП","3 — базовий ЗІП, частковий ремонт","5 — польовий ремонт ≤30 хв, документація/гарантія/запчастини"],
-    how:"Для 1–2 лінії важливо швидко відновити після дрібних пошкоджень.",
-    questions:["Який ЗІП/витратники в комплекті?","Гарантія, SLA, склад запчастин?","Час відновлення типових поломок?"] },
-  { id:"value", name:"Ціна/ефект", short:"чи не переплачуємо", weight:WEIGHTS.value,
-    scale:["0 — ціна явно завищена","3 — ринкова при підтверджених ТТХ","5 — найкраща ціна за підтверджені можливості + прозора комплектація"],
-    how:"Порівнюй не паспорт, а підтверджене на демо (зв’язок, fail-safe, прохідність, вантаж).",
-    questions:["Що входить у базову ціну?","Які опції платні?","Вартість експлуатації (АКБ/шини/сервіс)?"] },
-];
-
-const checklistItems = [
-  {k:"link_main", t:"Основний канал керування стабільний (200–500 м)"},
-  {k:"link_res", t:"Резервний канал керування наявний і перевірений"},
-  {k:"switching", t:"Перемикання каналів (авто/ручне) працює"},
-  {k:"failsafe", t:"Fail-safe при втраті зв’язку працює"},
-  {k:"failsafe_time", t:"Час реакції на втрату зв’язку ≤ 3 с"},
-  {k:"payload_run", t:"Рух з номінальним вантажем стабільний"},
-  {k:"turn_loaded", t:"Поворот під вантажем без зриву/заклинювання"},
-  {k:"slope", t:"Рух по ухилу (заявлений кут) підтверджено"},
-  {k:"cams", t:"Камери працюють, перемикання без зависань"},
-  {k:"night", t:"Нічний режим/ІЧ/тепловіз (якщо заявлено) підтверджено"},
-  {k:"overheat", t:"Немає перегріву/відмов під навантаженням"},
-  {k:"deploy_time", t:"Час розгортання відповідає заявленому"},
-  {k:"zip", t:"ЗІП/інструмент у комплекті, продемонстровано"},
-];
-
-// ==================== ФУНКЦІЇ ====================
-
-function loadState() { 
-  try { return JSON.parse(localStorage.getItem(KEY)) || {records:[]}; } 
-  catch(e) { return {records:[]}; } 
-}
-function saveState(state) { localStorage.setItem(KEY, JSON.stringify(state)); }
-function getRecordById(id) { return loadState().records.find(r => String(r.id) === String(id)); }
-function upsertRecord(rec) {
-  const st = loadState();
-  const idx = st.records.findIndex(r => String(r.id) === String(rec.id));
-  if (idx >= 0) st.records[idx] = rec; else st.records.push(rec);
-  saveState(st);
-}
-
-function valNum(id) { const v = document.getElementById(id)?.value; return v === "" ? null : Number(v); }
-function valStr(id) { return document.getElementById(id)?.value || ""; }
-function setVal(id, v) { const el = document.getElementById(id); if (el) el.value = (v == null || v === undefined) ? "" : v; }
-
-function switchTab(id) {
-  document.querySelectorAll(".tab").forEach(b => b.classList.toggle("active", b.dataset.tab === id));
-  document.querySelectorAll("main section").forEach(s => s.classList.toggle("hide", s.id !== id));
-}
-document.querySelectorAll(".tab").forEach(b => b.addEventListener("click", () => switchTab(b.dataset.tab)));
-
-// KPI
-function renderKPI() {
-  const price = valNum("price");
-  const payload = valNum("payloadNom");
-  const range = valNum("rangeRoad");
-  const box = document.getElementById("kpi");
-  box.innerHTML = "";
-
-  if (price && payload) {
-    box.insertAdjacentHTML("beforeend", `<span class="pill">грн/кг: <strong>${(price/payload).toFixed(0)}</strong></span>`);
-  }
-  if (price && payload && range) {
-    box.insertAdjacentHTML("beforeend", `<span class="pill">грн/(кг·км): <strong>${(price/(payload*range)).toFixed(2)}</strong></span>`);
-  }
-  if (!box.innerHTML) {
-    box.innerHTML = `<span class="pill">Заповни “Ціна”, “Навантаження” і “Запас ходу”</span>`;
-  }
-}
-
-// Пресети
-function presetKey(p) { return `${p.group} — ${p.model} (${p.maker})`; }
-
-function fillPresetSelect() {
-  const sel = document.getElementById("presetSelect");
-  if (!sel) return;
-  sel.innerHTML = `<option value="">— обрати модель —</option>`;
-  const groups = {};
-  PRESETS.forEach(p => (groups[p.group] ||= []).push(p));
-  Object.keys(groups).forEach(g => {
-    const og = document.createElement("optgroup");
-    og.label = g;
-    groups[g].forEach(p => {
-      const opt = document.createElement("option");
-      opt.value = presetKey(p);
-      opt.textContent = `${p.model} — ${p.price.toLocaleString("uk-UA")} грн`;
-      og.appendChild(opt);
-    });
-    sel.appendChild(og);
-  });
-}
-
-function applyPresetByKey(key) {
-  const p = PRESETS.find(x => presetKey(x) === key);
-  if (!p) return;
-
-  setVal("maker", p.maker);
-  setVal("model", p.model);
-  setVal("price", p.price);
-  setVal("power", p.power);
-  setVal("mass", p.mass);
-  setVal("dims", p.dims);
-  setVal("payloadNom", p.payload);
-  setVal("maxSpeed", p.maxSpeed);
-  setVal("rangeRoad", p.rangeRoad);
-  setVal("clearance", p.clearance);
-  setVal("climb", p.climb);
-  setVal("tilt", p.tilt);
-
-  document.getElementById("optical").value = p.optical || "-";
-  document.getElementById("opticalIR").value = p.opticalIR || "-";
-  document.getElementById("thermal").value = p.thermal || "-";
-  setVal("radioKm", p.radioKm);
-  document.getElementById("starlink").value = p.starlink || "-";
-  document.getElementById("lte").value = p.lte || "-";
-
-  renderKPI();
-}
-
-function wirePresetUI() {
-  const btn = document.getElementById("applyPresetBtn");
-  const sel = document.getElementById("presetSelect");
-  btn.addEventListener("click", () => {
-    if (!sel.value) return alert("Обери модель.");
-    applyPresetByKey(sel.value);
-    alert("Заповнено!");
-  });
-}
-
-// Критерії з коментарями
-function renderCriteria() {
-  const box = document.getElementById("criteriaList");
-  box.innerHTML = "";
-  CRITERIA.forEach(c => {
-    box.insertAdjacentHTML("beforeend", `
-      <div class="crit">
-        <div class="critTop">
-          <div class="critName">
-            <b>${c.name}</b>
-            <span>${c.short}</span>
-          </div>
-          <div class="critActions">
-            <span class="weightTag">вага ${(c.weight*100).toFixed(0)}%</span>
-            <button class="helpBtn" data-help="${c.id}">Довідка</button>
-          </div>
-        </div>
-        <label>Оцінка 0–5</label>
-        <input id="s_${c.id}" type="number" min="0" max="5" placeholder="0..5"/>
-        <label>Коментар / зауваження</label>
-        <textarea id="c_${c.id}" placeholder="Що не підтверджено, що потрібно доопрацювати..."></textarea>
-      </div>
-    `);
-  });
-
-  document.querySelectorAll("[data-help]").forEach(btn => btn.addEventListener("click", e => openHelp(e.target.dataset.help)));
-
-  CRITERIA.forEach(c => document.getElementById("s_"+c.id).addEventListener("input", () => calcFinal(false)));
-}
-
-const modalOverlay = document.getElementById("modalOverlay");
-const modalTitle = document.getElementById("modalTitle");
-const modalMeta = document.getElementById("modalMeta");
-const modalScale = document.getElementById("modalScale");
-const modalHow = document.getElementById("modalHow");
-const modalQuestions = document.getElementById("modalQuestions");
-
-function openHelp(id) {
-  const c = CRITERIA.find(x => x.id === id);
-  if (!c) return;
-  modalTitle.textContent = c.name + " — як оцінювати";
-  modalMeta.textContent = `Вага ${(c.weight*100).toFixed(0)}%. ${c.short}`;
-  modalScale.innerHTML = `<b>Шкала</b><br><br><div class="small">${c.scale.map(s => `• ${s}`).join("<br>")}</div>`;
-  modalHow.innerHTML = `<b>Як оцінювати</b><br><br><div class="small">${c.how}</div>`;
-  modalQuestions.innerHTML = `<b>Що просити на демо</b><br><br><div class="small">${c.questions.map(q => `• ${q}`).join("<br>")}</div>`;
-  modalOverlay.style.display = "flex";
-}
-document.getElementById("modalCloseBtn").addEventListener("click", () => modalOverlay.style.display = "none");
-modalOverlay.addEventListener("click", e => { if (e.target === modalOverlay) modalOverlay.style.display = "none"; });
-
-// Чек-лист
-function renderChecklist() {
-  const box = document.getElementById("checklist");
-  box.innerHTML = "";
-  checklistItems.forEach(it => {
-    box.insertAdjacentHTML("beforeend", `
-      <div class="row" style="align-items:center;gap:10px;padding:10px;border:1px solid var(--line);border-radius:12px;margin:8px 0;background:rgba(0,0,0,.10)">
-        <input type="checkbox" id="chk_${it.k}" style="width:18px;height:18px;"/>
-        <div style="font-size:13px">${it.t}</div>
-      </div>
-    `);
-  });
-}
-function collectChecklist() {
-  const out = {};
-  checklistItems.forEach(it => {
-    const el = document.getElementById("chk_"+it.k);
-    out[it.k] = el ? el.checked : false;
-  });
-  return out;
-}
-
-// Scoring
-function collectScoring() {
-  const s = {};
-  CRITERIA.forEach(c => {
-    const v = document.getElementById("s_"+c.id)?.value;
-    s[c.id] = v === "" ? null : Number(v);
-  });
-  return s;
-}
-function validateScoring(sc) {
-  const errors = [];
-  CRITERIA.forEach(c => {
-    const v = sc[c.id];
-    if (v === null || isNaN(v)) errors.push(`• ${c.name} — не заповнено`);
-    else if (v < 0 || v > 5) errors.push(`• ${c.name} — значення поза діапазоном 0–5`);
-  });
-  return errors;
-}
-function calcFinal(showAlert = true) {
-  const sc = collectScoring();
-  const errors = validateScoring(sc);
-  const vbox = document.getElementById("validationBox");
-  if (errors.length) {
-    vbox.innerHTML = "<b>Помилки:</b><br>" + errors.join("<br>");
-    setSummary(null, null, null);
-    if (showAlert) alert("Заповніть усі бали коректно.");
-    return null;
-  }
-  vbox.textContent = "";
-
-  let total = 0;
-  CRITERIA.forEach(c => total += c.weight * (sc[c.id] || 0));
-  total = Math.round(total * 100) / 100;
-
-  let decision = "Умовно рекомендовано";
-  if (total >= 4.0) decision = "Рекомендовано";
-  else if (total < 3.2) decision = "Не рекомендовано";
-
-  const keyMin = Math.min(...KEY_CRITERIA.map(k => sc[k] || 0));
-  const allMin = Math.min(...CRITERIA.map(c => sc[c.id] || 0));
-
-  let risk = { color: "green", text: "🟢 Прийнятно" };
-  if (keyMin < 3) risk = { color: "red", text: "🔴 Високий ризик (зв’язок/Fail-safe)" };
-  else if (allMin < 3) risk = { color: "yellow", text: "🟡 Обмеження (є слабкі місця)" };
-
-  setSummary(total, decision, { risk, keyMin });
-  return { total, decision, risk };
-}
-
-function setSummary(score, decision, riskObj) {
-  document.getElementById("finalScore").textContent = score === null ? "—" : score.toFixed(2);
-  document.getElementById("finalDecision").textContent = decision || "—";
-
-  const badge = document.getElementById("riskBadge");
-  const rText = document.getElementById("riskText");
-  const minKey = document.getElementById("minKey");
-  badge.className = "badge";
-  if (riskObj) {
-    rText.textContent = riskObj.risk.text;
-    minKey.textContent = riskObj.keyMin;
-    badge.classList.add(riskObj.risk.color);
-  } else {
-    rText.textContent = "—";
-    minKey.textContent = "—";
-  }
-}
-
-// Висновок
-document.getElementById("generateConclusionBtn")?.addEventListener("click", () => {
-  const res = calcFinal(false);
-  if (!res) return;
-
-  const model = valStr("model") || "[модель]";
-  const score = res.total.toFixed(2);
-  const decision = res.decision;
-  const risk = res.risk.text;
-
-  let text = `Висновок по моделі ${model}\n\n`;
-  text += `Підсумковий бал: ${score}\n`;
-  text += `Рішення: ${decision}\n`;
-  text += `Світлофор: ${risk}\n\n`;
-
-  text += "Сильні сторони:\n";
-  CRITERIA.forEach(c => {
-    const v = valNum("s_"+c.id);
-    if (v >= 4) text += `• ${c.name} — ${v} балів\n`;
-  });
-
-  text += "\nСлабкі місця та зауваження:\n";
-  CRITERIA.forEach(c => {
-    const v = valNum("s_"+c.id);
-    const comm = valStr("c_"+c.id).trim();
-    if (v <= 3 && v !== null) {
-      text += `• ${c.name} — ${v} балів`;
-      if (comm) text += ` (${comm})`;
-      text += "\n";
-    }
-  });
-
-  text += "\nРекомендація:\n";
-  if (res.total >= 4.0) text += "Рекомендуємо прийняти / закупити.";
-  else if (res.total >= 3.2) text += "Умовно рекомендуємо після усунення зауважень.";
-  else text += "Не рекомендуємо.";
-
-  document.getElementById("conclusionMeta").textContent = `Оцінка від ${valStr("evaluator") || "невідомо"} | ${new Date().toLocaleString("uk-UA")}`;
-  document.getElementById("conclusionText").textContent = text;
-  document.getElementById("conclusionModal").style.display = "flex";
-});
-
-document.getElementById("closeConclusion")?.addEventListener("click", () => document.getElementById("conclusionModal").style.display = "none");
-
-document.getElementById("copyConclusion")?.addEventListener("click", () => {
-  const text = document.getElementById("conclusionText").textContent;
-  navigator.clipboard.writeText(text).then(() => alert("Висновок скопійовано в буфер!"));
-});
-
-// Порівняння (виправлено)
-function updateCompareSelect() {
-  const sel = document.getElementById("compareSelect");
-  if (!sel) return;
-  sel.innerHTML = "";
-
-  const groups = {};
-  PRESETS.forEach(p => (groups[p.group] ||= []).push(p));
-  Object.keys(groups).forEach(g => {
-    const og = document.createElement("optgroup");
-    og.label = g;
-    groups[g].forEach(p => {
-      const opt = document.createElement("option");
-      opt.value = presetKey(p);
-      opt.textContent = `${p.model} — ${p.price.toLocaleString("uk-UA")} грн (${p.maker})`;
-      og.appendChild(opt);
-    });
-    sel.appendChild(og);
-  });
-
-  if (sel.options.length === 0) {
-    sel.innerHTML = '<option disabled>Моделі відсутні в довіднику</option>';
-  }
-}
-
-function buildCompareTable() {
-  const sel = document.getElementById("compareSelect");
-  if (!sel) {
-    console.error("Не знайдено елемент #compareSelect");
-    return;
-  }
-
-  const keys = Array.from(sel.selectedOptions).map(o => o.value);
-  if (keys.length < 2) {
-    alert("Оберіть принаймні 2 моделі (утримуйте Ctrl для множинного вибору)");
-    return;
-  }
-
-  let html = `<table><tr><th>Параметр</th>`;
-  keys.forEach(key => {
-    const p = PRESETS.find(x => presetKey(x) === key);
-    html += `<th>${p ? p.model : key}</th>`;
-  });
-  html += `</tr>`;
-
-  const params = [
-    ["Ціна, грн", "price"],
-    ["Навантаження, кг", "payload"],
-    ["Макс швидкість, км/год", "maxSpeed"],
-    ["Запас ходу, км", "rangeRoad"],
-    ["Кліренс, мм", "clearance"],
-    ["Кут підйому, °", "climb"],
-    ["Кут крену, °", "tilt"],
-    ["Маса, кг", "mass"],
-    ["Розміри", "dims"],
-    ["Силова установка", "power"],
-    ["Радіо, км", "radioKm"],
-    ["Оптична", "optical"],
-    ["Оптична з ІЧ", "opticalIR"],
-    ["Тепловізійна", "thermal"],
-    ["Starlink", "starlink"],
-    ["LTE", "lte"]
-  ];
-
-  params.forEach(([label, key]) => {
-    html += `<tr><td>${label}</td>`;
-    keys.forEach(k => {
-      const p = PRESETS.find(x => presetKey(x) === k);
-      html += `<td>${p?.[key] ?? "—"}</td>`;
-    });
-    html += "</tr>";
-  });
-
-  html += "</table>";
-  const tableDiv = document.getElementById("compareTable");
-  if (tableDiv) {
-    tableDiv.innerHTML = html;
-  } else {
-    console.error("Не знайдено елемент #compareTable");
-  }
-}
-
-// Експорт (без змін)
-function exportExcelXls() {
-  const st = loadState();
-  const rows = [];
-
-  rows.push([
-    "ID","Виробник","Назва","Ціна","Силова","Маса","Розміри",
-    "Навантаження","Макс швидкість","Запас ходу","Кліренс","Підйом","Крен",
-    "Оптична","Оптична ІЧ","Тепловізор","Радіо","Starlink","LTE",
-    "Підсумковий бал","Рішення","Світлофор","Мін ключовий","Загальні зауваження",
-    ...CRITERIA.map(c => `Бал: ${c.name}`),
-    ...CRITERIA.map(c => `Коментар: ${c.name}`)
-  ]);
-
-  st.records.forEach(r => {
-    const ex = computeScoreForExport(r.scoring || {});
-    const row = [
-      r.id ?? "", r.maker ?? "", r.model ?? "", r.price ?? "", r.power ?? "", r.mass ?? "", r.dims ?? "",
-      r.payloadNom ?? "", r.maxSpeed ?? "", r.rangeRoad ?? "", r.clearance ?? "", r.climb ?? "", r.tilt ?? "",
-      r.optical ?? "-", r.opticalIR ?? "-", r.thermal ?? "-", r.radioKm ?? "", r.starlink ?? "-", r.lte ?? "-",
-      ex.score, ex.decision, ex.risk, ex.keyMin, r.commissionNotes ?? "",
-      ...CRITERIA.map(c => r.scoring?.[c.id] ?? ""),
-      ...CRITERIA.map(c => r.comments?.[c.id] ?? "")
-    ];
-    rows.push(row);
-  });
-
-  const xls = buildExcelXml("Оцінювання НРК", rows);
-  downloadFile(`NRK_оцінювання_${new Date().toISOString().slice(0,10)}.xls`, xls, "application/vnd.ms-excel");
-}
-
-function computeScoreForExport(sc) {
-  if (!sc) return {score:"", decision:"", risk:"", keyMin:""};
-  let total = 0;
-  CRITERIA.forEach(c => total += c.weight * (sc[c.id] || 0));
-  total = Math.round(total * 100) / 100;
-  let decision = "Умовно рекомендовано";
-  if (total >= 4.0) decision = "Рекомендовано";
-  else if (total < 3.2) decision = "Не рекомендовано";
-
-  const keyMin = Math.min(...KEY_CRITERIA.map(k => sc[k] || 0));
-  const allMin = Math.min(...CRITERIA.map(c => sc[c.id] || 0));
-  let risk = "GREEN";
-  if (keyMin < 3) risk = "RED";
-  else if (allMin < 3) risk = "YELLOW";
-
-  return {score: total.toFixed(2), decision, risk, keyMin: String(keyMin)};
-}
-
-function buildExcelXml(sheetName, rows) {
-  const esc = s => String(s ?? "").replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;");
-  const rowXml = rows.map(r => {
-    const cells = r.map(v => {
-      const isNum = typeof v === "number" || (String(v).trim() && !isNaN(Number(v)));
-      return `<Cell><Data ss:Type="${isNum ? 'Number' : 'String'}">${esc(v)}</Data></Cell>`;
-    }).join("");
-    return `<Row>${cells}</Row>`;
-  }).join("");
-
-  return `<?xml version="1.0"?>
-<Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet"
- xmlns:o="urn:schemas-microsoft-com:office:office"
- xmlns:x="urn:schemas-microsoft-com:office:excel"
- xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet">
-  <Worksheet ss:Name="${esc(sheetName)}">
-    <Table>
-      ${rowXml}
-    </Table>
-  </Worksheet>
-</Workbook>`;
-}
-
-function downloadFile(name, content, mime) {
-  const blob = new Blob([content], {type: mime});
-  const a = document.createElement("a");
-  a.href = URL.createObjectURL(blob);
-  a.download = name;
-  a.click();
-  setTimeout(() => URL.revokeObjectURL(a.href), 5000);
-}
-
-// Збереження форми
-function collectForm() {
-  const data = {
-    id: valNum("id"),
-    maker: valStr("maker"),
-    model: valStr("model"),
-    price: valNum("price"),
-    power: valStr("power"),
-    mass: valNum("mass"),
-    dims: valStr("dims"),
-    payloadNom: valNum("payloadNom"),
-    maxSpeed: valNum("maxSpeed"),
-    rangeRoad: valNum("rangeRoad"),
-    clearance: valNum("clearance"),
-    climb: valNum("climb"),
-    tilt: valNum("tilt"),
-    optical: valStr("optical"),
-    opticalIR: valStr("opticalIR"),
-    thermal: valStr("thermal"),
-    radioKm: valNum("radioKm"),
-    starlink: valStr("starlink"),
-    lte: valStr("lte"),
-    notes: valStr("notes"),
-    scoring: collectScoring(),
-    comments: {},
-    commissionNotes: valStr("commissionNotes"),
-    checklist: collectChecklist()
-  };
-  CRITERIA.forEach(c => {
-    data.comments[c.id] = valStr("c_" + c.id);
-  });
-  return data;
-}
-
-function fillForm(r) {
-  if (!r) return;
-  setVal("id", r.id);
-  setVal("maker", r.maker);
-  setVal("model", r.model);
-  setVal("price", r.price);
-  setVal("power", r.power);
-  setVal("mass", r.mass);
-  setVal("dims", r.dims);
-  setVal("payloadNom", r.payloadNom);
-  setVal("maxSpeed", r.maxSpeed);
-  setVal("rangeRoad", r.rangeRoad);
-  setVal("clearance", r.clearance);
-  setVal("climb", r.climb);
-  setVal("tilt", r.tilt);
-
-  document.getElementById("optical").value = r.optical || "-";
-  document.getElementById("opticalIR").value = r.opticalIR || "-";
-  document.getElementById("thermal").value = r.thermal || "-";
-  setVal("radioKm", r.radioKm);
-  document.getElementById("starlink").value = r.starlink || "-";
-  document.getElementById("lte").value = r.lte || "-";
-
-  document.getElementById("notes").value = r.notes || "";
-  document.getElementById("commissionNotes").value = r.commissionNotes || "";
-
-  const sc = r.scoring || {};
-  CRITERIA.forEach(c => setVal("s_" + c.id, sc[c.id]));
-
-  const cm = r.comments || {};
-  CRITERIA.forEach(c => setVal("c_" + c.id, cm[c.id] || ""));
-
-  const chk = r.checklist || {};
-  checklistItems.forEach(it => {
-    const el = document.getElementById("chk_" + it.k);
-    if (el) el.checked = !!chk[it.k];
-  });
-
-  renderKPI();
-  calcFinal(false);
-}
-
-/** ---------- Ініціалізація ---------- **/
-renderCriteria();
-renderChecklist();
-renderKPI();
-fillPresetSelect();
-wirePresetUI();
-updateCompareSelect(); // заповнюємо список порівняння відразу
-
-// Прикріплюємо обробники для кнопок порівняння
-const compareBtn = document.getElementById("buildCompareBtn");
-if (compareBtn) {
-  compareBtn.addEventListener("click", buildCompareTable);
-} else {
-  console.error("Кнопка #buildCompareBtn не знайдена");
-}
-
-const clearBtn = document.getElementById("clearCompareBtn");
-if (clearBtn) {
-  clearBtn.addEventListener("click", () => {
-    document.getElementById("compareTable").innerHTML = "";
-  });
-}
-
-document.getElementById("weightsHint").textContent =
-  "Ваги: навантаження 12%, прохідність 10%, автономність 10%, зв'язок 16%, РЕБ/Fail-safe 14%, сенсори 8%, розгортання 6%, експлуатація 8%, ціна/ефект 16%.";
-</script>
+<script src="script.js"></script>
 </body>
 </html>
