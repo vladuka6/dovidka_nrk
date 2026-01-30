@@ -204,7 +204,7 @@ const PRESETS = [
     radioKm: 1,
     starlink: "+",
     lte: "+",
-    photo: "img/D-21.png",
+    photo: "D-21.png",
   },
   {
     group: "Важкі логістичні (колісні)",
