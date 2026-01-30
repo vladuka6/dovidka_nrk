@@ -5,6 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
   <title>НРК — оцінювання (2026 | порівняння + висновок)</title>
   <link rel="stylesheet" href="styles.css"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
 </head>
 <body>
 
@@ -71,9 +73,26 @@
             <div class="noPhoto" id="noPhoto">Фото</div>
           </div>
           <div class="photoMeta">
-            <div class="pill">Модель: <strong id="photoModel">—</strong></div>
-            <div class="pill">Виробник: <strong id="photoMaker">—</strong></div>
-          </div>
+  <div class="pill">Модель: <strong id="photoModel">—</strong></div>
+  <div class="pill">Виробник: <strong id="photoMaker">—</strong></div>
+
+  <div class="pill">Контакт: <strong id="photoContact">—</strong></div>
+
+  <div class="pill" style="gap:10px; flex-wrap:wrap">
+   Телефон:
+    <strong>
+      <a id="contactLink" href="#"
+         style="color:inherit; text-decoration:none;">
+        —
+      </a>
+    </strong>
+   <button id="copyContactBtn" class="iconBtn" type="button" title="Скопіювати номер">
+  <i class="fa-solid fa-copy"></i>
+</button>
+
+  </div>
+</div>
+
         </div>
       </div>
 
@@ -83,96 +102,97 @@
 
       <!-- Компактно: 2 колонки на десктопі -->
       <div class="formGrid">
-        <div>
-          <label>Виробник</label>
-          <input id="maker"/>
-        </div>
+  <div>
+    <label>Виробник</label>
+    <input id="maker"/>
+  </div>
 
-        <div>
-          <label>Назва БеНК</label>
-          <input id="model"/>
-        </div>
+  <div>
+    <label>Назва БеНК</label>
+    <input id="model"/>
+  </div>
 
-        <div>
-          <label>Орієнтовна ціна, грн</label>
-          <input id="price" type="number" min="0"/>
-        </div>
+  <div>
+    <label>Орієнтовна ціна, грн</label>
+    <input id="price" type="number" min="0"/>
+  </div>
 
-        <div>
-          <label>Силова установка</label>
-          <input id="power"/>
-        </div>
+  <div>
+    <label>Силова установка</label>
+    <input id="power"/>
+  </div>
 
-        <div>
-          <label>Маса, кг</label>
-          <input id="mass" type="number" min="0"/>
-        </div>
+  <div>
+    <label>Маса, кг</label>
+    <input id="mass" type="number" min="0"/>
+  </div>
 
-        <div>
-          <label>Розміри, мм (ДхШхВ)</label>
-          <input id="dims" placeholder="2155x1509x904"/>
-        </div>
+  <div>
+    <label>Розміри, мм (ДхШхВ)</label>
+    <input id="dims" placeholder="2155x1509x904"/>
+  </div>
 
-        <div>
-          <label>Корисне навантаження, кг</label>
-          <input id="payloadNom" type="number" min="0"/>
-        </div>
+  <div>
+    <label>Корисне навантаження, кг</label>
+    <input id="payloadNom" type="number" min="0"/>
+  </div>
 
-        <div>
-          <label>Макс швид., км/год</label>
-          <input id="maxSpeed" type="number" min="0"/>
-        </div>
+  <div>
+    <label>Макс швид., км/год</label>
+    <input id="maxSpeed" type="number" min="0"/>
+  </div>
 
-        <div>
-          <label>Запас ходу, км</label>
-          <input id="rangeRoad" type="number" min="0"/>
-        </div>
+  <div>
+    <label>Запас ходу, км</label>
+    <input id="rangeRoad" type="number" min="0"/>
+  </div>
 
-        <div>
-          <label>Кліренс, мм</label>
-          <input id="clearance" type="number" min="0"/>
-        </div>
+  <div>
+    <label>Кліренс, мм</label>
+    <input id="clearance" type="number" min="0"/>
+  </div>
 
-        <div>
-          <label>Кут підйому, °</label>
-          <input id="climb" type="number" min="0"/>
-        </div>
+  <div>
+    <label>Кут підйому, °</label>
+    <input id="climb" type="number" min="0"/>
+  </div>
 
-        <div>
-          <label>Кут крену, °</label>
-          <input id="tilt" type="number" min="0"/>
-        </div>
+  <div>
+    <label>Кут крену, °</label>
+    <input id="tilt" type="number" min="0"/>
+  </div>
 
-        <div>
-          <label>Оптична</label>
-          <select id="optical"><option value="-">-</option><option value="+">+</option></select>
-        </div>
+  <div>
+    <label>Оптична</label>
+    <select id="optical"><option value="-">-</option><option value="+">+</option></select>
+  </div>
 
-        <div>
-          <label>Оптична з ІЧ</label>
-          <select id="opticalIR"><option value="-">-</option><option value="+">+</option></select>
-        </div>
+  <div>
+    <label>Оптична з ІЧ</label>
+    <select id="opticalIR"><option value="-">-</option><option value="+">+</option></select>
+  </div>
 
-        <div>
-          <label>Тепловізійна</label>
-          <select id="thermal"><option value="-">-</option><option value="+">+</option></select>
-        </div>
+  <div>
+    <label>Тепловізійна</label>
+    <select id="thermal"><option value="-">-</option><option value="+">+</option></select>
+  </div>
 
-        <div>
-          <label>Радіо, км</label>
-          <input id="radioKm" type="number" step="0.1" min="0"/>
-        </div>
+  <div>
+    <label>Радіо, км</label>
+    <input id="radioKm" type="number" step="0.1" min="0"/>
+  </div>
 
-        <div>
-          <label>Starlink</label>
-          <select id="starlink"><option value="-">-</option><option value="+">+</option></select>
-        </div>
+  <div>
+    <label>Starlink</label>
+    <select id="starlink"><option value="-">-</option><option value="+">+</option></select>
+  </div>
 
-        <div>
-          <label>LTE</label>
-          <select id="lte"><option value="-">-</option><option value="+">+</option></select>
-        </div>
-      </div>
+  <div>
+    <label>LTE</label>
+    <select id="lte"><option value="-">-</option><option value="+">+</option></select>
+  </div>
+</div>
+
 
       <label>Примітки</label>
       <textarea id="notes" placeholder="Комплектація, обмеження, нюанси, що впливає на ціну..."></textarea>

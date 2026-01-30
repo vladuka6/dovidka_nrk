@@ -261,3 +261,43 @@ td.highlight-best{
 .stickyBox{
   overflow: visible;
 }
+
+/* Десктоп: без переносу — завжди збоку */
+@media (min-width: 981px){
+  .photoBox{
+    display:flex;
+    gap:12px;
+    align-items:flex-start;
+    flex-wrap: nowrap;          /* ← ключове */
+  }
+
+  .photoFrame{
+    flex: 0 0 240px;            /* ← фіксована ширина фото */
+    width: 240px;
+  }
+
+  .photoMeta{
+    flex: 1 1 auto;             /* ← мета займає решту */
+    min-width: 260px;           /* ← щоб не падало вниз */
+  }
+}
+.iconBtn{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  /* width:34px;
+  height:34px; */
+  border-radius:10px;
+  border:1px solid var(--line);
+  background:rgba(77,163,255,.14);
+  cursor:pointer;
+  transition:.2s;
+  padding:0;
+  font-size:14px;
+  color:var(--text);
+}
+
+.iconBtn:hover{
+  background:rgba(77,163,255,.25);
+  transform:translateY(-1px);
+}

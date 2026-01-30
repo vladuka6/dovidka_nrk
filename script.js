@@ -50,6 +50,9 @@ const PRESETS = [
     radioKm: 1,
     starlink: "+",
     lte: "+",
+    contactName: "Іван Петренко",
+contactInfo: "+380501112233",
+
     photo: "",
   },
   {
@@ -72,6 +75,9 @@ const PRESETS = [
     radioKm: 2.5,
     starlink: "+",
     lte: "+",
+    contactName: "Іван Петренко",
+contactInfo: "+380501112233",
+
     photo: "",
   },
   {
@@ -94,6 +100,9 @@ const PRESETS = [
     radioKm: 1,
     starlink: "+",
     lte: "+",
+    contactName: "Іван Петренко",
+contactInfo: "+380501112233",
+
     photo: "",
   },
   {
@@ -116,6 +125,9 @@ const PRESETS = [
     radioKm: 1.1,
     starlink: "+",
     lte: "-",
+    contactName: "Іван Петренко",
+contactInfo: "+380501112233",
+
     photo: "",
   },
   {
@@ -138,6 +150,9 @@ const PRESETS = [
     radioKm: 1,
     starlink: "+",
     lte: "-",
+    contactName: "Іван Петренко",
+contactInfo: "+380501112233",
+
     photo: "",
   },
   {
@@ -160,6 +175,9 @@ const PRESETS = [
     radioKm: 1,
     starlink: "+",
     lte: "-",
+    contactName: "Іван Петренко",
+contactInfo: "+380501112233",
+
     photo: "",
   },
   {
@@ -182,6 +200,9 @@ const PRESETS = [
     radioKm: 1.1,
     starlink: "+",
     lte: "-",
+    contactName: "Іван Петренко",
+contactInfo: "+380501112233",
+
     photo: "",
   },
   {
@@ -204,6 +225,9 @@ const PRESETS = [
     radioKm: 1,
     starlink: "+",
     lte: "+",
+    contactName: "Іван Петренко",
+contactInfo: "+380501112233",
+
     photo: "D-21.png",
   },
   {
@@ -226,6 +250,9 @@ const PRESETS = [
     radioKm: 0.5,
     starlink: "+",
     lte: "-",
+    contactName: "Іван Петренко",
+contactInfo: "+380501112233",
+
     photo: "",
   },
   {
@@ -248,6 +275,9 @@ const PRESETS = [
     radioKm: 1,
     starlink: "-",
     lte: "-",
+    contactName: "Іван Петренко",
+contactInfo: "+380501112233",
+
     photo: "",
   },
   {
@@ -270,6 +300,9 @@ const PRESETS = [
     radioKm: 7,
     starlink: "+",
     lte: "-",
+    contactName: "Іван Петренко",
+contactInfo: "+380501112233",
+
     photo: "",
   },
 
@@ -294,6 +327,9 @@ const PRESETS = [
     radioKm: 1.5,
     starlink: "+",
     lte: "-",
+    contactName: "Іван Петренко",
+contactInfo: "+380501112233",
+
     photo: "",
   },
   {
@@ -316,6 +352,9 @@ const PRESETS = [
     radioKm: 1,
     starlink: "+",
     lte: "-",
+    contactName: "Іван Петренко",
+contactInfo: "+380501112233",
+
     photo: "",
   },
   {
@@ -338,6 +377,9 @@ const PRESETS = [
     radioKm: 2,
     starlink: "+",
     lte: "+",
+    contactName: "Іван Петренко",
+contactInfo: "+380501112233",
+
     photo: "",
   },
   {
@@ -360,6 +402,9 @@ const PRESETS = [
     radioKm: 1,
     starlink: "+",
     lte: "-",
+    contactName: "Іван Петренко",
+contactInfo: "+380501112233",
+
     photo: ""
   },
   {
@@ -382,6 +427,9 @@ const PRESETS = [
     radioKm: 1,
     starlink: "-",
     lte: "-",
+    contactName: "Іван Петренко",
+contactInfo: "+380501112233",
+
     photo: ""
   },
   {
@@ -404,6 +452,9 @@ const PRESETS = [
     radioKm: 1,
     starlink: "-",
     lte: "-",
+    contactName: "Іван Петренко",
+contactInfo: "+380501112233",
+
     photo: ""
   },
   {
@@ -426,6 +477,9 @@ const PRESETS = [
     radioKm: null,     // у таблиці "-"
     starlink: "+",
     lte: "+",
+    contactName: "Іван Петренко",
+contactInfo: "+380501112233",
+
     photo: ""
   },
   {
@@ -448,6 +502,9 @@ const PRESETS = [
     radioKm: 1,
     starlink: "-",
     lte: "-",
+    contactName: "Іван Петренко",
+contactInfo: "+380501112233",
+
     photo: ""
   },
   {
@@ -470,6 +527,9 @@ const PRESETS = [
     radioKm: 1,
     starlink: "+",
     lte: "-",
+    contactName: "Іван Петренко",
+contactInfo: "+380501112233",
+
     photo: ""
   },
   {
@@ -492,6 +552,9 @@ const PRESETS = [
     radioKm: 1,
     starlink: "+",
     lte: "-",
+    contactName: "Іван Петренко",
+contactInfo: "+380501112233",
+
     photo: ""
   },
   {
@@ -514,6 +577,9 @@ const PRESETS = [
     radioKm: 1.5,
     starlink: "+",
     lte: "-",
+    contactName: "Іван Петренко",
+contactInfo: "+380501112233",
+
     photo: ""
   },
   {
@@ -536,6 +602,9 @@ const PRESETS = [
     radioKm: 0.1,
     starlink: "+",
     lte: "-",
+    contactName: "Іван Петренко",
+contactInfo: "+380501112233",
+
     photo: ""
   },
   {
@@ -558,6 +627,9 @@ const PRESETS = [
     radioKm: 1,
     starlink: "+",
     lte: "-",
+    contactName: "Іван Петренко",
+contactInfo: "+380501112233",
+
     photo: ""
   },
   {
@@ -580,6 +652,9 @@ const PRESETS = [
     radioKm: 1,
     starlink: "-",
     lte: "-",
+    contactName: "Іван Петренко",
+contactInfo: "+380501112233",
+
     photo: ""
   },
   {
@@ -602,6 +677,9 @@ const PRESETS = [
     radioKm: 0.5,
     starlink: "-",
     lte: "-",
+    contactName: "Іван Петренко",
+contactInfo: "+380501112233",
+
     photo: ""
   },
   {
@@ -624,6 +702,8 @@ const PRESETS = [
     radioKm: 1.1,
     starlink: "+",
     lte: "+",
+    contactName: "Іван Петренко",
+contactInfo: "+380501112233",
     photo: ""
   },
   {
@@ -646,6 +726,9 @@ const PRESETS = [
     radioKm: 13,
     starlink: "+",
     lte: "-",
+    contactName: "Іван Петренко",
+contactInfo: "+380501112233",
+
     photo: ""
   },
   {
@@ -668,6 +751,8 @@ const PRESETS = [
     radioKm: 1,
     starlink: "+",
     lte: "+",
+    contactName: "Іван Петренко",
+contactInfo: "+380501112233",
     photo: ""
   },
   {
@@ -690,6 +775,8 @@ const PRESETS = [
     radioKm: 0.6,
     starlink: "+",
     lte: "+",
+    contactName: "Іван Петренко",
+contactInfo: "+380501112233",
     photo: ""
   },
   {
@@ -712,6 +799,8 @@ const PRESETS = [
     radioKm: 0.15,
     starlink: "+",
     lte: "-",
+    contactName: "Іван Петренко",
+contactInfo: "+380501112233",
     photo: ""
   },
   {
@@ -734,6 +823,8 @@ const PRESETS = [
     radioKm: 0.6,
     starlink: "+",
     lte: "+",
+    contactName: "Іван Петренко",
+contactInfo: "+380501112233",
     photo: ""
   },
 
@@ -762,6 +853,9 @@ const PRESETS = [
     radioKm: 0.7,
     starlink: "+",
     lte: "-",
+    contactName: "Іван Петренко",
+contactInfo: "+380501112233",
+
     photo: ""
   },
   {
@@ -784,6 +878,9 @@ const PRESETS = [
     radioKm: 0.7,
     starlink: "+",
     lte: "+",
+    contactName: "Іван Петренко",
+contactInfo: "+380501112233",
+
     photo: ""
   },
   {
@@ -806,6 +903,9 @@ const PRESETS = [
     radioKm: 1,
     starlink: "+",
     lte: "-",
+    contactName: "Іван Петренко",
+contactInfo: "+380501112233",
+
     photo: ""
   },
   {
@@ -828,6 +928,9 @@ const PRESETS = [
     radioKm: 0.3,
     starlink: "-",
     lte: "-",
+    contactName: "Іван Петренко",
+contactInfo: "+380501112233",
+
     photo: ""
   },
   {
@@ -850,6 +953,9 @@ const PRESETS = [
     radioKm: 1.5,
     starlink: "+",
     lte: "-",
+    contactName: "Іван Петренко",
+contactInfo: "+380501112233",
+
     photo: ""
   },
   {
@@ -872,6 +978,9 @@ const PRESETS = [
     radioKm: 1,
     starlink: "+",
     lte: "+",
+    contactName: "Іван Петренко",
+contactInfo: "+380501112233",
+
     photo: ""
   },
   {
@@ -894,6 +1003,9 @@ const PRESETS = [
     radioKm: 1,
     starlink: "+",
     lte: "-",
+    contactName: "Іван Петренко",
+contactInfo: "+380501112233",
+
     photo: ""
   },
   {
@@ -916,6 +1028,9 @@ const PRESETS = [
     radioKm: 1,
     starlink: "+",
     lte: "+",
+    contactName: "Іван Петренко",
+contactInfo: "+380501112233",
+
     photo: ""
   },
   {
@@ -938,6 +1053,9 @@ const PRESETS = [
     radioKm: 1,
     starlink: "+",
     lte: "+",
+    contactName: "Іван Петренко",
+contactInfo: "+380501112233",
+
     photo: ""
   },
   {
@@ -960,6 +1078,9 @@ const PRESETS = [
     radioKm: 0.8,
     starlink: "+",
     lte: "-",
+    contactName: "Іван Петренко",
+contactInfo: "+380501112233",
+
     photo: ""
   },
   {
@@ -982,6 +1103,9 @@ const PRESETS = [
     radioKm: 1.5,
     starlink: "-",
     lte: "-",
+    contactName: "Іван Петренко",
+contactInfo: "+380501112233",
+
     photo: ""
   },
   {
@@ -1004,6 +1128,9 @@ const PRESETS = [
     radioKm: 0.5,
     starlink: "-",
     lte: "-",
+    contactName: "Іван Петренко",
+contactInfo: "+380501112233",
+
     photo: ""
   },
   {
@@ -1026,6 +1153,9 @@ const PRESETS = [
     radioKm: 0.45,
     starlink: "+",
     lte: "-",
+    contactName: "Іван Петренко",
+contactInfo: "+380501112233",
+
     photo: ""
   },
   {
@@ -1048,6 +1178,9 @@ const PRESETS = [
     radioKm: 0.4,
     starlink: "-",
     lte: "-",
+    contactName: "Іван Петренко",
+contactInfo: "+380501112233",
+
     photo: ""
   },
   {
@@ -1070,6 +1203,9 @@ const PRESETS = [
     radioKm: 0.5,
     starlink: "+",
     lte: "+",
+    contactName: "Іван Петренко",
+contactInfo: "+380501112233",
+
     photo: ""
   },
   {
@@ -1092,6 +1228,9 @@ const PRESETS = [
     radioKm: 1,
     starlink: "-",
     lte: "-",
+    contactName: "Іван Петренко",
+contactInfo: "+380501112233",
+
     photo: ""
   },
 
@@ -1120,6 +1259,9 @@ const PRESETS = [
     radioKm: 0.7,
     starlink: "-",
     lte: "-",
+    contactName: "Іван Петренко",
+contactInfo: "+380501112233",
+
     photo: ""
   },
   // ===============================
@@ -1662,6 +1804,7 @@ const PRESETS = [
 
 ];
 
+
 /* ---------- КРИТЕРІЇ (поки як було; розширимо у твоєму наступному кроці) ---------- */
 const CRITERIA = [
   {
@@ -1838,6 +1981,12 @@ const checklistItems = [
 function $(id) {
   return document.getElementById(id);
 }
+function setContactsVisible(visible) {
+  const block = $("contactBlock");
+  if (!block) return;
+  block.classList.toggle("hide", !visible);
+}
+
 function esc(s) {
   return String(s ?? "")
     .replaceAll("&", "&amp;")
@@ -1972,11 +2121,7 @@ function applyPresetByKey(key) {
   setVal("mass", p.mass);
   setVal("dims", p.dims);
 
-  // ТУТ ВАЖЛИВО: КЛІРЕНС / КУТ ПІДЙОМУ / КУТ КРЕНУ
-  // Ми ставимо чітко:
-  // clearance -> кліренс (мм)
-  // climb     -> кут підйому (°)
-  // tilt      -> кут крену (°)
+  // ТТХ
   setVal("payloadNom", p.payload);
   setVal("maxSpeed", p.maxSpeed);
   setVal("rangeRoad", p.rangeRoad);
@@ -1992,6 +2137,9 @@ function applyPresetByKey(key) {
   setSelect("starlink", p.starlink ?? "-");
   setSelect("lte", p.lte ?? "-");
 
+  // ✅ КОНТАКТИ — ТІЛЬКИ В БЛОЦІ "Модель/Виробник" (photoMeta)
+  updateContactUI(p);
+
   // фото + підписи
   setPhoto(p);
   if ($("photoModel")) $("photoModel").textContent = p.model;
@@ -1999,6 +2147,68 @@ function applyPresetByKey(key) {
 
   renderKPI();
 }
+
+
+function updateContactUI(p) {
+  const nameEl = $("photoContact");
+  const linkEl = $("contactLink");
+  const btnCopy = $("copyContactBtn");
+
+  const name = String(p?.contactName ?? "").trim();
+  const info = String(p?.contactInfo ?? "").trim();
+
+  // Контакт (ПІБ)
+  if (nameEl) nameEl.textContent = name || "—";
+
+  // Телефон/контактний канал
+  if (!linkEl || !btnCopy) return;
+
+  if (!info) {
+    linkEl.textContent = "—";
+    linkEl.href = "#";
+    linkEl.onclick = (e) => e.preventDefault();
+    btnCopy.style.display = "none";
+    return;
+  }
+
+  btnCopy.style.display = "inline-block";
+  linkEl.textContent = info;
+
+  const phone = info.match(/\+?\d[\d\s().-]{8,}\d/g)?.[0]?.replace(/[^\d+]/g, "");
+  const email = info.match(/[^\s]+@[^\s]+\.[^\s]+/)?.[0];
+
+  if (phone && phone.replace(/\D/g, "").length >= 10) {
+    linkEl.href = "tel:" + phone;
+    linkEl.onclick = null;
+  } else if (email) {
+    linkEl.href = "mailto:" + email;
+    linkEl.onclick = null;
+  } else {
+    linkEl.href = "#";
+    linkEl.onclick = async (e) => {
+      e.preventDefault();
+      try {
+        await navigator.clipboard.writeText(info);
+        alert("Скопійовано в буфер");
+      } catch {
+        alert("Не вдалось скопіювати");
+      }
+    };
+  }
+
+  btnCopy.onclick = async () => {
+    try {
+      await navigator.clipboard.writeText(info);
+      alert("Скопійовано в буфер");
+    } catch {
+      alert("Не вдалось скопіювати");
+    }
+  };
+}
+
+
+
+
 
 /* =========================================================
    AUTOCOMPLETE (typeahead) — підказки під полем
@@ -2593,7 +2803,37 @@ function init() {
   wireAutocomplete();
     initCompare();   // <-- ОЦЕ ДОДАЙ
   // стартовий KPI
+  
   renderKPI();
+  wireCopyButton();
 }
 
 document.addEventListener("DOMContentLoaded", init);
+function wireCopyButton() {
+  const copyBtn = $("copyContactBtn");
+  const link = $("contactLink");
+
+  if (!copyBtn || !link) return;
+
+  const icon = copyBtn.querySelector("i");
+  if (!icon) return;
+
+  copyBtn.addEventListener("click", () => {
+    const text = link.textContent.trim();
+    if (!text || text === "—") return;
+
+    navigator.clipboard.writeText(text).then(() => {
+
+      // змінюємо іконку
+      icon.classList.remove("fa-copy");
+      icon.classList.add("fa-check");
+
+      setTimeout(() => {
+        icon.classList.remove("fa-check");
+        icon.classList.add("fa-copy");
+      }, 1200);
+
+    });
+  });
+}
+
