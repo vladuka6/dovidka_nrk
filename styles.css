@@ -64,9 +64,16 @@ button.danger{background:rgba(255,92,122,.18);border:1px solid rgba(255,92,122,.
 
 /* sticky блок вибору моделі */
 .stickyBox{
-  position:sticky; top:78px; /* під шапкою */
-  padding-bottom:10px;
+  position: sticky;
+  top: 78px;                 /* під шапкою */
+  z-index: 80;               /* ВАЖЛИВО: вище контенту */
+  background: rgba(17,27,46,.98); /* ВАЖЛИВО: щоб перекривав */
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 10px;
+  backdrop-filter: blur(10px);
 }
+
 
 /* форма в 2 колонки */
 .formGrid{
@@ -203,4 +210,15 @@ td.highlight-best{
   border-radius: 14px;
   padding: 10px;
   backdrop-filter: blur(10px);
+}
+/* верхній закріплений блок у вкладці "Довідник" */
+.stickyTop{
+  position: sticky;
+  top: 62px;              /* висота твого header з вкладками (підбери) */
+  z-index: 60;            /* вище за контент */
+  background: rgba(17,27,46,.98);  /* НЕ прозорий */
+  backdrop-filter: blur(10px);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 10px;
 }
