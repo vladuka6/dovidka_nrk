@@ -605,21 +605,33 @@ function renderKPI() {
 ========================================================= */
 function setPhoto(preset) {
   const img = $("nrkPhoto");
-  const txt = $("nrkPhotoText");
-  if (!img || !txt) return;
+  const no = $("noPhoto"); // ✅ під твій HTML
+  if (!img || !no) return;
 
-  const url = preset?.photo || "";
+  const url = (preset?.photo || "").trim();
+
+  // reset handlers
+  img.onerror = null;
+
   if (url) {
     img.src = url;
-    img.classList.remove("hide");
-    txt.classList.add("hide");
+    img.style.display = "block";
+    no.style.display = "none";
+
+    // якщо файл не знайдено — показати "Фото"
+    img.onerror = () => {
+      img.removeAttribute("src");
+      img.style.display = "none";
+      no.style.display = "flex";
+    };
   } else {
-    img.src = "";
-    img.classList.add("hide");
-    txt.classList.remove("hide");
-    txt.textContent = "Фото";
+    img.removeAttribute("src");
+    img.style.display = "none";
+    no.style.display = "flex";
+    no.textContent = "Фото";
   }
 }
+
 
 /* =========================================================
    АВТОЗАПОВНЕННЯ ПОЛІВ (ДОВІДНИК)
