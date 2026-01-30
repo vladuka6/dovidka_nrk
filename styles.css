@@ -301,3 +301,42 @@ td.highlight-best{
   background:rgba(77,163,255,.25);
   transform:translateY(-1px);
 }
+/* === MOBILE: фото зліва, мета справа === */
+@media (max-width: 980px){
+
+  .photoBox{
+    display: flex;
+    flex-wrap: nowrap;        /* НЕ переносити вниз */
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .photoFrame{
+    width: 46% !important;    /* замість 100% */
+    max-width: 260px;
+    flex: 0 0 auto;
+  }
+
+  .photoMeta{
+    flex: 1 1 auto;
+    min-width: 0;             /* важливо, щоб текст не ламав layout */
+  }
+
+  /* щоб довгі телефони/email не розривали колонку */
+  .photoMeta .pill,
+  #contactLink{
+    word-break: break-word;
+    overflow-wrap: anywhere;
+  }
+}
+
+/* === VERY SMALL: якщо екран зовсім вузький — тоді можна вниз === */
+@media (max-width: 420px){
+  .photoBox{
+    flex-wrap: wrap;          /* тут вже дозволяємо перенос */
+  }
+  .photoFrame{
+    width: 100% !important;
+    max-width: 100%;
+  }
+}
