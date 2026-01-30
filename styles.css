@@ -46,7 +46,7 @@ button.danger{background:rgba(255,92,122,.18);border:1px solid rgba(255,92,122,.
 .hide{display:none}
 
 /* KPI зверху */
-.kpiTop{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px}
+.kpiTop{display:flex;gap:5px;flex-wrap:wrap;margin-top:0px}
 
 /* Фото */
 .photoBox{display:flex;gap:12px;align-items:flex-start;flex-wrap:wrap}
