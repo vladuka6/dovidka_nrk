@@ -2630,11 +2630,11 @@ function renderCriteria() {
           id="s_${esc(c.id)}"
           type="text"
           inputmode="numeric"
-          pattern="[0-5]"
           maxlength="1"
           placeholder="0..5"
           aria-label="Оцінка ${esc(c.name)}"
         />
+        <div class="fieldError hide" id="e_${esc(c.id)}">Дозволено лише 0–5</div>
 
         <label>Коментар / зауваження</label>
         <textarea id="c_${esc(c.id)}" placeholder="Що не підтверджено, що потрібно доопрацювати..."></textarea>
@@ -2648,64 +2648,75 @@ function renderCriteria() {
     btn.addEventListener("click", (e) => openHelp(e.currentTarget.dataset.help));
   });
 
-  // ✅ жорстка валідація 0..5 + перерахунок
+  // ✅ жорстка валідація 0..5 (помилка, а не clamp)
   CRITERIA.forEach((c) => {
     const el = $("s_" + c.id);
+    const err = $("e_" + c.id);
     if (!el) return;
 
-    const normalize = () => {
-      let s = String(el.value ?? "");
+    let prev = ""; // попереднє коректне значення
 
-      // лишаємо тільки цифри
-      s = s.replace(/[^\d]/g, "");
+    const showErr = (on) => {
+      if (!err) return;
+      err.classList.toggle("hide", !on);
+    };
 
-      // дозволяємо або порожнє, або 1 цифру
-      if (!s) {
-        el.value = "";
-        return;
-      }
+    const validate = (raw) => {
+      // залишаємо тільки цифри
+      const digits = String(raw ?? "").replace(/[^\d]/g, "");
+      if (!digits) return { ok: true, value: "" }; // пусто дозволено (але потім перевіримо “повністю заповнено”)
+      const ch = digits[0]; // одна цифра
+      const n = Number(ch);
 
-      // якщо вставили/набрали "78" -> беремо першу цифру
-      s = s[0];
+      if (!Number.isFinite(n)) return { ok: false, value: "" };
+      if (n < 0 || n > 5) return { ok: false, value: "" };
 
-      let n = Number(s);
-      if (!Number.isFinite(n)) {
-        el.value = "";
-        return;
-      }
-
-      // clamp 0..5
-      if (n < 0) n = 0;
-      if (n > 5) n = 5;
-
-      el.value = String(n);
+      return { ok: true, value: String(n) };
     };
 
     el.addEventListener("input", () => {
-      normalize();
-      calcFinal(false);
+      const { ok, value } = validate(el.value);
+
+      if (!ok) {
+        // повертаємо попереднє валідне значення + показуємо помилку
+        el.value = prev;
+        showErr(true);
+        // щоб помилку було видно навіть якщо значення не змінилось
+        el.classList.add("invalid");
+        setTimeout(() => el.classList.remove("invalid"), 250);
+      } else {
+        el.value = value;
+        prev = value;
+        showErr(false);
+        calcFinal(false);
+      }
     });
 
     el.addEventListener("blur", () => {
-      normalize();
-      calcFinal(false);
+      // прибираємо помилку якщо поле порожнє або валідне
+      const { ok } = validate(el.value);
+      showErr(!ok);
+      if (ok) calcFinal(false);
     });
 
-    // блокуємо paste довгих значень
     el.addEventListener("paste", (e) => {
       e.preventDefault();
       const txt = (e.clipboardData?.getData("text") || "").trim();
-      const d = txt.replace(/[^\d]/g, "");
-      if (!d) {
-        el.value = "";
-      } else {
-        const n = Math.min(5, Math.max(0, Number(d[0])));
-        el.value = String(n);
+      const { ok, value } = validate(txt);
+      if (!ok) {
+        showErr(true);
+        el.classList.add("invalid");
+        setTimeout(() => el.classList.remove("invalid"), 250);
+        return;
       }
+      el.value = value;
+      prev = value;
+      showErr(false);
       calcFinal(false);
     });
   });
 }
+
 
 
 function openHelp(id) {

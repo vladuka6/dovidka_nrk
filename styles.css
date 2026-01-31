@@ -334,4 +334,7 @@ td.highlight-best{
     flex: 0 0 100%;
   }
 }
+.fieldError { margin-top:6px; font-size:12px; color:#ff6b6b; }
+.hide { display:none; }
+.invalid { outline: 2px solid #ff6b6b; }
 
