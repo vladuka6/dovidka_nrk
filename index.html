@@ -221,10 +221,24 @@
       <p class="small">Постав бали та додай зауваження. Натисни “Довідка” біля критерію — там опис як ставити 0/3/5 і що питати.</p>
       <div id="criteriaList"></div>
       <div class="btnrow">
+  <button class="primary" id="calcBtn">Порахувати</button>
+  <button class="primary" id="generateConclusionBtn">Сформувати висновок</button>
+
+  <!-- ✅ Замість localStorage: скачати звіт -->
+  <button class="ghost" id="downloadReportHtmlBtn" type="button" title="Скачати звіт HTML">
+    <i class="fa-solid fa-file-lines"></i> Звіт (HTML)
+  </button>
+
+  <button class="ghost" id="downloadReportTxtBtn" type="button" title="Скачати звіт TXT">
+    <i class="fa-solid fa-file-arrow-down"></i> Звіт (TXT)
+  </button>
+</div>
+
+      <!-- <div class="btnrow">
         <button class="primary" id="calcBtn">Порахувати</button>
         <button class="primary" id="generateConclusionBtn">Сформувати висновок</button>
         <button class="ghost" id="saveScoreBtn">Зберегти оцінку</button>
-      </div>
+      </div> -->
       <div class="divider"></div>
       <div id="validationBox" class="small err"></div>
     </div>

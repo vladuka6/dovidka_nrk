@@ -2626,7 +2626,15 @@ function renderCriteria() {
         </div>
 
         <label>Оцінка 0–5</label>
-        <input id="s_${esc(c.id)}" type="number" min="0" max="5" placeholder="0..5"/>
+        <input
+          id="s_${esc(c.id)}"
+          type="text"
+          inputmode="numeric"
+          pattern="[0-5]"
+          maxlength="1"
+          placeholder="0..5"
+          aria-label="Оцінка ${esc(c.name)}"
+        />
 
         <label>Коментар / зауваження</label>
         <textarea id="c_${esc(c.id)}" placeholder="Що не підтверджено, що потрібно доопрацювати..."></textarea>
@@ -2635,15 +2643,70 @@ function renderCriteria() {
     );
   });
 
+  // довідка
   document.querySelectorAll("[data-help]").forEach((btn) => {
     btn.addEventListener("click", (e) => openHelp(e.currentTarget.dataset.help));
   });
 
+  // ✅ жорстка валідація 0..5 + перерахунок
   CRITERIA.forEach((c) => {
     const el = $("s_" + c.id);
-    if (el) el.addEventListener("input", () => calcFinal(false));
+    if (!el) return;
+
+    const normalize = () => {
+      let s = String(el.value ?? "");
+
+      // лишаємо тільки цифри
+      s = s.replace(/[^\d]/g, "");
+
+      // дозволяємо або порожнє, або 1 цифру
+      if (!s) {
+        el.value = "";
+        return;
+      }
+
+      // якщо вставили/набрали "78" -> беремо першу цифру
+      s = s[0];
+
+      let n = Number(s);
+      if (!Number.isFinite(n)) {
+        el.value = "";
+        return;
+      }
+
+      // clamp 0..5
+      if (n < 0) n = 0;
+      if (n > 5) n = 5;
+
+      el.value = String(n);
+    };
+
+    el.addEventListener("input", () => {
+      normalize();
+      calcFinal(false);
+    });
+
+    el.addEventListener("blur", () => {
+      normalize();
+      calcFinal(false);
+    });
+
+    // блокуємо paste довгих значень
+    el.addEventListener("paste", (e) => {
+      e.preventDefault();
+      const txt = (e.clipboardData?.getData("text") || "").trim();
+      const d = txt.replace(/[^\d]/g, "");
+      if (!d) {
+        el.value = "";
+      } else {
+        const n = Math.min(5, Math.max(0, Number(d[0])));
+        el.value = String(n);
+      }
+      calcFinal(false);
+    });
   });
 }
+
 
 function openHelp(id) {
   const c = CRITERIA.find((x) => x.id === id);
@@ -2695,6 +2758,22 @@ function validateScoring(sc) {
   });
   return errors;
 }
+function requireFullScoringOrThrow() {
+  const sc = collectScoring();
+  const errors = validateScoring(sc); // вже перевіряє null і 0..5
+
+  if (errors.length) {
+    const msg = "Не можна сформувати звіт. Заповніть оцінювання:\n\n" +
+      errors.map(e => e.replace(/^•\s*/, "• ")).join("\n");
+    alert(msg);
+    return false;
+  }
+
+  // додатково: якщо calcFinal ще не пораховано/не виведено — порахуємо
+  calcFinal(false);
+  return true;
+}
+
 function setSummary(score, decision, riskObj) {
   if ($("finalScore")) $("finalScore").textContent = score === null ? "—" : score.toFixed(2);
   if ($("finalDecision")) $("finalDecision").textContent = decision || "—";
@@ -2782,6 +2861,328 @@ function loadState() {
 function saveState(state) {
   localStorage.setItem(KEY, JSON.stringify(state));
 }
+function safeText(v) {
+  const s = (v ?? "").toString().trim();
+  return s ? s : "—";
+}
+
+function getVal(id) {
+  const el = document.getElementById(id);
+  return el ? el.value : "";
+}
+
+function getText(id) {
+  const el = document.getElementById(id);
+  return el ? el.textContent : "";
+}
+
+function todayStamp() {
+  const d = new Date();
+  const yyyy = d.getFullYear();
+  const mm = String(d.getMonth() + 1).padStart(2, "0");
+  const dd = String(d.getDate()).padStart(2, "0");
+  return `${yyyy}-${mm}-${dd}`;
+}
+
+function fileSafeName(s) {
+  return (s || "")
+    .toString()
+    .trim()
+    .replace(/[\\/:*?"<>|]+/g, "_")
+    .replace(/\s+/g, " ")
+    .slice(0, 80) || "report";
+}
+
+function downloadBlob(content, filename, mime) {
+  const blob = new Blob([content], { type: mime });
+  const url = URL.createObjectURL(blob);
+
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+
+  setTimeout(() => URL.revokeObjectURL(url), 3000);
+}
+
+/**
+ * Забирає з UI поточні дані.
+ * Якщо у тебе інша структура критеріїв — нижче є блок "criteriaDump"
+ * який максимально безболісно витягує все з #criteriaList.
+ */
+function collectCriteriaDump() {
+  const lines = [];
+
+  CRITERIA.forEach((c, idx) => {
+    const scoreEl = document.getElementById("s_" + c.id);
+    const commEl  = document.getElementById("c_" + c.id);
+
+    const score = scoreEl ? scoreEl.value.trim() : "";
+    const comm  = commEl ? commEl.value.trim() : "";
+
+    const isKey = KEY_CRITERIA.includes(c.id);
+
+    lines.push(`${idx + 1}. ${c.name}${isKey ? " (КЛЮЧОВИЙ)" : ""}`);
+    lines.push(`   Вага: ${(c.weight * 100).toFixed(0)}%`);
+    lines.push(`   Оцінка: ${score !== "" ? score : "—"}`);
+    lines.push(`   Коментар: ${comm !== "" ? comm : "—"}`);
+    lines.push(""); // пустий рядок між критеріями
+  });
+
+  return lines.join("\n").trim();
+}
+
+function collectReportData() {
+  const maker = safeText(getVal("maker"));
+  const model = safeText(getVal("model"));
+
+  const price = safeText(getVal("price"));
+  const power = safeText(getVal("power"));
+  const mass = safeText(getVal("mass"));
+  const dims = safeText(getVal("dims"));
+
+  const payload = safeText(getVal("payloadNom"));
+  const maxSpeed = safeText(getVal("maxSpeed"));
+  const rangeRoad = safeText(getVal("rangeRoad"));
+  const clearance = safeText(getVal("clearance"));
+  const climb = safeText(getVal("climb"));
+  const tilt = safeText(getVal("tilt"));
+
+  const optical = safeText(getVal("optical"));
+  const opticalIR = safeText(getVal("opticalIR"));
+  const thermal = safeText(getVal("thermal"));
+  const radioKm = safeText(getVal("radioKm"));
+  const starlink = safeText(getVal("starlink"));
+  const lte = safeText(getVal("lte"));
+
+  // контакти з фотоблоку (в тебе вони тільки там)
+  const contactName = safeText(getText("photoContact"));
+  const contactPhone = safeText(getText("contactLink"));
+
+  const notes = safeText(getVal("notes"));
+  const commissionNotes = safeText(getVal("commissionNotes"));
+
+  // результат оцінки
+  const finalScore = safeText(getText("finalScore"));
+  const finalDecision = safeText(getText("finalDecision"));
+  const riskText = safeText(getText("riskText"));
+  const minKey = safeText(getText("minKey"));
+
+  // KPI (з верхнього блоку)
+  const kpiTop = document.getElementById("kpiTop");
+  const kpiText = kpiTop ? kpiTop.innerText.trim() : "";
+
+  const criteriaDump = collectCriteriaDump();
+
+
+  return {
+    maker, model,
+    contactName, contactPhone,
+    price, power, mass, dims,
+    payload, maxSpeed, rangeRoad, clearance, climb, tilt,
+    optical, opticalIR, thermal, radioKm, starlink, lte,
+    notes,
+    finalScore, finalDecision, riskText, minKey,
+    commissionNotes,
+    kpiText,
+    criteriaDump
+  };
+}
+
+function buildTxtReport(d) {
+  const lines = [];
+  lines.push(`ЗВІТ ОЦІНЮВАННЯ НРК`);
+  lines.push(`Дата: ${todayStamp()}`);
+  lines.push(``);
+
+  lines.push(`1) Ідентифікація`);
+  lines.push(`Модель: ${d.model}`);
+  lines.push(`Виробник: ${d.maker}`);
+  lines.push(`Контакт: ${d.contactName}`);
+  lines.push(`Телефон: ${d.contactPhone}`);
+  lines.push(``);
+
+  lines.push(`2) Основні характеристики`);
+  lines.push(`Ціна, грн: ${d.price}`);
+  lines.push(`Силова установка: ${d.power}`);
+  lines.push(`Маса, кг: ${d.mass}`);
+  lines.push(`Розміри: ${d.dims}`);
+  lines.push(`Корисне навантаження, кг: ${d.payload}`);
+  lines.push(`Макс швидкість, км/год: ${d.maxSpeed}`);
+  lines.push(`Запас ходу, км: ${d.rangeRoad}`);
+  lines.push(`Кліренс, мм: ${d.clearance}`);
+  lines.push(`Кут підйому, °: ${d.climb}`);
+  lines.push(`Кут крену, °: ${d.tilt}`);
+  lines.push(``);
+
+  lines.push(`3) Сенсори / зв’язок`);
+  lines.push(`Оптична: ${d.optical}`);
+  lines.push(`Оптична з ІЧ: ${d.opticalIR}`);
+  lines.push(`Тепловізійна: ${d.thermal}`);
+  lines.push(`Радіо, км: ${d.radioKm}`);
+  lines.push(`Starlink: ${d.starlink}`);
+  lines.push(`LTE: ${d.lte}`);
+  lines.push(``);
+
+  if (d.kpiText) {
+    lines.push(`4) KPI`);
+    lines.push(d.kpiText);
+    lines.push(``);
+  }
+
+  lines.push(`5) Результат оцінки`);
+  lines.push(`Бал: ${d.finalScore}`);
+  lines.push(`Рішення: ${d.finalDecision}`);
+  lines.push(`Світлофор: ${d.riskText}`);
+  lines.push(`Мін. ключовий: ${d.minKey}`);
+  lines.push(``);
+
+  lines.push(`6) Коментарі`);
+  lines.push(`Примітки (довідник): ${d.notes}`);
+  lines.push(`Загальні зауваження комісії: ${d.commissionNotes}`);
+  lines.push(``);
+
+  if (d.criteriaDump) {
+    lines.push(`7) Деталізація критеріїв (з форми)`);
+    lines.push(d.criteriaDump);
+    lines.push(``);
+  }
+
+  return lines.join("\n");
+}
+
+function escapeHtml(s) {
+  return (s || "").toString()
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;");
+}
+
+function buildHtmlReport(d) {
+  const title = `Звіт оцінювання НРК — ${d.model}`;
+  const css = `
+    body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif; margin:24px; color:#111}
+    h1{margin:0 0 8px}
+    .muted{color:#555}
+    .box{border:1px solid #ddd;border-radius:12px;padding:14px;margin:12px 0}
+    .grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+    .row{display:flex;justify-content:space-between;gap:12px;padding:6px 0;border-bottom:1px dashed #eee}
+    .row:last-child{border-bottom:none}
+    .kpi{white-space:pre-wrap}
+    pre{white-space:pre-wrap;background:#fafafa;border:1px solid #eee;border-radius:12px;padding:12px}
+  `;
+
+  return `<!doctype html>
+<html lang="uk">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>${escapeHtml(title)}</title>
+<style>${css}</style>
+</head>
+<body>
+  <h1>${escapeHtml(title)}</h1>
+  <div class="muted">Дата: ${escapeHtml(todayStamp())}</div>
+
+  <div class="box">
+    <h2>1) Ідентифікація</h2>
+    <div class="grid">
+      <div class="row"><b>Модель</b><span>${escapeHtml(d.model)}</span></div>
+      <div class="row"><b>Виробник</b><span>${escapeHtml(d.maker)}</span></div>
+      <div class="row"><b>Контакт</b><span>${escapeHtml(d.contactName)}</span></div>
+      <div class="row"><b>Телефон</b><span>${escapeHtml(d.contactPhone)}</span></div>
+    </div>
+  </div>
+
+  <div class="box">
+    <h2>2) Основні характеристики</h2>
+    <div class="grid">
+      <div class="row"><b>Ціна, грн</b><span>${escapeHtml(d.price)}</span></div>
+      <div class="row"><b>Силова установка</b><span>${escapeHtml(d.power)}</span></div>
+      <div class="row"><b>Маса, кг</b><span>${escapeHtml(d.mass)}</span></div>
+      <div class="row"><b>Розміри</b><span>${escapeHtml(d.dims)}</span></div>
+      <div class="row"><b>Корисне навантаження, кг</b><span>${escapeHtml(d.payload)}</span></div>
+      <div class="row"><b>Макс швидкість, км/год</b><span>${escapeHtml(d.maxSpeed)}</span></div>
+      <div class="row"><b>Запас ходу, км</b><span>${escapeHtml(d.rangeRoad)}</span></div>
+      <div class="row"><b>Кліренс, мм</b><span>${escapeHtml(d.clearance)}</span></div>
+      <div class="row"><b>Кут підйому, °</b><span>${escapeHtml(d.climb)}</span></div>
+      <div class="row"><b>Кут крену, °</b><span>${escapeHtml(d.tilt)}</span></div>
+    </div>
+  </div>
+
+  <div class="box">
+    <h2>3) Сенсори / зв’язок</h2>
+    <div class="grid">
+      <div class="row"><b>Оптична</b><span>${escapeHtml(d.optical)}</span></div>
+      <div class="row"><b>Оптична з ІЧ</b><span>${escapeHtml(d.opticalIR)}</span></div>
+      <div class="row"><b>Тепловізійна</b><span>${escapeHtml(d.thermal)}</span></div>
+      <div class="row"><b>Радіо, км</b><span>${escapeHtml(d.radioKm)}</span></div>
+      <div class="row"><b>Starlink</b><span>${escapeHtml(d.starlink)}</span></div>
+      <div class="row"><b>LTE</b><span>${escapeHtml(d.lte)}</span></div>
+    </div>
+  </div>
+
+  ${d.kpiText ? `
+  <div class="box">
+    <h2>4) KPI</h2>
+    <div class="kpi">${escapeHtml(d.kpiText)}</div>
+  </div>` : ""}
+
+  <div class="box">
+    <h2>5) Результат оцінки</h2>
+    <div class="grid">
+      <div class="row"><b>Бал</b><span>${escapeHtml(d.finalScore)}</span></div>
+      <div class="row"><b>Рішення</b><span>${escapeHtml(d.finalDecision)}</span></div>
+      <div class="row"><b>Світлофор</b><span>${escapeHtml(d.riskText)}</span></div>
+      <div class="row"><b>Мін. ключовий</b><span>${escapeHtml(d.minKey)}</span></div>
+    </div>
+  </div>
+
+  <div class="box">
+    <h2>6) Коментарі</h2>
+    <div class="row"><b>Примітки (довідник)</b><span>${escapeHtml(d.notes)}</span></div>
+    <div class="row"><b>Загальні зауваження комісії</b><span>${escapeHtml(d.commissionNotes)}</span></div>
+  </div>
+
+  ${d.criteriaDump ? `
+  <div class="box">
+    <h2>7) Деталізація критеріїв (з форми)</h2>
+    <pre>${escapeHtml(d.criteriaDump)}</pre>
+  </div>` : ""}
+
+</body>
+</html>`;
+}
+
+function wireReportButtons() {
+  const btnHtml = document.getElementById("downloadReportHtmlBtn");
+  const btnTxt = document.getElementById("downloadReportTxtBtn");
+
+  // якщо ти ще не вставив кнопки в HTML — просто вийдемо
+  if (!btnHtml && !btnTxt) return;
+
+  if (btnTxt) {
+    btnTxt.addEventListener("click", () => {
+      if (!requireFullScoringOrThrow()) return;
+      const d = collectReportData();
+      const fname = `${fileSafeName(d.model)}__${todayStamp()}__report.txt`;
+      downloadBlob(buildTxtReport(d), fname, "text/plain;charset=utf-8");
+    });
+  }
+
+  if (btnHtml) {
+    btnHtml.addEventListener("click", () => {
+      const d = collectReportData();
+      if (!requireFullScoringOrThrow()) return;
+      const fname = `${fileSafeName(d.model)}__${todayStamp()}__report.html`;
+      downloadBlob(buildHtmlReport(d), fname, "text/html;charset=utf-8");
+    });
+  }
+}
 
 /* =========================================================
    INIT
@@ -2803,7 +3204,7 @@ function init() {
   wireAutocomplete();
     initCompare();   // <-- ОЦЕ ДОДАЙ
   // стартовий KPI
-  
+  wireReportButtons();
   renderKPI();
   wireCopyButton();
 }
