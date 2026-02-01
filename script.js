@@ -1,14 +1,5 @@
-/* ===========================
-   NRK app (v2026) — app.js
-   Повністю оновлений JS під:
-   - Вкладка "Довідник" (замість "Паспорт")
-   - Автокомпліт пошуку (підказки під полем, без select)
-   - Автозаповнення полів характеристик + фото
-   - KPI зверху замість ID: грн/кг та грн/(кг·км)
-   - Підготовка під розширення Оцінки/Чек-листа
-   =========================== */
-
 const KEY = "nrk_app_v2026";
+
 
 /* ---------- ВАГИ / КЛЮЧОВІ ---------- */
 const WEIGHTS = {
@@ -1803,6 +1794,103 @@ contactInfo: "+380501112233",
 
 
 ];
+// ===============================
+// ПРИКЗ: ДОВІДНИК ЗАГОНІВ (поки цифрами)
+// ===============================
+const UNITS = [
+  { id: "1", name: "1 загін" },
+  { id: "2", name: "2 загін" },
+  { id: "3", name: "3 загін" },
+  { id: "4", name: "4 загін" },
+  { id: "5", name: "5 загін" },
+];
+
+// ===============================
+// ПРИКЗ: НАЯВНІСТЬ (приклад)
+// ключ: unitId -> { modelName: qty }
+// modelName має співпадати з PRESETS[].model
+// ===============================
+const INVENTORY = {
+  "1": {
+    'ТОВ "РІВА-СТАЛЬ"__D-21': 2,
+    'ТОВ "ВІКТОРІСОФТ"__ГУЛІВЕР К7': 1,
+    'ТОВ "GLOBAL DYNAMICS"__РИСЬ PRO': 1,
+    'ТОВ "ТЕНКОР"__ТЕРМІТ': 1,
+    'ТОВ "МАРКЕТ ЛОГІСТИКИ"__ТАРГАН 2К': 3,
+    'ТОВ "ІНДУСТРІАЛЬНЕ БЮРО"__BOAR TAC': 1,
+    'ГО "ROBOFORCE"__ГОЛЕМ': 1
+  },
+
+  "2": {
+    'ТОВ "РОВЕР-ТЕК"__ЗМІЙ ЛОГІСТИЧНИЙ': 1,
+    'ТОВ "ДОДЖЕР НРК"__DODGER': 2,
+    'ТОВ "МОРОЗ-ТЕХ"__БНК MOROZ-02L': 1,
+    'ТОВ "ДЖЕЙКЕЙ ЛЕНД ВІКЛЗ"__RATEL М': 1,
+    'ТОВ "КОТИГОРОШКО"__TOR 800': 1,
+    'ТОВ "КОТИГОРОШКО"__TOR 1000': 1,
+    'ТОВ "УКРАЇНСЬКІ БЕЗПІЛОТНІ ТЕХНОЛОГІЇ"__УМП-РАВЛИК-2': 1,
+    'ТОВ "УКРПРОТОТИП"__БУРЕВІЙ': 1
+  },
+
+  "3": {
+    'ТОВ КВП "СИНЕРГІЯ"__МИРОТВОРЕЦЬ': 1,
+    'ТОВ "УКРАЇНСЬКА БРОНЕТЕХНІКА"__PROTECTOR': 1,
+    'ТОВ "ДЖЕЙКЕЙ ЛЕНД ВІКЛЗ"__RATEL H': 1,
+    'ТОВ "РОБОТИЗОВАНІ КОМПЛЕКСИ"__МУРАХА': 1,
+    'ТОВ "РОБОТИЗОВАНІ СИСТЕМИ"__PIXEL': 2,
+    'ТОВ "СКОРТЕХ"__СПАЙДЕР-Л': 1,
+    'ТОВ "МАРКЕТ ЛОГІСТИКИ"__ТАРГАН 200': 1
+  },
+
+  "4": {
+    'ТОВ "МАРКЕТ ЛОГІСТИКИ"__ТАРГАН 1К': 3,
+    'ТОВ "КБ БУРЕВІЙ"__MANGAL': 1,
+    'ТОВ "СОКІЛСКАЙ"__ДРОНДРИН': 1,
+    'ТОВ "СУМИСПЕЦПОСТАВКА"__BRO-1409': 1,
+    'ТОВ "ГРІНТЕХ ХАРВЕСТ"__СІМБА': 1,
+    'ТОВ "ФАНТОМ ТЕХНОЛОДЖИ"__ТЕСЛЯ': 1,
+    'ТОВ "ЕЛЬФ СИСТЕМ"__ГІМЛІ-Е': 1,
+    'ТОВ "НОРД-ТРЕК"__CRAB-LS': 1,
+    'ТОВ "ТЕМЕРЛАНД"__ГНОМ-ЛОГІСТ': 1
+  },
+
+  "5": {
+    'ТОВ "ТРАЙДЕНТ ТЕК"__ПЛАСТУН': 1,
+    'ТОВ "КБ-АЙТІ-С.А.М.Р.С"__ДРАЙВЕР-М': 1,
+    'ТОВ "GLOBAL DYNAMICS"__РИСЬ': 1,
+    'ТОВ "РОБОТИЗОВАНІ СИСТЕМИ"__PONY': 1,
+    'ТОВ "РЕМТЕХНОЛОГІЯ"__ЛЕГІТ МОДЕЛЬ L1': 1,
+    'ТОВ "ІНДУСТРІАЛЬНЕ БЮРО"__FOXTAC': 1,
+    'ТОВ "ТЕРРА ТРАВЕРСЕ"__ВОЛЯ-Е': 1,
+    'ТОВ "АРГИРОПРАТ"__ЛЮТІК': 1,
+    'ТОВ "ФАЙРБОКС"__ТАНЧИК': 1,
+    'ТОВ "ПАРТНЕР-ВС"__КНЛР-Е': 1,
+    'ТОВ КБ "БУРЕВІЙ"__АРДАЛ 920': 1,
+    'ТОВ ТВП "РОСЬ-ГУМА"__ВОЖАК': 1,
+    'ТОВ "ТАНКОВЕ БЮРО МАМОНОВА"__NUMO': 1,
+    'ТОВ "РОБОВЕЙВ"__FOX 2.0': 2,
+    'ТОВ "КБ ВЕПРИК"__ВЕПРИК 6.1': 1,
+    'ТОВ "РОБОТ ЗАХИСНИК"__КОЗАК': 1,
+    'ТОВ "РЕМТЕХНОЛОГІЯ"__ЛЕГІТ МОДЕЛЬ S1': 1,
+    'ТОВ "РОВЕР-ТЕК"__ЗМІЙ': 1,
+    'ТОВ "ТЕНКОР"__ТЕРМІТ ПІД ТМ-62': 1,
+    'ТОВ "ДЖЕЙКЕЙ ЛЕНД ВІКЛЗ"__RATEL S': 1,
+    'ТОВ "СКОРТЕХ"__СПАЙДЕР-М': 1,
+    'ТОВ "ТЕМЕРЛАНД"__ГНОМ-МІНЕР (на пневмо-колесі)': 1,
+    'ТОВ "ТЕМЕРЛАНД"__ГНОМ-МІНЕР (на безповітряному колесі)': 1,
+    'ТОВ "ТЕМЕРЛАНД"__ГНОМ-М5': 1,
+    'ТОВ "ЕЛЬФ СИСТЕМ"__ГІМЛІ-Р(1)': 1,
+    'ТОВ "ЕЛЬФ СИСТЕМ"__ГІМЛІ-Р(2)': 1,
+    'ТОВ "ЕЛЬФ СИСТЕМ"__ГІМЛІ-РЗП': 1,
+    'ТОВ "ВІКТОРІСОФТ"__ГУЛІВЕР К10': 1,
+    'ТОВ "СКАЙ-ЛАБ ЮА"__SIRKO-S1': 1,
+    'ТОВ "СКАЙ-ЛАБ ЮА"__SIRKO-S1 MINER (ТМ-124)': 1,
+    'ТОВ "СКАЙ-ЛАБ ЮА"__SIRKO-S1 MINER (ПТМ-У)': 1,
+    'ТОВ "АСИМЕТРИКА"__SPEXTR K2': 1,
+    'ТОВ "МАРКЕТ ЛОГІСТИКИ"__ТАРГАН 1 С': 1
+  }
+};
+
 
 
 /* ---------- КРИТЕРІЇ (поки як було; розширимо у твоєму наступному кроці) ---------- */
@@ -2101,7 +2189,6 @@ function setPhoto(preset) {
   }
 }
 
-
 /* =========================================================
    АВТОЗАПОВНЕННЯ ПОЛІВ (ДОВІДНИК)
 ========================================================= */
@@ -2147,7 +2234,6 @@ function applyPresetByKey(key) {
 
   renderKPI();
 }
-
 
 function updateContactUI(p) {
   const nameEl = $("photoContact");
@@ -2205,10 +2291,6 @@ function updateContactUI(p) {
     }
   };
 }
-
-
-
-
 
 /* =========================================================
    AUTOCOMPLETE (typeahead) — підказки під полем
@@ -2630,11 +2712,10 @@ function renderCriteria() {
           id="s_${esc(c.id)}"
           type="text"
           inputmode="numeric"
-          maxlength="1"
           placeholder="0..5"
           aria-label="Оцінка ${esc(c.name)}"
         />
-        <div class="fieldError hide" id="e_${esc(c.id)}">Дозволено лише 0–5</div>
+        <div class="fieldError hide" id="e_${esc(c.id)}">Дозволено лише одну цифру 0–5</div>
 
         <label>Коментар / зауваження</label>
         <textarea id="c_${esc(c.id)}" placeholder="Що не підтверджено, що потрібно доопрацювати..."></textarea>
@@ -2648,76 +2729,47 @@ function renderCriteria() {
     btn.addEventListener("click", (e) => openHelp(e.currentTarget.dataset.help));
   });
 
-  // ✅ жорстка валідація 0..5 (помилка, а не clamp)
+  // ✅ Валідація БЕЗ clamp і БЕЗ відкату:
+  // - можна ввести будь-що, але якщо не "0..5" (одна цифра) -> показуємо помилку
+  // - calcFinal() рахує тільки коли все валідно (вона і так це робить)
   CRITERIA.forEach((c) => {
     const el = $("s_" + c.id);
     const err = $("e_" + c.id);
     if (!el) return;
 
-    let prev = ""; // попереднє коректне значення
-
-    const showErr = (on) => {
+    const setErr = (on) => {
       if (!err) return;
       err.classList.toggle("hide", !on);
     };
 
-    const validate = (raw) => {
-      // залишаємо тільки цифри
-      const digits = String(raw ?? "").replace(/[^\d]/g, "");
-      if (!digits) return { ok: true, value: "" }; // пусто дозволено (але потім перевіримо “повністю заповнено”)
-      const ch = digits[0]; // одна цифра
-      const n = Number(ch);
-
-      if (!Number.isFinite(n)) return { ok: false, value: "" };
-      if (n < 0 || n > 5) return { ok: false, value: "" };
-
-      return { ok: true, value: String(n) };
+    const isValidScoreText = (raw) => {
+      const s = String(raw ?? "").trim();
+      if (s === "") return false;          // порожнє = не заповнено
+      return /^[0-5]$/.test(s);            // тільки ОДНА цифра 0..5
     };
 
-    el.addEventListener("input", () => {
-      const { ok, value } = validate(el.value);
+    const validateAndRender = () => {
+      const ok = isValidScoreText(el.value);
+      setErr(!ok);
 
-      if (!ok) {
-        // повертаємо попереднє валідне значення + показуємо помилку
-        el.value = prev;
-        showErr(true);
-        // щоб помилку було видно навіть якщо значення не змінилось
-        el.classList.add("invalid");
-        setTimeout(() => el.classList.remove("invalid"), 250);
-      } else {
-        el.value = value;
-        prev = value;
-        showErr(false);
-        calcFinal(false);
-      }
-    });
+      // якщо все валідно — перерахувати підсумок
+      // якщо не валідно — calcFinal сам покаже помилки в validationBox при потребі
+      calcFinal(false);
+    };
 
-    el.addEventListener("blur", () => {
-      // прибираємо помилку якщо поле порожнє або валідне
-      const { ok } = validate(el.value);
-      showErr(!ok);
-      if (ok) calcFinal(false);
-    });
+    el.addEventListener("input", validateAndRender);
+    el.addEventListener("blur", validateAndRender);
 
     el.addEventListener("paste", (e) => {
+      // вставка типу "78" теж має бути помилкою
+      // але щоб не вставлялись пробіли/букви — беремо чистий текст
       e.preventDefault();
       const txt = (e.clipboardData?.getData("text") || "").trim();
-      const { ok, value } = validate(txt);
-      if (!ok) {
-        showErr(true);
-        el.classList.add("invalid");
-        setTimeout(() => el.classList.remove("invalid"), 250);
-        return;
-      }
-      el.value = value;
-      prev = value;
-      showErr(false);
-      calcFinal(false);
+      el.value = txt;
+      validateAndRender();
     });
   });
 }
-
-
 
 function openHelp(id) {
   const c = CRITERIA.find((x) => x.id === id);
@@ -2755,20 +2807,25 @@ function wireHelpModal() {
 function collectScoring() {
   const s = {};
   CRITERIA.forEach((c) => {
-    const v = $("s_" + c.id)?.value;
-    s[c.id] = v === "" ? null : Number(v);
+    const raw = ($("s_" + c.id)?.value ?? "").trim();
+
+    // тільки одна цифра 0..5
+    if (/^[0-5]$/.test(raw)) s[c.id] = Number(raw);
+    else s[c.id] = null; // і порожнє, і 8, і 78, і "a" = null
   });
   return s;
 }
+
 function validateScoring(sc) {
   const errors = [];
   CRITERIA.forEach((c) => {
     const v = sc[c.id];
-    if (v === null || Number.isNaN(v)) errors.push(`• ${c.name} — не заповнено`);
+    if (v === null) errors.push(`• ${c.name} — введіть одну цифру 0–5`);
     else if (v < 0 || v > 5) errors.push(`• ${c.name} — значення поза діапазоном 0–5`);
   });
   return errors;
 }
+
 function requireFullScoringOrThrow() {
   const sc = collectScoring();
   const errors = validateScoring(sc); // вже перевіряє null і 0..5
@@ -2887,13 +2944,22 @@ function getText(id) {
   return el ? el.textContent : "";
 }
 
-function todayStamp() {
+function todayStampUA() {
   const d = new Date();
-  const yyyy = d.getFullYear();
-  const mm = String(d.getMonth() + 1).padStart(2, "0");
   const dd = String(d.getDate()).padStart(2, "0");
-  return `${yyyy}-${mm}-${dd}`;
+  const mm = String(d.getMonth() + 1).padStart(2, "0");
+  const yy = String(d.getFullYear()).slice(-2);
+  return `${dd}.${mm}.${yy}`;
 }
+
+function centerLine(text, width = 70) {
+  const s = String(text ?? "").trim();
+  if (!s) return "";
+  if (s.length >= width) return s;
+  const left = Math.floor((width - s.length) / 2);
+  return " ".repeat(left) + s;
+}
+
 
 function fileSafeName(s) {
   return (s || "")
@@ -2926,20 +2992,17 @@ function downloadBlob(content, filename, mime) {
 function collectCriteriaDump() {
   const lines = [];
 
-  CRITERIA.forEach((c, idx) => {
+  CRITERIA.forEach((c) => {
     const scoreEl = document.getElementById("s_" + c.id);
     const commEl  = document.getElementById("c_" + c.id);
 
-    const score = scoreEl ? scoreEl.value.trim() : "";
-    const comm  = commEl ? commEl.value.trim() : "";
+    const rawScore = (scoreEl ? scoreEl.value : "").trim();
+    const score = /^[0-5]$/.test(rawScore) ? rawScore : "—";
 
-    const isKey = KEY_CRITERIA.includes(c.id);
+    const comm = (commEl ? commEl.value : "").trim();
 
-    lines.push(`${idx + 1}. ${c.name}${isKey ? " (КЛЮЧОВИЙ)" : ""}`);
-    lines.push(`   Вага: ${(c.weight * 100).toFixed(0)}%`);
-    lines.push(`   Оцінка: ${score !== "" ? score : "—"}`);
-    lines.push(`   Коментар: ${comm !== "" ? comm : "—"}`);
-    lines.push(""); // пустий рядок між критеріями
+    // формат: Навантаження(5):все чудово
+    lines.push(`${c.name}(${score}):${comm ? comm : "—"}`);
   });
 
   return lines.join("\n").trim();
@@ -3001,21 +3064,158 @@ function collectReportData() {
     criteriaDump
   };
 }
+function toggleHowCalcInline(forceOpen = null) {
+  const box = $("howCalcInline");
+  if (!box) return;
+
+  const willOpen = forceOpen === null ? box.classList.contains("hide") : !!forceOpen;
+
+  // якщо відкриваємо — будуємо HTML один раз / або перебудовуємо (зручно, якщо ваги зміняться)
+  if (willOpen) {
+    const weights = CRITERIA
+      .map(c => `<li><b>${esc(c.name)}</b> — ${(c.weight * 100).toFixed(0)}%</li>`)
+      .join("");
+
+    // ВАЖЛИВО: використовуємо KEY_CRITERIA з твого коду
+    const keyNames = KEY_CRITERIA
+      .map(k => CRITERIA.find(c => c.id === k)?.name)
+      .filter(Boolean)
+      .map(n => `<span class="tag">${esc(n)}</span>`)
+      .join(" ");
+
+    box.innerHTML = `
+      <div class="howcalcHead">
+  <div>
+    <div class="howcalcTitle">Як рахується результат</div>
+    <div class="howcalcSub">
+      Формула, пороги рішення та логіка “світлофора” — максимально коротко.
+    </div>
+  </div>
+</div>
+
+
+      <div class="howcalcGrid">
+
+        <div class="howcalcCard">
+          <div class="howcalcH">1) Формула</div>
+          <div class="howcalcText">
+            <div><b>Підсумковий бал</b> = Σ (<b>вага критерію</b> × <b>оцінка</b>).</div>
+            <div class="muted">Оцінка кожного критерію — лише <b>одна цифра 0–5</b>.</div>
+            <div class="muted">Ваги в сумі дають 100% — це “важливість” критерію у підсумку.</div>
+          </div>
+        </div>
+
+        <div class="howcalcCard">
+          <div class="howcalcH">2) Пороги рішення</div>
+          <ul class="howcalcList">
+            <li><b>≥ 4.0</b> → <b>Рекомендовано</b> (можна приймати)</li>
+            <li><b>3.2 – 3.99</b> → <b>Умовно рекомендовано</b> (можна, але з умовами/доопрацюванням)</li>
+            <li><b>&lt; 3.2</b> → <b>Не рекомендовано</b> (ризики/невідповідність)</li>
+          </ul>
+          <div class="muted">Пороги підібрані так, щоб “Рекомендовано” означало стабільно сильний результат по більшості критеріїв.</div>
+        </div>
+
+        <div class="howcalcCard">
+          <div class="howcalcH">3) Світлофор (ризики)</div>
+          <div class="howcalcText">
+            <div><b>Ключові критерії:</b> ${keyNames || "<span class='muted'>не задані</span>"}</div>
+            <ul class="howcalcList">
+              <li>Якщо мінімум по ключових <b>&lt; 3</b> → <b>🔴 Високий ризик</b></li>
+              <li>Інакше якщо мінімум по будь-якому критерію <b>&lt; 3</b> → <b>🟡 Є слабкі місця</b></li>
+              <li>Інакше → <b>🟢 Прийнятно</b></li>
+            </ul>
+            <div class="muted">Логіка проста: навіть при високому середньому балі “провал” по зв’язку/Fail-safe небезпечний.</div>
+          </div>
+        </div>
+
+        <div class="howcalcCard">
+          <div class="howcalcH">4) Ваги критеріїв</div>
+          <ul class="howcalcList">${weights}</ul>
+          <div class="muted">Більша вага = критерій сильніше впливає на фінальний бал.</div>
+        </div>
+
+      </div>
+    `;
+
+    // кнопка "Згорнути"
+    const closeBtn = $("howCalcCloseBtn");
+    if (closeBtn) closeBtn.addEventListener("click", () => toggleHowCalcInline(false));
+
+    // автоскрол до секції, щоб не “шукати очима”
+    box.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+
+  box.classList.toggle("hide", !willOpen);
+
+  // (опційно) змінюємо текст кнопки зверху
+  const topBtn = $("howCalcBtn");
+  if (topBtn) topBtn.innerHTML = willOpen
+    ? `<i class="fa-solid fa-chevron-up"></i> Згорнути`
+    : `<i class="fa-solid fa-circle-info"></i> Як рахується?`;
+}
 
 function buildTxtReport(d) {
+  const W = 70;
+
+  const centerLine = (text, width = W) => {
+    const s = String(text ?? "").trim();
+    if (!s) return "";
+    if (s.length >= width) return s;
+    const left = Math.floor((width - s.length) / 2);
+    return " ".repeat(left) + s;
+  };
+
+  const isPlus = (v) => String(v ?? "").trim() === "+";
+  const isDash = (v) => {
+    const s = String(v ?? "").trim();
+    return s === "" || s === "-" || s === "—";
+  };
+  const numOrNull = (v) => {
+    if (v === null || v === undefined) return null;
+    const s = String(v).trim().replace(",", ".");
+    if (!s) return null;
+    const n = Number(s);
+    return Number.isFinite(n) ? n : null;
+  };
+
+  const today = todayStampUA();
+
+  // Камери
+  const cameraLines = [];
+  const opticalN = numOrNull(d.optical);
+  const opticalIRN = numOrNull(d.opticalIR);
+  const thermalN = numOrNull(d.thermal);
+
+  if (!isDash(d.optical)) {
+    if (opticalN !== null) cameraLines.push(`• Оптична — ${opticalN}`);
+    else if (isPlus(d.optical)) cameraLines.push(`• Оптична`);
+  }
+  if (!isDash(d.opticalIR)) {
+    if (opticalIRN !== null) cameraLines.push(`• Оптична з ІЧ — ${opticalIRN}`);
+    else if (isPlus(d.opticalIR)) cameraLines.push(`• Оптична з ІЧ`);
+  }
+  if (!isDash(d.thermal)) {
+    if (thermalN !== null) cameraLines.push(`• Тепловізійна — ${thermalN}`);
+    else if (isPlus(d.thermal)) cameraLines.push(`• Тепловізійна`);
+  }
+
+  // Зв’язок
+  const linkLines = [];
+  const radioN = numOrNull(d.radioKm);
+  if (radioN !== null && radioN > 0) linkLines.push(`• Радіоканал — ${radioN} км`);
+  if (isPlus(d.starlink)) linkLines.push(`• Starlink`);
+  if (isPlus(d.lte)) linkLines.push(`• LTE`);
+
   const lines = [];
-  lines.push(`ЗВІТ ОЦІНЮВАННЯ НРК`);
-  lines.push(`Дата: ${todayStamp()}`);
-  lines.push(``);
 
-  lines.push(`1) Ідентифікація`);
-  lines.push(`Модель: ${d.model}`);
-  lines.push(`Виробник: ${d.maker}`);
-  lines.push(`Контакт: ${d.contactName}`);
-  lines.push(`Телефон: ${d.contactPhone}`);
-  lines.push(``);
+  // ====== ЗАГОЛОВОК ======
+  lines.push(centerLine("ЗВІТ", W));
+  lines.push(centerLine(`щодо БеНК ${d.model} ${d.maker}`, W));
+  lines.push(centerLine(`Дата: ${today}`, W));
+  lines.push("");
 
-  lines.push(`2) Основні характеристики`);
+  // ====== 1) ОСНОВНІ ХАРАКТЕРИСТИКИ ======
+  lines.push(centerLine("1) ОСНОВНІ ХАРАКТЕРИСТИКИ", W));
   lines.push(`Ціна, грн: ${d.price}`);
   lines.push(`Силова установка: ${d.power}`);
   lines.push(`Маса, кг: ${d.mass}`);
@@ -3026,42 +3226,49 @@ function buildTxtReport(d) {
   lines.push(`Кліренс, мм: ${d.clearance}`);
   lines.push(`Кут підйому, °: ${d.climb}`);
   lines.push(`Кут крену, °: ${d.tilt}`);
-  lines.push(``);
 
-  lines.push(`3) Сенсори / зв’язок`);
-  lines.push(`Оптична: ${d.optical}`);
-  lines.push(`Оптична з ІЧ: ${d.opticalIR}`);
-  lines.push(`Тепловізійна: ${d.thermal}`);
-  lines.push(`Радіо, км: ${d.radioKm}`);
-  lines.push(`Starlink: ${d.starlink}`);
-  lines.push(`LTE: ${d.lte}`);
-  lines.push(``);
-
-  if (d.kpiText) {
-    lines.push(`4) KPI`);
-    lines.push(d.kpiText);
-    lines.push(``);
+  if (cameraLines.length) {
+    lines.push("Камери:");
+    cameraLines.forEach((x) => lines.push(x));
   }
 
-  lines.push(`5) Результат оцінки`);
+  if (linkLines.length) {
+    lines.push("Види зв’язку:");
+    linkLines.forEach((x) => lines.push(x));
+  }
+
+  lines.push("");
+
+  // ====== 2) ДЕТАЛІЗАЦІЯ ======
+  lines.push(centerLine("2) ДЕТАЛІЗАЦІЯ КРИТЕРІЇВ", W));
+  lines.push(d.criteriaDump ? d.criteriaDump : "—");
+  lines.push("");
+
+  // ====== 3) РЕЗУЛЬТАТ ======
+  lines.push(centerLine("3) РЕЗУЛЬТАТ ОЦІНКИ", W));
   lines.push(`Бал: ${d.finalScore}`);
   lines.push(`Рішення: ${d.finalDecision}`);
   lines.push(`Світлофор: ${d.riskText}`);
   lines.push(`Мін. ключовий: ${d.minKey}`);
-  lines.push(``);
+  lines.push("");
 
-  lines.push(`6) Коментарі`);
-  lines.push(`Примітки (довідник): ${d.notes}`);
+  // ====== 4) КОМЕНТАРІ ======
+  lines.push(centerLine("4) КОМЕНТАРІ", W));
   lines.push(`Загальні зауваження комісії: ${d.commissionNotes}`);
-  lines.push(``);
-
-  if (d.criteriaDump) {
-    lines.push(`7) Деталізація критеріїв (з форми)`);
-    lines.push(d.criteriaDump);
-    lines.push(``);
-  }
+  lines.push("");
 
   return lines.join("\n");
+}
+
+function wireHowCalcInline() {
+  const btn = $("howCalcBtn");
+  const box = $("howCalcInline");
+  if (!btn || !box) return;
+
+  // початково сховано
+  box.classList.add("hide");
+
+  btn.addEventListener("click", () => toggleHowCalcInline());
 }
 
 function escapeHtml(s) {
@@ -3173,27 +3380,192 @@ function wireReportButtons() {
   const btnHtml = document.getElementById("downloadReportHtmlBtn");
   const btnTxt = document.getElementById("downloadReportTxtBtn");
 
-  // якщо ти ще не вставив кнопки в HTML — просто вийдемо
   if (!btnHtml && !btnTxt) return;
+
+  const fileToken = (s) => (s || "")
+    .toString()
+    .trim()
+    .replace(/[\\/:*?"<>|]+/g, "_")
+    .replace(/\s+/g, "_")
+    .replace(/_+/g, "_")
+    .slice(0, 60);
+
+  const buildBaseName = (d) => {
+    const model = fileToken(d.model) || "Без_назви";
+    const maker = fileToken(d.maker);
+    const date = todayStampUA();
+    // якщо виробник порожній/—, не додаємо його
+    return maker && maker !== "—"
+      ? `Звіт_БенК_${model}_${maker}_${date}`
+      : `Звіт_БенК_${model}_${date}`;
+  };
 
   if (btnTxt) {
     btnTxt.addEventListener("click", () => {
       if (!requireFullScoringOrThrow()) return;
       const d = collectReportData();
-      const fname = `${fileSafeName(d.model)}__${todayStamp()}__report.txt`;
+      const fname = `${buildBaseName(d)}.txt`;
       downloadBlob(buildTxtReport(d), fname, "text/plain;charset=utf-8");
     });
   }
 
   if (btnHtml) {
     btnHtml.addEventListener("click", () => {
-      const d = collectReportData();
       if (!requireFullScoringOrThrow()) return;
-      const fname = `${fileSafeName(d.model)}__${todayStamp()}__report.html`;
+      const d = collectReportData();
+      const fname = `${buildBaseName(d)}.html`;
       downloadBlob(buildHtmlReport(d), fname, "text/html;charset=utf-8");
     });
   }
 }
+
+function uniqModelsFromPresets() {
+  // беремо назви моделей з PRESETS, унікальні
+  const set = new Set(PRESETS.map(p => String(p.model || "").trim()).filter(Boolean));
+  return Array.from(set).sort((a,b)=>a.localeCompare(b, "uk"));
+}
+
+function getGroupsFromPresets() {
+  const set = new Set(PRESETS.map(p => String(p.group || "").trim()).filter(Boolean));
+  return ["Усі"].concat(Array.from(set).sort((a,b)=>a.localeCompare(b, "uk")));
+}
+
+function modelToGroupMap() {
+  const map = new Map();
+  PRESETS.forEach(p => {
+    const m = String(p.model || "").trim();
+    const g = String(p.group || "").trim();
+    if (m) map.set(m, g || "—");
+  });
+  return map;
+}
+
+function buildInvModelList({ groupFilter = "Усі", search = "" } = {}) {
+  const all = uniqModelsFromPresets();
+  const m2g = modelToGroupMap();
+  const q = String(search || "").trim().toLowerCase();
+
+  return all.filter(m => {
+    const g = m2g.get(m) || "—";
+    const okGroup = (groupFilter === "Усі") ? true : (g === groupFilter);
+    const okSearch = q ? m.toLowerCase().includes(q) : true;
+    return okGroup && okSearch;
+  });
+}
+
+function renderInventoryFilters() {
+  const sel = $("invGroupFilter");
+  if (!sel) return;
+
+  sel.innerHTML = "";
+  getGroupsFromPresets().forEach(g => {
+    const opt = document.createElement("option");
+    opt.value = g;
+    opt.textContent = g;
+    sel.appendChild(opt);
+  });
+}
+
+function getQty(unitId, modelName) {
+  const unit = INVENTORY[unitId] || {};
+  let total = 0;
+
+  Object.entries(unit).forEach(([key, qty]) => {
+
+    const [maker, model] = key.split("__");  // 👈 ОСЬ ТУТ
+
+    if (model === modelName) {
+      total += Number(qty) || 0;
+    }
+
+  });
+
+  return total;
+}
+
+
+function renderInventory() {
+  const out = $("inventoryTable");
+  const sumOut = $("inventorySummary");
+  if (!out || !sumOut) return;
+
+  const groupFilter = $("invGroupFilter")?.value || "Усі";
+  const search = $("invSearch")?.value || "";
+
+  const models = buildInvModelList({ groupFilter, search });
+
+  if (!models.length) {
+    out.innerHTML = `<div class="small">Нічого не знайдено.</div>`;
+    sumOut.innerHTML = "";
+    return;
+  }
+
+  let html = `<table>
+    <tr>
+      <th style="min-width:180px">БеНК</th>
+      ${UNITS.map(u => `<th style="min-width:70px;text-align:center">${u.id}</th>`).join("")}
+      <th style="min-width:100px;text-align:center">Всього</th>
+    </tr>`;
+
+  let grandTotal = 0;
+  const totalByUnit = Object.fromEntries(UNITS.map(u => [u.id, 0]));
+
+  models.forEach(model => {
+    let rowTotal = 0;
+
+    html += `<tr><td><b>${esc(model)}</b></td>`;
+
+    UNITS.forEach(u => {
+      const qty = getQty(u.id, model);
+      rowTotal += qty;
+      totalByUnit[u.id] += qty;
+      html += `<td style="text-align:center">${qty ? `<b>${qty}</b>` : "—"}</td>`;
+    });
+
+    grandTotal += rowTotal;
+    html += `<td style="text-align:center"><b>${rowTotal || "—"}</b></td></tr>`;
+  });
+
+  // Нижній рядок: підсумок по загонах
+  html += `<tr>
+    <td><b>Всього</b></td>
+    ${UNITS.map(u => `<td style="text-align:center"><b>${totalByUnit[u.id] || "—"}</b></td>`).join("")}
+    <td style="text-align:center"><b>${grandTotal || "—"}</b></td>
+  </tr>`;
+
+  html += `</table>`;
+  out.innerHTML = html;
+
+  // Підсумковий блок (компактно)
+  sumOut.innerHTML = `
+    <div class="small">
+      Загальна кількість БеНК за поточним фільтром: <b>${grandTotal}</b>
+    </div>
+  `;
+}
+
+
+function wireInventory() {
+  renderInventoryFilters();
+  renderInventory();
+
+  const sel = $("invGroupFilter");
+  const inp = $("invSearch");
+  const reset = $("invResetBtn");
+
+  if (sel) sel.addEventListener("change", renderInventory);
+  if (inp) inp.addEventListener("input", () => {
+    // легкий debounce без таймерів: просто перерендер
+    renderInventory();
+  });
+
+  if (reset) reset.addEventListener("click", () => {
+    if (sel) sel.value = "Усі";
+    if (inp) inp.value = "";
+    renderInventory();
+  });
+}
+
 
 /* =========================================================
    INIT
@@ -3201,6 +3573,7 @@ function wireReportButtons() {
 function init() {
   wireTabs();
   wireHelpModal();
+  wireInventory();
 
   renderCriteria();
   renderChecklist();
@@ -3210,6 +3583,7 @@ function init() {
     const el = $(id);
     if (el) el.addEventListener("input", renderKPI);
   });
+wireHowCalcInline();
 
   // Автокомпліт
   wireAutocomplete();

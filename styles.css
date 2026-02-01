@@ -337,4 +337,112 @@ td.highlight-best{
 .fieldError { margin-top:6px; font-size:12px; color:#ff6b6b; }
 .hide { display:none; }
 .invalid { outline: 2px solid #ff6b6b; }
+.howcalc { margin-top:12px; border:1px solid var(--line); border-radius:14px; padding:12px; background:rgba(0,0,0,.10); }
+.howcalcHead { display:flex; justify-content:space-between; gap:10px; align-items:flex-start; }
+.howcalcTitle { font-weight:800; font-size:14px; line-height:1.2; margin:0; }
+.howcalcSub { font-size:12px; opacity:.85; margin-top:4px; line-height:1.25; }
 
+.howcalcGrid { display:grid; grid-template-columns:1fr; gap:10px; margin-top:10px; }
+.howcalcCard { border:1px solid var(--line); border-radius:12px; padding:10px; background:rgba(0,0,0,.08); }
+.howcalcH { font-weight:800; font-size:13px; margin-bottom:6px; }
+.howcalcText { font-size:12.5px; line-height:1.25; display:flex; flex-direction:column; gap:6px; }
+.howcalcList { margin:0; padding-left:18px; font-size:12.5px; line-height:1.25; display:flex; flex-direction:column; gap:4px; }
+.howcalc .muted { opacity:.8; font-size:12px; line-height:1.25; }
+.howcalc .tag { display:inline-block; padding:2px 8px; border-radius:999px; border:1px solid var(--line); font-size:11px; margin-right:6px; }
+
+.howcalcClose { padding:6px 10px; }
+/* sticky панель фільтрів у вкладці "Наявність" */
+.invStickyBar{
+  position: sticky;
+  top: 10px;                 /* відступ зверху */
+  z-index: 50;
+
+  /* щоб таблиця не "просвічувала" під час прилипання */
+  background: var(--card, rgba(20,20,22,0.95));
+  backdrop-filter: blur(6px);
+
+  padding-top: 10px;
+  border-radius: 14px;
+}
+.invStickyBar.isStuck{
+  box-shadow: 0 12px 28px rgba(0,0,0,.25);
+}
+:root{
+  --headerH: 92px;   /* запасне значення, JS нижче зробить точне */
+}
+
+/* header і так sticky — лишаємо */
+header{
+  position: sticky;
+  top: 0;
+  z-index: 100; /* трохи вище, щоб перекривав інше */
+}
+
+/* sticky блок "Довідник" — липне під header */
+.stickyBox{
+  top: calc(var(--headerH) + 10px) !important;
+  z-index: 80;
+}
+
+/* sticky панель фільтрів у t7 — теж під header */
+.invStickyBar{
+  top: calc(var(--headerH) + 0px) !important;
+  z-index: 70;
+}
+
+/* =========================
+   TAB t7 (Прикз) FIX PACK
+   ========================= */
+
+/* 1) На t7 дозволяємо елементам стискатись (зараз глобально min-width:220px ламає мобілку) */
+#t7 .row > *{
+  min-width: 0 !important;
+}
+
+/* 2) На t7 кнопка не тягне ширину і не ламає ряд */
+#t7 .btnrow{
+  flex: 0 0 auto;
+  margin: 0 !important;
+}
+
+/* 3) Мобілка: фільтри йдуть в колонку */
+@media (max-width: 720px){
+  #t7 .row{
+    flex-direction: column;
+    align-items: stretch !important;
+  }
+
+  #t7 .btnrow button{
+    width: 100%;
+  }
+
+  /* трошки компактніше */
+  #t7 input, #t7 select{
+    padding: 9px;
+    font-size: 14px;
+    max-width: 100%;
+  }
+}
+/* t7: робимо таблицю еластичною */
+#t7 .invTableWrap table{
+  width: 100%;
+  table-layout: fixed;     /* колонки ділять ширину */
+}
+
+/* дозволяємо перенос */
+#t7 .invTableWrap th,
+#t7 .invTableWrap td{
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+#t7 .invTableWrap{
+  width:100%;
+  overflow-x:auto;
+  -webkit-overflow-scrolling:touch;
+}
+
+#t7 .invTableWrap table{
+  width:max-content;
+  min-width:100%;
+  table-layout:auto;   /* fixed часто робить “криве стискання” */
+}
