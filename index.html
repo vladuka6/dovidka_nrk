@@ -329,35 +329,36 @@
   </div>
 </section>
 <!-- TAB 7 Прикз (наявність по загонам) -->
-<section id="t7" class="grid hide">
-  <div class="card">
+<!-- TAB 7 Прикз (наявність по загонам) -->
+<section id="t7" class="grid hide">  <!-- ← як у t2, без cols2 (одна колонка) -->
+  <div class="card">  <!-- ← як у всіх інших: один card для всього контенту -->
     <h2>Наявність БеНК по загонам</h2>
     <p class="small">
       Тут фіксується кількість БеНК у підрозділах (загонах). Дані локальні для цього файлу (пізніше можна підв’язати до Google Sheet).
     </p>
 
+    <!-- Sticky-блок тепер лежить як частина card, з обмеженням від .wrap -->
     <div id="invStickyBar" class="invStickyBar">
-  <div class="row" style="gap:10px; flex-wrap:wrap; align-items:flex-end">
-    <div style="flex:1; min-width:220px">
-      <label>Фільтр (група/клас)</label>
-      <select id="invGroupFilter"></select>
+      <div class="row" style="gap:10px; flex-wrap:wrap; align-items:flex-end">
+        <div style="flex:1; min-width:220px">
+          <label>Фільтр (група/клас)</label>
+          <select id="invGroupFilter"></select>
+        </div>
+
+        <div style="flex:1; min-width:220px">
+          <label>Пошук БеНК</label>
+          <input id="invSearch" placeholder="Напр. D-21, ГУЛІВЕР, RATEL..." />
+        </div>
+
+        <div class="btnrow" style="margin:0">
+          <button class="ghost" id="invResetBtn" type="button">
+            <i class="fa-solid fa-rotate-left"></i> Скинути
+          </button>
+        </div>
+      </div>
+
+      <div class="divider"></div>
     </div>
-
-    <div style="flex:1; min-width:220px">
-      <label>Пошук БеНК</label>
-      <input id="invSearch" placeholder="Напр. D-21, ГУЛІВЕР, RATEL..." />
-    </div>
-
-    <div class="btnrow" style="margin:0">
-      <button class="ghost" id="invResetBtn" type="button">
-        <i class="fa-solid fa-rotate-left"></i> Скинути
-      </button>
-    </div>
-  </div>
-
-  <div class="divider"></div>
-</div>
-
 
     <div id="inventoryTable" style="overflow-x:auto"></div>
 
