@@ -3530,11 +3530,12 @@ function renderInventory() {
     return;
   }
 
+  // Генерація таблиці з ВИПРАВЛЕНИМИ min-width для мобілки
   let html = `<table>
     <tr>
-      <th style="min-width:180px">БеНК</th>
-      ${UNITS.map(u => `<th style="min-width:70px;text-align:center">${u.id}</th>`).join("")}
-      <th style="min-width:100px;text-align:center">Всього</th>
+      <th style="min-width:120px; max-width:160px; white-space:normal; word-break:break-word;">БеНК</th>
+      ${UNITS.map(u => `<th style="min-width:45px; text-align:center;">${u.id}</th>`).join("")}
+      <th style="min-width:80px; text-align:center;">Всього</th>
     </tr>`;
 
   let grandTotal = 0;
@@ -3542,36 +3543,53 @@ function renderInventory() {
 
   models.forEach(model => {
     let rowTotal = 0;
-
-    html += `<tr><td><b>${esc(model)}</b></td>`;
+    html += `<tr>
+      <td style="white-space:normal; word-break:break-word;"><b>${esc(model)}</b></td>`;
 
     UNITS.forEach(u => {
       const qty = getQty(u.id, model);
       rowTotal += qty;
       totalByUnit[u.id] += qty;
-      html += `<td style="text-align:center">${qty ? `<b>${qty}</b>` : "—"}</td>`;
+      html += `<td style="text-align:center;">${qty ? `<b>${qty}</b>` : "—"}</td>`;
     });
 
     grandTotal += rowTotal;
-    html += `<td style="text-align:center"><b>${rowTotal || "—"}</b></td></tr>`;
+    html += `<td style="text-align:center;"><b>${rowTotal || "—"}</b></td></tr>`;
   });
 
-  // Нижній рядок: підсумок по загонах
+  // Підсумковий рядок
   html += `<tr>
     <td><b>Всього</b></td>
-    ${UNITS.map(u => `<td style="text-align:center"><b>${totalByUnit[u.id] || "—"}</b></td>`).join("")}
-    <td style="text-align:center"><b>${grandTotal || "—"}</b></td>
+    ${UNITS.map(u => `<td style="text-align:center;"><b>${totalByUnit[u.id] || "—"}</b></td>`).join("")}
+    <td style="text-align:center;"><b>${grandTotal || "—"}</b></td>
   </tr>`;
 
   html += `</table>`;
+
   out.innerHTML = html;
 
-  // Підсумковий блок (компактно)
+  // Підсумковий блок
   sumOut.innerHTML = `
     <div class="small">
       Загальна кількість БеНК за поточним фільтром: <b>${grandTotal}</b>
     </div>
   `;
+
+  // Автоматичне масштабування на мобілці після рендеру
+  if (window.innerWidth <= 980) {
+    setTimeout(() => {
+      // Скидаємо масштаб до 100%
+      document.body.style.zoom = '1.0';
+      // Прокручування до початку таблиці (враховуємо header)
+      const t7 = document.getElementById('t7');
+      if (t7) {
+        window.scrollTo({
+          top: t7.offsetTop - 80,
+          behavior: 'smooth'
+        });
+      }
+    }, 200); // даємо час браузеру намалювати таблицю
+  }
 }
 
 
