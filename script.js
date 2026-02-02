@@ -2195,6 +2195,34 @@ function setPhoto(preset) {
 function presetKey(p) {
   return `${p.group} — ${p.model} (${p.maker})`;
 }
+function setReferenceLocked(locked) {
+  const idsReadonly = [
+    "maker","model","price","power","mass","dims",
+    "payloadNom","maxSpeed","rangeRoad","clearance","climb","tilt","radioKm"
+  ];
+
+  const idsSelect = ["optical","opticalIR","thermal","starlink","lte"];
+
+  idsReadonly.forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.readOnly = locked;
+  });
+
+  const notes = document.getElementById("notes");
+  if (notes) notes.readOnly = locked;
+
+  idsSelect.forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.disabled = locked;
+  });
+
+  // щоб видно було, що “readonly”
+  const tab = document.getElementById("t1"); 
+  if (tab) tab.classList.toggle("locked", locked);
+}
+
+
+
 
 function applyPresetByKey(key) {
   const p = PRESETS.find((x) => presetKey(x) === key);
@@ -2233,6 +2261,8 @@ function applyPresetByKey(key) {
   if ($("photoMaker")) $("photoMaker").textContent = p.maker;
 
   renderKPI();
+  setReferenceLocked(true);
+
 }
 
 function updateContactUI(p) {
