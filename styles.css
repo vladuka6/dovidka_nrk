@@ -506,3 +506,40 @@ header{
     font-size: 13px;
   }
 }
+/* =========================
+   THEME: light
+   ========================= */
+body[data-theme="light"]{
+  --bg:#f3f6ff;
+  --card:#ffffff;
+  --muted:#4f5b76;
+  --text:#111827;
+  --accent:#2563eb;
+  --ok:#059669;
+  --bad:#dc2626;
+  --warn:#d97706;
+  --line:rgba(17,24,39,.12);
+}
+
+/* фон для світлої */
+body[data-theme="light"]{
+  background: linear-gradient(180deg,#eef3ff,#f6f8ff);
+}
+body[data-theme="light"] header{
+  background: rgba(255,255,255,.82);
+}
+
+/* кнопка теми в tabs */
+.tabTheme{
+  margin-left:auto;              /* відштовхнути вправо */
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  white-space:nowrap;
+}
+
+/* на мобілці не ламай ряд */
+@media (max-width: 520px){
+  .tabTheme{ margin-left:0; }
+  .tabTheme .themeLabel{ display:none; } /* залишиться тільки іконка */
+}

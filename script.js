@@ -3595,6 +3595,38 @@ function wireInventory() {
     renderInventory();
   });
 }
+/* =========================
+   THEME TOGGLE
+   ========================= */
+const THEME_KEY = "nrk_theme_v1";
+
+function setTheme(theme){
+  document.body.setAttribute("data-theme", theme);
+  localStorage.setItem(THEME_KEY, theme);
+
+  const btn = document.getElementById("themeToggle");
+  if (!btn) return;
+
+  const icon = btn.querySelector("i");
+  const label = btn.querySelector(".themeLabel");
+
+  const isLight = theme === "light";
+  if (icon) icon.className = "fa-solid " + (isLight ? "fa-sun" : "fa-moon");
+  if (label) label.textContent = isLight ? "Світла" : "Темна";
+}
+
+function initTheme(){
+  const saved = localStorage.getItem(THEME_KEY) || "dark";
+  setTheme(saved);
+
+  const btn = document.getElementById("themeToggle");
+  if (!btn) return;
+
+  btn.addEventListener("click", () => {
+    const current = document.body.getAttribute("data-theme") || "dark";
+    setTheme(current === "light" ? "dark" : "light");
+  });
+}
 
 
 /* =========================================================
@@ -3604,6 +3636,7 @@ function init() {
   wireTabs();
   wireHelpModal();
   wireInventory();
+initTheme();
 
   renderCriteria();
   renderChecklist();
