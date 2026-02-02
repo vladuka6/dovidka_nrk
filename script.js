@@ -3647,7 +3647,17 @@ function initTheme() {
   // одразу оновлюємо кнопку
   toggleTheme();   // це викличе оновлення іконки/тексту
 }
-
+function adjustMobileZoomForT7() {
+  if (window.innerWidth <= 980) {
+    const t7 = document.getElementById('t7');
+    if (t7 && !t7.classList.contains('hide')) {
+      // можна спробувати скинути масштаб (працює не на всіх браузерах)
+      document.body.style.zoom = 1.0;
+      // або просто скрол до верху
+      window.scrollTo(0, 0);
+    }
+  }
+}
 document.addEventListener("DOMContentLoaded", () => {
   initTheme();
   document.getElementById("themeToggle")?.addEventListener("click", toggleTheme);
