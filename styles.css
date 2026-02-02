@@ -543,3 +543,31 @@ body[data-theme="light"] header{
   .tabTheme{ margin-left:0; }
   .tabTheme .themeLabel{ display:none; } /* залишиться тільки іконка */
 }
+:root{
+  --bg: #f6f7fb;
+  --card: #ffffff;
+  --text: #111;
+  --line: rgba(0,0,0,.12);
+}
+
+:root[data-theme="dark"]{
+  --bg: #0f1115;
+  --card: #171a21;
+  --text: #e9eef6;
+  --line: rgba(255,255,255,.14);
+}
+
+body{ background: var(--bg); color: var(--text); }
+.card{ background: var(--card); border: 1px solid var(--line); }
+.tabTheme{
+  margin-left:auto;
+  display:flex;
+  gap:8px;
+  align-items:center;
+  padding:10px 12px;
+  border-radius:12px;
+  border:1px solid var(--line);
+  background:transparent;
+  color:inherit;
+  cursor:pointer;
+}

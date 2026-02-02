@@ -2115,12 +2115,23 @@ function setSelect(id, v) {
    TABS
 ========================================================= */
 function switchTab(id) {
-  document.querySelectorAll(".tab").forEach((b) => b.classList.toggle("active", b.dataset.tab === id));
-  document.querySelectorAll("main section").forEach((s) => s.classList.toggle("hide", s.id !== id));
+  if (!id) return; // ✅ захист від undefined
+
+  document.querySelectorAll(".tab[data-tab]").forEach((b) => {
+    b.classList.toggle("active", b.dataset.tab === id);
+  });
+
+  document.querySelectorAll("main section").forEach((s) => {
+    s.classList.toggle("hide", s.id !== id);
+  });
 }
+
 function wireTabs() {
-  document.querySelectorAll(".tab").forEach((b) => b.addEventListener("click", () => switchTab(b.dataset.tab)));
+  document.querySelectorAll(".tab[data-tab]").forEach((b) => {
+    b.addEventListener("click", () => switchTab(b.dataset.tab));
+  });
 }
+
 
 /* =========================================================
    KPI (замість ID)
@@ -3600,9 +3611,9 @@ function wireInventory() {
    ========================= */
 const THEME_KEY = "nrk_theme_v1";
 
-function setTheme(theme){
-  document.body.setAttribute("data-theme", theme);
-  localStorage.setItem(THEME_KEY, theme);
+function applyTheme(mode) {
+  document.documentElement.dataset.theme = mode; // "dark" або "light"
+  localStorage.setItem("theme", mode);
 
   const btn = document.getElementById("themeToggle");
   if (!btn) return;
@@ -3610,23 +3621,28 @@ function setTheme(theme){
   const icon = btn.querySelector("i");
   const label = btn.querySelector(".themeLabel");
 
-  const isLight = theme === "light";
-  if (icon) icon.className = "fa-solid " + (isLight ? "fa-sun" : "fa-moon");
-  if (label) label.textContent = isLight ? "Світла" : "Темна";
+  if (mode === "dark") {
+    if (icon) icon.className = "fa-solid fa-sun";
+    if (label) label.textContent = "Світла";
+  } else {
+    if (icon) icon.className = "fa-solid fa-moon";
+    if (label) label.textContent = "Темна";
+  }
 }
 
-function initTheme(){
-  const saved = localStorage.getItem(THEME_KEY) || "dark";
-  setTheme(saved);
-
+function wireTheme() {
   const btn = document.getElementById("themeToggle");
   if (!btn) return;
 
+  const saved = localStorage.getItem("theme") || "light";
+  applyTheme(saved);
+
   btn.addEventListener("click", () => {
-    const current = document.body.getAttribute("data-theme") || "dark";
-    setTheme(current === "light" ? "dark" : "light");
+    const cur = document.documentElement.dataset.theme || "light";
+    applyTheme(cur === "dark" ? "light" : "dark");
   });
 }
+
 
 
 /* =========================================================
@@ -3636,7 +3652,8 @@ function init() {
   wireTabs();
   wireHelpModal();
   wireInventory();
-initTheme();
+wireTabs();
+  wireTheme();
 
   renderCriteria();
   renderChecklist();
