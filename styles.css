@@ -446,24 +446,8 @@ header{
   min-width:100%;
   table-layout:auto;   /* fixed часто робить “криве стискання” */
 }
-/* Вкладка Прикз — верхній sticky-бар */
 #t7 .invStickyBar {
-  /* Обмежуємо ширину так само, як .wrap */
-  max-width: 1100px;
-  margin: 0 auto;
-  width: 100%;               /* на всяк випадок */
-  box-sizing: border-box;
-
-  /* Якщо хочеш той самий стиль, як у .card */
-  background: rgba(17,27,46,.98);
-  border: 1px solid var(--line);
-  border-radius: 14px;
-  padding: 12px 14px;        /* трохи більше відступів з боків */
-  backdrop-filter: blur(10px);
-}
-
-/* Додатково: щоб вміст всередині не "вилазив" за межі */
-#t7 .invStickyBar .row {
-  max-width: 100%;
-  overflow: hidden;
+  max-width: 1100px !important;
+  margin: 0 auto !important;
+  width: 100% !important;
 }
