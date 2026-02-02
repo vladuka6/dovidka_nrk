@@ -2115,23 +2115,12 @@ function setSelect(id, v) {
    TABS
 ========================================================= */
 function switchTab(id) {
-  if (!id) return; // ✅ захист від undefined
-
-  document.querySelectorAll(".tab[data-tab]").forEach((b) => {
-    b.classList.toggle("active", b.dataset.tab === id);
-  });
-
-  document.querySelectorAll("main section").forEach((s) => {
-    s.classList.toggle("hide", s.id !== id);
-  });
+  document.querySelectorAll(".tab").forEach((b) => b.classList.toggle("active", b.dataset.tab === id));
+  document.querySelectorAll("main section").forEach((s) => s.classList.toggle("hide", s.id !== id));
 }
-
 function wireTabs() {
-  document.querySelectorAll(".tab[data-tab]").forEach((b) => {
-    b.addEventListener("click", () => switchTab(b.dataset.tab));
-  });
+  document.querySelectorAll(".tab").forEach((b) => b.addEventListener("click", () => switchTab(b.dataset.tab)));
 }
-
 
 /* =========================================================
    KPI (замість ID)
@@ -3606,45 +3595,93 @@ function wireInventory() {
     renderInventory();
   });
 }
-/* =========================
-   THEME TOGGLE
-   ========================= */
-const THEME_KEY = "nrk_theme_v1";
 
-function applyTheme(mode) {
-  document.documentElement.dataset.theme = mode; // "dark" або "light"
-  localStorage.setItem("theme", mode);
-
+function toggleTheme() {
+  const current = document.body.getAttribute("data-theme") || "dark";
+  const next = current === "dark" ? "light" : "dark";
+  
+  document.body.setAttribute("data-theme", next);
+  
+  // запам'ятовуємо вибір
+  localStorage.setItem("preferredTheme", next);
+  
+  // оновлюємо іконку та текст
   const btn = document.getElementById("themeToggle");
-  if (!btn) return;
-
-  const icon = btn.querySelector("i");
-  const label = btn.querySelector(".themeLabel");
-
-  if (mode === "dark") {
-    if (icon) icon.className = "fa-solid fa-sun";
-    if (label) label.textContent = "Світла";
-  } else {
-    if (icon) icon.className = "fa-solid fa-moon";
-    if (label) label.textContent = "Темна";
+  if (btn) {
+    const icon = btn.querySelector("i");
+    const label = btn.querySelector(".themeLabel");
+    if (next === "dark") {
+      icon.className = "fa-solid fa-moon";
+      label.textContent = "Темна";
+    } else {
+      icon.className = "fa-solid fa-sun";
+      label.textContent = "Світла";
+    }
+  }
+}
+// в init() або після завантаження сторінки
+function updateHeaderHeight() {
+  const header = document.querySelector('header');
+  if (header) {
+    const height = header.offsetHeight;
+    document.documentElement.style.setProperty('--headerH', height + 'px');
   }
 }
 
-function wireTheme() {
-  const btn = document.getElementById("themeToggle");
-  if (!btn) return;
-
-  const saved = localStorage.getItem("theme") || "light";
-  applyTheme(saved);
-
-  btn.addEventListener("click", () => {
-    const cur = document.documentElement.dataset.theme || "light";
-    applyTheme(cur === "dark" ? "light" : "dark");
-  });
+window.addEventListener('load', updateHeaderHeight);
+window.addEventListener('resize', updateHeaderHeight);
+// ініціалізація при завантаженні
+function initTheme() {
+  let saved = localStorage.getItem("preferredTheme");
+  
+  // якщо є збережений вибір — використовуємо його
+  if (saved) {
+    document.body.setAttribute("data-theme", saved);
+  } else {
+    // інакше дивимось на системні налаштування
+    const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+    const initial = prefersDark ? "dark" : "light";
+    document.body.setAttribute("data-theme", initial);
+  }
+  
+  // одразу оновлюємо кнопку
+  toggleTheme();   // це викличе оновлення іконки/тексту
 }
 
+document.addEventListener("DOMContentLoaded", () => {
+  initTheme();
+  document.getElementById("themeToggle")?.addEventListener("click", toggleTheme);
+});
+function handleStickyBar() {
+  const bar = document.getElementById('invStickyBar');
+  if (!bar) return;
 
+  const sectionT7 = document.getElementById('t7');
+  if (!sectionT7 || sectionT7.classList.contains('hide')) {
+    bar.classList.remove('isStuck');
+    return;
+  }
 
+  const rect = bar.getBoundingClientRect();
+  const headerHeight = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--headerH')) || 92;
+
+  if (rect.top <= headerHeight) {
+    bar.classList.add('isStuck');
+  } else {
+    bar.classList.remove('isStuck');
+  }
+}
+
+// Виклик при скролі та при перемиканні вкладок
+window.addEventListener('scroll', handleStickyBar);
+document.querySelectorAll('.tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    setTimeout(handleStickyBar, 100); // даємо час на показ секції
+  });
+});
+
+// Початковий виклик
+setTimeout(handleStickyBar, 300);
 /* =========================================================
    INIT
 ========================================================= */
@@ -3652,8 +3689,6 @@ function init() {
   wireTabs();
   wireHelpModal();
   wireInventory();
-wireTabs();
-  wireTheme();
 
   renderCriteria();
   renderChecklist();
