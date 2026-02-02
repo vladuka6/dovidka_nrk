@@ -3766,3 +3766,36 @@ function wireCopyButton() {
   });
 }
 
+// Примусовий ресет масштабу при кожному показі вкладки Прикз
+function forceMobileScaleReset() {
+  if (window.innerWidth > 1024) return;
+
+  const t7 = document.getElementById('t7');
+  if (!t7 || t7.classList.contains('hide')) return;
+
+  // 1. Скидаємо масштаб
+  document.body.style.zoom = '0.85';           // 85% — оптимально для 414px екрану
+  document.documentElement.style.zoom = '0.85';
+
+  // 2. Прокручуємо до початку таблиці
+  setTimeout(() => {
+    window.scrollTo({
+      top: t7.offsetTop - 100,
+      behavior: 'instant'
+    });
+  }, 300);
+}
+
+// Виклик при перемиканні вкладок
+document.querySelectorAll('.tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    if (tab.dataset.tab === 't7') {
+      setTimeout(forceMobileScaleReset, 400);
+    }
+  });
+});
+
+// Виклик при першому завантаженні, якщо вже на t7
+if (!document.getElementById('t7').classList.contains('hide')) {
+  setTimeout(forceMobileScaleReset, 800);
+}
