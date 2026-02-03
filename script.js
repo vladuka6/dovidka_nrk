@@ -2121,6 +2121,15 @@ function setSelect(id, v) {
 function switchTab(id) {
   document.querySelectorAll(".tab").forEach((b) => b.classList.toggle("active", b.dataset.tab === id));
   document.querySelectorAll("main section").forEach((s) => s.classList.toggle("hide", s.id !== id));
+  if (window.innerWidth <= 980) {
+    if (id === "t6") {
+      document.body.style.zoom = "0.92";
+      document.documentElement.style.zoom = "0.92";
+    } else {
+      document.body.style.zoom = "1";
+      document.documentElement.style.zoom = "1";
+    }
+  }
 }
 function wireTabs() {
   document.querySelectorAll(".tab").forEach((b) => b.addEventListener("click", () => switchTab(b.dataset.tab)));
@@ -3712,7 +3721,14 @@ function renderT6Catalog() {
 
   const html = grouped.map(g => `
     <div class="classGroup">
-      <div class="classGroupTitle">${esc(g.name)} <span class="count">${g.items.length}</span></div>
+      <div class="classGroupTitle">
+        ${esc(g.name)} <span class="count">${g.items.length}</span>
+        <span class="count">Гусенічні: ${g.items.filter(x => x.chassis === "Гусеничне").length}</span>
+        <span class="count">Колісні: ${g.items.filter(x => x.chassis === "Колісне").length}</span>
+        <span class="count">Легкі: ${g.items.filter(x => x.massClass === "Легкі").length}</span>
+        <span class="count">Середні: ${g.items.filter(x => x.massClass === "Середні").length}</span>
+        <span class="count">Важкі: ${g.items.filter(x => x.massClass === "Важкі").length}</span>
+      </div>
       <table class="classTable">
         <tr>
           <th class="numCell">№</th>
@@ -3727,7 +3743,7 @@ function renderT6Catalog() {
         ${g.items.map((r, idx) => `
           <tr class="classRow" data-preset="${encodeURIComponent(r.key)}">
             <td class="numCell">${idx + 1}</td>
-            <td>
+            <td class="modelCol">
               <div class="modelCell">
                 <strong>${esc(r.model || "—")}</strong>
                 <span class="muted">${esc(r.maker || "—")}</span>
@@ -3756,10 +3772,10 @@ function renderT6Insights() {
   const items = PRESETS.map(p => ({
     model: String(p.model || "").trim(),
     maker: String(p.maker || "").trim(),
+    func: classifyFunction(p),
     payload: Number(p.payload),
     rangeRoad: Number(p.rangeRoad),
     maxSpeed: Number(p.maxSpeed),
-    clearance: Number(p.clearance),
     price: Number(p.price),
   })).filter(x => x.model);
 
@@ -3781,11 +3797,22 @@ function renderT6Insights() {
       </ul>
     </div>`;
 
+  const buildTopBlock = (title, subset) => `
+    <div class="insightCard">
+      <div class="insightTitle">${title}</div>
+      <div class="t6Insights">
+        ${renderList("ТОП‑5 вантажність", top5(subset, "payload"), "payload", " кг")}
+        ${renderList("ТОП‑5 запас ходу", top5(subset, "rangeRoad"), "rangeRoad", " км")}
+        ${renderList("ТОП‑5 швидкість", top5(subset, "maxSpeed"), "maxSpeed", " км/год")}
+      </div>
+    </div>`;
+
+  const logistic = items.filter(x => x.func === "Логістичний");
+  const engineering = items.filter(x => x.func === "Інженерний");
+
   topOut.innerHTML = [
-    renderList("ТОП‑5 вантажність", top5(items, "payload"), "payload", " кг"),
-    renderList("ТОП‑5 дальність", top5(items, "rangeRoad"), "rangeRoad", " км"),
-    renderList("ТОП‑5 швидкість", top5(items, "maxSpeed"), "maxSpeed", " км/год"),
-    renderList("ТОП‑5 кліренс", top5(items, "clearance"), "clearance", " мм"),
+    buildTopBlock("Логістичні", logistic),
+    buildTopBlock("Інженерні", engineering),
   ].join("");
 
   const withValue = items

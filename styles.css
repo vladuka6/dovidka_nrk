@@ -227,8 +227,11 @@ body[data-theme="light"] header{
 }
 
 .t6TableWrap{ overflow-x:auto; }
-.t6Table th{ text-align:left; }
+.t6Table th{ text-align:center; }
 .t6Table td{ text-align:left; vertical-align:top; }
+.t6Table td:first-child{ text-align:center; width:56px; }
+.t6Table td:nth-child(2){ text-align:left; word-break:break-word; }
+.t6Table th:nth-child(2){ text-align:center; }
 .vlist{ display:flex; flex-direction:column; gap:4px; }
 @media (max-width: 720px){
   .t6Table{ font-size:12px; }
@@ -290,6 +293,9 @@ body[data-theme="light"] header{
   display:grid;
   gap:10px;
   grid-template-columns:repeat(auto-fit, minmax(220px, 1fr));
+}
+.t6Insights .insightCard{
+  background: color-mix(in srgb, var(--card) 86%, transparent);
 }
 .insightCard{
   border:1px solid var(--line);
@@ -373,8 +379,9 @@ body[data-theme="light"] header{
 }
 @media (max-width: 720px){
   .presetHero{ grid-template-columns:1fr; }
-  .presetPhoto{ height:auto; min-height:160px; }
-  .presetPhoto img{ height:160px; }
+  .presetMain{ grid-template-columns:140px 1fr; }
+  .presetPhoto{ height:100%; min-height:140px; }
+  .presetPhoto img{ height:100%; }
 }
 
 .classTableWrap{ overflow-x:auto; }
@@ -387,9 +394,10 @@ body[data-theme="light"] header{
 .classTable td{
   padding:8px 10px;
   border:1px solid var(--line);
-  text-align:left;
+  text-align:center;
   vertical-align:top;
 }
+.classTable .modelCol{ text-align:left; }
 .classTable th{
   background: color-mix(in srgb, var(--card2) 85%, transparent);
   position:sticky;
