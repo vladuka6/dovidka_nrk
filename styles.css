@@ -130,6 +130,9 @@ body[data-theme="light"] header{
   font-size:13px;
   cursor:pointer;
   transition:.18s;
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
 }
 .tab:hover{ transform: translateY(-1px); }
 .tab.active{
@@ -183,6 +186,12 @@ body[data-theme="light"] header{
   border-radius:var(--r);
   padding:14px;
   box-shadow: var(--shadow), 0 0 0 1px color-mix(in srgb, var(--accent) 6%, transparent);
+}
+.tabLabel{ display:inline; }
+@media (max-width: 720px){
+  .tab{ padding:8px 10px; }
+  .tabLabel{ display:none; }
+  .tab i{ font-size:14px; }
 }
 
 .card h2{
@@ -276,6 +285,38 @@ body[data-theme="light"] header{
   padding:12px;
   background: color-mix(in srgb, var(--card) 88%, transparent);
 }
+
+.t6Insights{
+  display:grid;
+  gap:10px;
+  grid-template-columns:repeat(auto-fit, minmax(220px, 1fr));
+}
+.insightCard{
+  border:1px solid var(--line);
+  border-radius:12px;
+  padding:10px 12px;
+  background: color-mix(in srgb, var(--card2) 85%, transparent);
+}
+.insightTitle{
+  font-weight:800;
+  font-size:13px;
+  margin:0 0 8px;
+}
+.insightList{
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+  margin:0;
+  padding:0;
+  list-style:none;
+}
+.insightItem{
+  display:flex;
+  justify-content:space-between;
+  gap:10px;
+  font-size:12.5px;
+}
+.insightItem .muted{ color:var(--muted); }
 
 .classTableWrap{ overflow-x:auto; }
 .classTable{

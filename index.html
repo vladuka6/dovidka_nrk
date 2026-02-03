@@ -15,11 +15,21 @@
     <h1>Безекіпажні наземні комплекси</h1>
     <!-- <p class="sub">Обери модель → заповни бали + коментарі → сформуй висновок → порівняй → експорт.</p> -->
 <div class="tabs" role="tablist">
-  <button class="tab active" data-tab="t1" type="button">Довідник</button>
-  <button class="tab" data-tab="t2" type="button">Оцінка</button>
-  <button class="tab" data-tab="t6" type="button">Класифікація</button>
-  <button class="tab" data-tab="t7" type="button">Прикз</button>
-  <button class="tab" data-tab="t5" type="button">Порівняння</button>
+  <button class="tab active" data-tab="t1" type="button">
+    <i class="fa-solid fa-book"></i><span class="tabLabel">Довідник</span>
+  </button>
+  <button class="tab" data-tab="t2" type="button">
+    <i class="fa-solid fa-clipboard-check"></i><span class="tabLabel">Оцінка</span>
+  </button>
+  <button class="tab" data-tab="t6" type="button">
+    <i class="fa-solid fa-layer-group"></i><span class="tabLabel">Класифікація</span>
+  </button>
+  <button class="tab" data-tab="t7" type="button">
+    <i class="fa-solid fa-warehouse"></i><span class="tabLabel">Прикз</span>
+  </button>
+  <button class="tab" data-tab="t5" type="button">
+    <i class="fa-solid fa-scale-balanced"></i><span class="tabLabel">Порівняння</span>
+  </button>
 
   <!-- ✅ ТЕМА — НЕ .tab -->
   <button class="tabTheme" type="button" id="themeToggle" title="Перемкнути тему">
@@ -453,6 +463,13 @@
         </div>
       </div>
       <div id="t6Catalog" class="classTableWrap"></div>
+    </div>
+
+    <div class="section">
+      <div class="sectionTitle">4) Аналітика з пресетів</div>
+      <div id="t6Top5" class="t6Insights"></div>
+      <div class="divider"></div>
+      <div id="t6Value" class="t6Insights"></div>
     </div>
   </div>
 </section>

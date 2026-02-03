@@ -3658,8 +3658,9 @@ function renderT6Catalog() {
     const mass = Number.isFinite(massNum) && massNum > 0 ? `${massNum} кг` : "—";
     const priceNum = Number(p.price);
     const price = Number.isFinite(priceNum) && priceNum > 0 ? formatPrice(priceNum) : "—";
+    const key = presetKey(p);
     const funcClass = funcClassName(func);
-    return { model, maker, func, funcClass, massClass, chassis, chassisShort, power, powerShort, mass, massNum, price, priceNum };
+    return { key, model, maker, func, funcClass, massClass, chassis, chassisShort, power, powerShort, mass, massNum, price, priceNum };
   }).sort((a, b) => a.model.localeCompare(b.model, "uk"));
 
   const funcSelect = $("t6FuncFilter");
@@ -3720,7 +3721,7 @@ function renderT6Catalog() {
           <th>Силова</th>
         </tr>
         ${g.items.map((r, idx) => `
-          <tr class="classRow">
+          <tr class="classRow" data-preset="${esc(r.key)}">
             <td class="numCell">${idx + 1}</td>
             <td>
               <div class="modelCell">
@@ -3743,6 +3744,83 @@ function renderT6Catalog() {
   out.innerHTML = html;
 }
 
+function renderT6Insights() {
+  const topOut = $("t6Top5");
+  const valOut = $("t6Value");
+  if (!topOut || !valOut || typeof PRESETS === "undefined") return;
+
+  const items = PRESETS.map(p => ({
+    model: String(p.model || "").trim(),
+    maker: String(p.maker || "").trim(),
+    payload: Number(p.payload),
+    rangeRoad: Number(p.rangeRoad),
+    maxSpeed: Number(p.maxSpeed),
+    clearance: Number(p.clearance),
+    price: Number(p.price),
+  })).filter(x => x.model);
+
+  const top5 = (arr, key) => arr
+    .filter(x => Number.isFinite(x[key]) && x[key] > 0)
+    .sort((a, b) => b[key] - a[key])
+    .slice(0, 5);
+
+  const renderList = (title, list, key, suffix) => `
+    <div class="insightCard">
+      <div class="insightTitle">${title}</div>
+      <ul class="insightList">
+        ${list.map(x => `
+          <li class="insightItem">
+            <span>${esc(x.model)}</span>
+            <span class="muted">${x[key]}${suffix}</span>
+          </li>
+        `).join("")}
+      </ul>
+    </div>`;
+
+  topOut.innerHTML = [
+    renderList("ТОП‑5 вантажність", top5(items, "payload"), "payload", " кг"),
+    renderList("ТОП‑5 дальність", top5(items, "rangeRoad"), "rangeRoad", " км"),
+    renderList("ТОП‑5 швидкість", top5(items, "maxSpeed"), "maxSpeed", " км/год"),
+    renderList("ТОП‑5 кліренс", top5(items, "clearance"), "clearance", " мм"),
+  ].join("");
+
+  const withValue = items
+    .filter(x => Number.isFinite(x.price) && x.price > 0)
+    .map(x => ({
+      ...x,
+      pricePerKg: (x.payload && x.payload > 0) ? x.price / x.payload : null,
+      pricePerKm: (x.rangeRoad && x.rangeRoad > 0) ? x.price / x.rangeRoad : null,
+    }));
+
+  const bestKg = withValue
+    .filter(x => x.pricePerKg)
+    .sort((a, b) => a.pricePerKg - b.pricePerKg)
+    .slice(0, 5);
+
+  const bestKm = withValue
+    .filter(x => x.pricePerKm)
+    .sort((a, b) => a.pricePerKm - b.pricePerKm)
+    .slice(0, 5);
+
+  const renderValueList = (title, list, key) => `
+    <div class="insightCard">
+      <div class="insightTitle">${title}</div>
+      <ul class="insightList">
+        ${list.map(x => `
+          <li class="insightItem">
+            <span>${esc(x.model)}</span>
+            <span class="muted">${formatPrice(Math.round(x[key]))}</span>
+          </li>
+        `).join("")}
+      </ul>
+    </div>`;
+
+  valOut.innerHTML = [
+    renderValueList("Ціна за кг вантажності (краще)", bestKg, "pricePerKg"),
+    renderValueList("Ціна за км пробігу (краще)", bestKm, "pricePerKm"),
+  ].join("");
+}
+
 function wireT6CatalogControls() {
   const func = $("t6FuncFilter");
   const search = $("t6Search");
@@ -3750,6 +3828,19 @@ function wireT6CatalogControls() {
   if (func) func.addEventListener("change", renderT6Catalog);
   if (sort) sort.addEventListener("change", renderT6Catalog);
   if (search) search.addEventListener("input", renderT6Catalog);
+}
+
+function wireT6CatalogRowClicks() {
+  const wrap = $("t6Catalog");
+  if (!wrap) return;
+  wrap.addEventListener("click", (e) => {
+    const row = e.target.closest("tr[data-preset]");
+    if (!row) return;
+    const key = row.getAttribute("data-preset");
+    if (!key) return;
+    applyPresetByKey(key);
+    switchTab("t1");
+  });
 }
 
 function wireInventory() {
@@ -3885,7 +3976,9 @@ wireHowCalcInline();
   wireCopyButton();
   initDebugBadge();
   renderT6Catalog();
+  renderT6Insights();
   wireT6CatalogControls();
+  wireT6CatalogRowClicks();
 }
 
 document.addEventListener("DOMContentLoaded", init);
