@@ -322,7 +322,7 @@ body[data-theme="light"] header{
 .presetHero{
   display:grid;
   gap:12px;
-  grid-template-columns:220px 1fr;
+  grid-template-columns:1fr 240px;
   align-items:start;
 }
 .presetPhoto{
@@ -333,8 +333,9 @@ body[data-theme="light"] header{
   background: color-mix(in srgb, var(--card2) 80%, transparent);
   box-shadow: var(--shadow);
   min-height:170px;
+  height:100%;
 }
-.presetPhoto img{ width:100%; height:170px; object-fit:cover; display:block; }
+.presetPhoto img{ width:100%; height:100%; object-fit:cover; display:block; }
 .presetBadges{ display:flex; flex-wrap:wrap; gap:8px; }
 .presetGrid{
   display:grid;
@@ -344,6 +345,15 @@ body[data-theme="light"] header{
   border-radius:12px;
   padding:10px 12px;
   background: color-mix(in srgb, var(--card2) 85%, transparent);
+}
+.presetMain{
+  display:grid;
+  grid-template-columns:1.2fr 1fr;
+  gap:12px;
+  align-items:stretch;
+}
+@media (max-width: 980px){
+  .presetMain{ grid-template-columns:1fr; }
 }
 .presetItem{
   display:flex;
@@ -363,6 +373,7 @@ body[data-theme="light"] header{
 }
 @media (max-width: 720px){
   .presetHero{ grid-template-columns:1fr; }
+  .presetPhoto{ height:auto; min-height:160px; }
   .presetPhoto img{ height:160px; }
 }
 

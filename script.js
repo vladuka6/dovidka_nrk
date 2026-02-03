@@ -3858,10 +3858,6 @@ function buildPresetModalHtml(p) {
   return `
     <div class="presetModalBody">
       <div class="presetHero">
-        <div class="presetPhoto">
-          ${imgHtml}
-          <div class="noPhoto"${photoUrl ? ' style="display:none"' : ""}>Фото</div>
-        </div>
         <div class="presetBadges">
           <span class="chip"><strong>${esc(p.model || "—")}</strong></span>
           <span class="chip muted">${esc(p.maker || "—")}</span>
@@ -3870,7 +3866,12 @@ function buildPresetModalHtml(p) {
         </div>
       </div>
 
-      <div class="presetGrid">
+      <div class="presetMain">
+        <div class="presetPhoto">
+          ${imgHtml}
+          <div class="noPhoto"${photoUrl ? ' style="display:none"' : ""}>Фото</div>
+        </div>
+        <div class="presetGrid">
         <div class="presetItem"><b>Маса</b><span>${esc(p.mass ?? "—")}</span></div>
         <div class="presetItem"><b>Корисне навантаження</b><span>${esc(p.payload ?? "—")}</span></div>
         <div class="presetItem"><b>Макс швидкість</b><span>${esc(p.maxSpeed ?? "—")}</span></div>
@@ -3883,6 +3884,7 @@ function buildPresetModalHtml(p) {
         <div class="presetItem"><b>Starlink</b><span>${esc(p.starlink ?? "—")}</span></div>
         <div class="presetItem"><b>LTE</b><span>${esc(p.lte ?? "—")}</span></div>
         <div class="presetItem"><b>Радіо, км</b><span>${esc(p.radioKm ?? "—")}</span></div>
+        </div>
       </div>
 
       <div class="presetFooter">
@@ -3903,8 +3905,10 @@ function openPresetModalByKey(key) {
   const body = $("presetModalBody");
   if (!overlay || !title || !meta || !body) return;
 
-  title.textContent = p.model ? `БеНК: ${p.model}` : "БеНК";
-  meta.textContent = p.maker ? `Виробник: ${p.maker}` : "";
+  title.textContent = "";
+  meta.textContent = "";
+  title.style.display = "none";
+  meta.style.display = "none";
   body.innerHTML = buildPresetModalHtml(p);
   overlay.style.display = "flex";
 }
