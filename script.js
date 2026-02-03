@@ -3838,9 +3838,99 @@ function wireT6CatalogRowClicks() {
     if (!row) return;
     const key = row.getAttribute("data-preset");
     if (!key) return;
-    applyPresetByKey(key);
-    switchTab("t1");
+    openPresetModalByKey(key);
   });
+}
+
+function buildPresetModalHtml(p) {
+  const photoUrl = String(p.photo || "").trim();
+  const imgHtml = photoUrl
+    ? `<img src="${esc(photoUrl)}" alt="${esc(p.model || "")}">`
+    : "";
+
+  const photoBlock = `
+    <div class="photoBox">
+      <div class="photoFrame">
+        ${imgHtml}
+        <div class="noPhoto"${photoUrl ? ' style="display:none"' : ""}>Фото</div>
+      </div>
+      <div class="photoMeta">
+        <div class="pill"><strong>${esc(p.model || "—")}</strong></div>
+        <div class="pill">${esc(p.maker || "—")}</div>
+        <div class="pill">Ціна: <strong>${formatPrice(Number(p.price))}</strong></div>
+        <div class="pill">Силова: <strong>${esc(p.power || "—")}</strong></div>
+      </div>
+    </div>
+  `;
+
+  const specBlock = `
+    <div class="box">
+      <h2>1) Загальні</h2>
+      <div class="grid">
+        <div class="row"><b>Маса, кг</b><span>${esc(p.mass ?? "—")}</span></div>
+        <div class="row"><b>Розміри</b><span>${esc(p.dims ?? "—")}</span></div>
+        <div class="row"><b>Корисне навантаження, кг</b><span>${esc(p.payload ?? "—")}</span></div>
+        <div class="row"><b>Макс швидкість, км/год</b><span>${esc(p.maxSpeed ?? "—")}</span></div>
+        <div class="row"><b>Запас ходу, км</b><span>${esc(p.rangeRoad ?? "—")}</span></div>
+        <div class="row"><b>Кліренс, мм</b><span>${esc(p.clearance ?? "—")}</span></div>
+        <div class="row"><b>Кут підйому, °</b><span>${esc(p.climb ?? "—")}</span></div>
+        <div class="row"><b>Кут крену, °</b><span>${esc(p.tilt ?? "—")}</span></div>
+      </div>
+    </div>
+  `;
+
+  const sensorsBlock = `
+    <div class="box">
+      <h2>2) Сенсори / зв’язок</h2>
+      <div class="grid">
+        <div class="row"><b>Оптична</b><span>${esc(p.optical ?? "—")}</span></div>
+        <div class="row"><b>Оптична з ІЧ</b><span>${esc(p.opticalIR ?? "—")}</span></div>
+        <div class="row"><b>Тепловізійна</b><span>${esc(p.thermal ?? "—")}</span></div>
+        <div class="row"><b>Радіо, км</b><span>${esc(p.radioKm ?? "—")}</span></div>
+        <div class="row"><b>Starlink</b><span>${esc(p.starlink ?? "—")}</span></div>
+        <div class="row"><b>LTE</b><span>${esc(p.lte ?? "—")}</span></div>
+      </div>
+    </div>
+  `;
+
+  const contactBlock = `
+    <div class="box">
+      <h2>3) Контакти</h2>
+      <div class="grid">
+        <div class="row"><b>Контакт</b><span>${esc(p.contactName ?? "—")}</span></div>
+        <div class="row"><b>Зв’язок</b><span>${esc(p.contactInfo ?? "—")}</span></div>
+      </div>
+    </div>
+  `;
+
+  return `${photoBlock}${specBlock}${sensorsBlock}${contactBlock}`;
+}
+
+function openPresetModalByKey(key) {
+  const p = PRESETS.find(x => presetKey(x) === key);
+  if (!p) return;
+
+  const overlay = $("presetModal");
+  const title = $("presetModalTitle");
+  const meta = $("presetModalMeta");
+  const body = $("presetModalBody");
+  if (!overlay || !title || !meta || !body) return;
+
+  title.textContent = p.model ? `БеНК: ${p.model}` : "БеНК";
+  meta.textContent = p.maker ? `Виробник: ${p.maker}` : "";
+  body.innerHTML = buildPresetModalHtml(p);
+  overlay.style.display = "flex";
+}
+
+function wirePresetModal() {
+  const overlay = $("presetModal");
+  const closeBtn = $("presetModalCloseBtn");
+  if (closeBtn) closeBtn.addEventListener("click", () => { if (overlay) overlay.style.display = "none"; });
+  if (overlay) {
+    overlay.addEventListener("click", (e) => {
+      if (e.target === overlay) overlay.style.display = "none";
+    });
+  }
 }
 
 function wireInventory() {
@@ -3979,6 +4069,7 @@ wireHowCalcInline();
   renderT6Insights();
   wireT6CatalogControls();
   wireT6CatalogRowClicks();
+  wirePresetModal();
 }
 
 document.addEventListener("DOMContentLoaded", init);
