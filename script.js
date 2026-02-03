@@ -3576,6 +3576,112 @@ function renderInventory() {
   `;
 }
 
+function classifyMass(mass) {
+  const m = Number(mass);
+  if (!Number.isFinite(m)) return "—";
+  if (m <= 5) return "Міні";
+  if (m <= 50) return "Легкі";
+  if (m <= 500) return "Середні";
+  if (m <= 5000) return "Важкі";
+  return "Надважкі";
+}
+
+function classifyFunction(p) {
+  const g = String(p?.group || "").toLowerCase();
+  if (g.includes("бой")) return "Бойовий";
+  if (g.includes("логіст")) return "Логістичний";
+  if (g.includes("інжен")) return "Інженерний";
+  if (g.includes("спец")) return "Спеціальний";
+  if (g.includes("трен")) return "Тренажер";
+  return "—";
+}
+
+function classifyChassis(p) {
+  const g = String(p?.group || "").toLowerCase();
+  if (g.includes("коліс")) return "Колісне";
+  if (g.includes("гусен")) return "Гусеничне";
+  if (g.includes("спец")) return "Спеціальне";
+  return "—";
+}
+
+function classifyPower(p) {
+  const s = String(p?.power || "").toLowerCase();
+  if (s.includes("елект")) return "Електрична";
+  if (s.includes("двз") || s.includes("двз")) return "ДВЗ";
+  if (s.includes("комб")) return "Комбінована";
+  return p?.power ? String(p.power) : "—";
+}
+
+function funcClassName(func) {
+  switch (func) {
+    case "Бойовий": return "func-b";
+    case "Логістичний": return "func-l";
+    case "Інженерний": return "func-i";
+    case "Спеціальний": return "func-s";
+    case "Тренажер": return "func-t";
+    default: return "func-na";
+  }
+}
+
+function renderT6Catalog() {
+  const out = $("t6Catalog");
+  if (!out || typeof PRESETS === "undefined") return;
+
+  const rows = PRESETS.map(p => {
+    const model = String(p.model || "").trim();
+    const maker = String(p.maker || "").trim();
+    const func = classifyFunction(p);
+    const massClass = classifyMass(p.mass);
+    const chassis = classifyChassis(p);
+    const power = classifyPower(p);
+    const mass = (Number(p.mass) || 0) > 0 ? `${p.mass} кг` : "—";
+    const funcClass = funcClassName(func);
+    return { model, maker, func, funcClass, massClass, chassis, power, mass };
+  }).sort((a, b) => a.model.localeCompare(b.model, "uk"));
+
+  const groupOrder = ["Бойовий", "Логістичний", "Інженерний", "Спеціальний", "Тренажер", "—"];
+  const grouped = groupOrder.map(name => ({
+    name,
+    items: rows.filter(r => r.func === name)
+  })).filter(g => g.items.length);
+
+  const html = grouped.map(g => `
+    <div class="classGroup">
+      <div class="classGroupTitle">${esc(g.name)}</div>
+      <table class="classTable">
+        <tr>
+          <th>Модель</th>
+          <th>Призначення</th>
+          <th>Маса (клас)</th>
+          <th>Шасі</th>
+          <th>Силова</th>
+        </tr>
+        ${g.items.map(r => `
+          <tr class="classRow">
+            <td>
+              <div class="modelCell">
+                <strong>${esc(r.model || "—")}</strong>
+                <span class="muted">${esc(r.maker || "—")}</span>
+              </div>
+            </td>
+            <td><span class="chip ${r.funcClass}">${esc(r.func)}</span></td>
+            <td>
+              <div class="chipGroup">
+                <span class="chip">${esc(r.massClass)}</span>
+                <span class="chip muted">${esc(r.mass)}</span>
+              </div>
+            </td>
+            <td><span class="chip">${esc(r.chassis)}</span></td>
+            <td><span class="chip">${esc(r.power)}</span></td>
+          </tr>
+        `).join("")}
+      </table>
+    </div>
+  `).join("");
+
+  out.innerHTML = html;
+}
+
 function wireInventory() {
   renderInventoryFilters();
   renderInventory();
@@ -3708,6 +3814,7 @@ wireHowCalcInline();
   renderKPI();
   wireCopyButton();
   initDebugBadge();
+  renderT6Catalog();
 }
 
 document.addEventListener("DOMContentLoaded", init);

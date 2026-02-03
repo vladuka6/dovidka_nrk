@@ -277,6 +277,93 @@ body[data-theme="light"] header{
   background: color-mix(in srgb, var(--card) 88%, transparent);
 }
 
+.classTableWrap{ overflow-x:auto; }
+.classTable{
+  width:100%;
+  border-collapse:collapse;
+  font-size:13px;
+}
+.classTable th,
+.classTable td{
+  padding:8px 10px;
+  border:1px solid var(--line);
+  text-align:left;
+  vertical-align:top;
+}
+.classTable th{
+  background: color-mix(in srgb, var(--card2) 85%, transparent);
+  position:sticky;
+  top:0;
+  z-index:1;
+}
+.classRow:hover{
+  background: color-mix(in srgb, var(--accent) 8%, transparent);
+}
+.chip{
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  padding:4px 8px;
+  border-radius:999px;
+  border:1px solid var(--line);
+  background: color-mix(in srgb, var(--card2) 70%, transparent);
+  font-size:12px;
+  color:var(--text);
+  white-space:nowrap;
+}
+.chip.muted{ color:var(--muted); }
+.chipGroup{ display:flex; flex-wrap:wrap; gap:6px; }
+.modelCell{ display:flex; flex-direction:column; gap:4px; }
+.modelCell .muted{ color:var(--muted); font-size:12px; }
+.classGroup{ margin-top:12px; }
+.classGroupTitle{
+  font-weight:800;
+  font-size:13px;
+  margin:0 0 8px;
+  color: color-mix(in srgb, var(--text) 90%, var(--accent) 10%);
+}
+
+.chip.func-b{
+  border-color: color-mix(in srgb, var(--bad) 45%, transparent);
+  background: color-mix(in srgb, var(--bad) 18%, transparent);
+  color: var(--bad);
+}
+.chip.func-l{
+  border-color: color-mix(in srgb, var(--accent) 45%, transparent);
+  background: color-mix(in srgb, var(--accent) 16%, transparent);
+  color: var(--accent);
+}
+.chip.func-i{
+  border-color: color-mix(in srgb, var(--ok) 45%, transparent);
+  background: color-mix(in srgb, var(--ok) 16%, transparent);
+  color: var(--ok);
+}
+.chip.func-s{
+  border-color: color-mix(in srgb, var(--warn) 45%, transparent);
+  background: color-mix(in srgb, var(--warn) 16%, transparent);
+  color: var(--warn);
+}
+.chip.func-t{
+  border-color: color-mix(in srgb, var(--accent2) 45%, transparent);
+  background: color-mix(in srgb, var(--accent2) 16%, transparent);
+  color: var(--accent2);
+}
+.chip.func-na{
+  border-color: color-mix(in srgb, var(--muted) 40%, transparent);
+  background: color-mix(in srgb, var(--muted) 12%, transparent);
+  color: var(--muted);
+}
+
+@media (max-width: 720px){
+  .classTable{ font-size:12px; }
+  .classTable th, .classTable td{ padding:6px 8px; }
+  .chip{ font-size:11px; padding:3px 7px; }
+}
+@media (max-width: 420px){
+  .classTable{ font-size:11px; }
+  .classTable th, .classTable td{ padding:5px 6px; }
+}
+
 /* =========================
    5) FORMS
    ========================= */
