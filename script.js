@@ -3721,7 +3721,7 @@ function renderT6Catalog() {
           <th>Силова</th>
         </tr>
         ${g.items.map((r, idx) => `
-          <tr class="classRow" data-preset="${esc(r.key)}">
+          <tr class="classRow" data-preset="${encodeURIComponent(r.key)}">
             <td class="numCell">${idx + 1}</td>
             <td>
               <div class="modelCell">
@@ -3836,7 +3836,7 @@ function wireT6CatalogRowClicks() {
   wrap.addEventListener("click", (e) => {
     const row = e.target.closest("tr[data-preset]");
     if (!row) return;
-    const key = row.getAttribute("data-preset");
+    const key = decodeURIComponent(row.getAttribute("data-preset") || "");
     if (!key) return;
     openPresetModalByKey(key);
   });
