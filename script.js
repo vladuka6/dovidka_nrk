@@ -1269,8 +1269,8 @@ contactInfo: "+380501112233",
     mass: 1100,
     dims: "2850x1670x860",
     payload: 150,
-    maxSpeed: 15,
-    rangeRoad: 250,
+    maxSpeed: 0.4,
+    rangeRoad: 15,
     clearance: 250,
     climb: 30,
     tilt: 30,
@@ -1291,8 +1291,8 @@ contactInfo: "+380501112233",
     mass: 510,
     dims: "1590x1170x1300",
     payload: 250,
-    maxSpeed: 20,
-    rangeRoad: 210,
+    maxSpeed: 10,
+    rangeRoad: 20,
     clearance: 210,
     climb: 35,
     tilt: 25,
@@ -1319,8 +1319,8 @@ contactInfo: "+380501112233",
     mass: 711,
     dims: "1465x1220x1241",
     payload: 200,
-    maxSpeed: 40,
-    rangeRoad: 400,
+    maxSpeed: 15,
+    rangeRoad: 40,
     clearance: 400,
     climb: 30,
     tilt: 25,
@@ -1347,8 +1347,8 @@ contactInfo: "+380501112233",
     mass: 163.5,
     dims: "1050x790x1170",
     payload: 50,
-    maxSpeed: 17,
-    rangeRoad: 160,
+    maxSpeed: 8,
+    rangeRoad: 17,
     clearance: 160,
     climb: 20,
     tilt: 25,
@@ -1369,8 +1369,8 @@ contactInfo: "+380501112233",
     mass: 65,
     dims: "830x740x1010",
     payload: 95,
-    maxSpeed: 6,
-    rangeRoad: 150,
+    maxSpeed: 20,
+    rangeRoad: 6,
     clearance: 150,
     climb: 30,
     tilt: 30,
@@ -1391,8 +1391,8 @@ contactInfo: "+380501112233",
     mass: 60,
     dims: "740x700x1330",
     payload: 50,
-    maxSpeed: 20,
-    rangeRoad: 180,
+    maxSpeed: 30,
+    rangeRoad: 20,
     clearance: 180,
     climb: 30,
     tilt: 30,
@@ -1413,8 +1413,8 @@ contactInfo: "+380501112233",
     mass: 70,
     dims: "950x850x765",
     payload: 80,
-    maxSpeed: 24,
-    rangeRoad: 175,
+    maxSpeed: 12,
+    rangeRoad: 24,
     clearance: 175,
     climb: 20,
     tilt: 20,
@@ -1435,8 +1435,8 @@ contactInfo: "+380501112233",
     mass: 135,
     dims: "1080x785x1248",
     payload: 41,
-    maxSpeed: 30,
-    rangeRoad: 163,
+    maxSpeed: 10,
+    rangeRoad: 30,
     clearance: 163,
     climb: 17,
     tilt: 22,
@@ -1457,8 +1457,8 @@ contactInfo: "+380501112233",
     mass: 176,
     dims: "1055x870x1260",
     payload: 44,
-    maxSpeed: 32,
-    rangeRoad: 160,
+    maxSpeed: 8.5,
+    rangeRoad: 32,
     clearance: 160,
     climb: 23,
     tilt: 23,
@@ -1479,8 +1479,8 @@ contactInfo: "+380501112233",
     mass: 157,
     dims: "1485x900x1860",
     payload: 50,
-    maxSpeed: 25,
-    rangeRoad: 165,
+    maxSpeed: 8,
+    rangeRoad: 25,
     clearance: 165,
     climb: 23,
     tilt: 23,
@@ -1501,8 +1501,8 @@ contactInfo: "+380501112233",
     mass: 280,
     dims: "1400x1200x1500",
     payload: 200,
-    maxSpeed: 11,
-    rangeRoad: 200,
+    maxSpeed: 15,
+    rangeRoad: 11,
     clearance: 200,
     climb: 30,
     tilt: 30,
@@ -1523,8 +1523,8 @@ contactInfo: "+380501112233",
     mass: 280,
     dims: "1400x1200x1500",
     payload: 200,
-    maxSpeed: 11,
-    rangeRoad: 200,
+    maxSpeed: 15,
+    rangeRoad: 11,
     clearance: 200,
     climb: 30,
     tilt: 30,
@@ -1545,8 +1545,8 @@ contactInfo: "+380501112233",
     mass: 290,
     dims: "1400x1200x2140",
     payload: 200,
-    maxSpeed: 11,
-    rangeRoad: 200,
+    maxSpeed: 15,
+    rangeRoad: 11,
     clearance: 200,
     climb: 30,
     tilt: 30,
@@ -1567,8 +1567,8 @@ contactInfo: "+380501112233",
     mass: 325,
     dims: "1250x1400x1350",
     payload: 320,
-    maxSpeed: 40,
-    rangeRoad: 180,
+    maxSpeed: 15,
+    rangeRoad: 40,
     clearance: 180,
     climb: 30,
     tilt: 30,
@@ -1589,8 +1589,8 @@ contactInfo: "+380501112233",
     mass: 90,
     dims: "1410x370x325",
     payload: 130,
-    maxSpeed: 30,
-    rangeRoad: 160,
+    maxSpeed: 5,
+    rangeRoad: 30,
     clearance: 160,
     climb: 15,
     tilt: 20,
@@ -1611,8 +1611,8 @@ contactInfo: "+380501112233",
     mass: 142,
     dims: "1540x400x220",
     payload: 130,
-    maxSpeed: 30,
-    rangeRoad: 160,
+    maxSpeed: 5,
+    rangeRoad: 30,
     clearance: 160,
     climb: 15,
     tilt: 20,
@@ -1633,8 +1633,8 @@ contactInfo: "+380501112233",
     mass: 73,
     dims: "935x710x510",
     payload: 43,
-    maxSpeed: 25,
-    rangeRoad: 140,
+    maxSpeed: 10,
+    rangeRoad: 25,
     clearance: 140,
     climb: 30,
     tilt: 25,
@@ -1661,8 +1661,8 @@ contactInfo: "+380501112233",
     mass: 360,
     dims: "1640x1150x1050",
     payload: 200,
-    maxSpeed: 10,
-    rangeRoad: 180,
+    maxSpeed: 4.5,
+    rangeRoad: 10,
     clearance: 180,
     climb: 25,
     tilt: 24,
@@ -1683,8 +1683,8 @@ contactInfo: "+380501112233",
     mass: 275,
     dims: "1300x1080x1300",
     payload: 150,
-    maxSpeed: 40,
-    rangeRoad: 190,
+    maxSpeed: 12,
+    rangeRoad: 40,
     clearance: 190,
     climb: 25,
     tilt: 30,
@@ -1705,8 +1705,8 @@ contactInfo: "+380501112233",
     mass: 400,
     dims: "1810x1110x1120",
     payload: 300,
-    maxSpeed: 12,
-    rangeRoad: 110,
+    maxSpeed: 4,
+    rangeRoad: 12,
     clearance: 110,
     climb: 33,
     tilt: 36,
@@ -1727,8 +1727,8 @@ contactInfo: "+380501112233",
     mass: 250,
     dims: "1165x900x1225",
     payload: 300,
-    maxSpeed: 15,
-    rangeRoad: 115,
+    maxSpeed: 7,
+    rangeRoad: 15,
     clearance: 115,
     climb: 25,
     tilt: 20,
@@ -1755,8 +1755,8 @@ contactInfo: "+380501112233",
     mass: 43.5,
     dims: "740x650x1120",
     payload: 30,
-    maxSpeed: 13,
-    rangeRoad: 150,
+    maxSpeed: 10,
+    rangeRoad: 13,
     clearance: 150,
     climb: 30,
     tilt: 30,
@@ -1777,8 +1777,8 @@ contactInfo: "+380501112233",
     mass: 48,
     dims: "900x800x800",
     payload: 50,
-    maxSpeed: 16,
-    rangeRoad: 180,
+    maxSpeed: 24,
+    rangeRoad: 16,
     clearance: 180,
     climb: 35,
     tilt: 30,
@@ -3780,6 +3780,14 @@ function renderT6Insights() {
   const valOut = $("t6Value");
   if (!topOut || !valOut || typeof PRESETS === "undefined") return;
 
+  const toFlag = (v) => {
+    const s = String(v ?? "").trim();
+    if (s === "+") return 1;
+    if (s === "-" || s === "") return 0;
+    const n = Number(s);
+    return Number.isFinite(n) && n > 0 ? 1 : 0;
+  };
+
   const items = PRESETS.map(p => ({
     model: String(p.model || "").trim(),
     maker: String(p.maker || "").trim(),
@@ -3787,7 +3795,15 @@ function renderT6Insights() {
     payload: Number(p.payload),
     rangeRoad: Number(p.rangeRoad),
     maxSpeed: Number(p.maxSpeed),
+    clearance: Number(p.clearance),
     price: Number(p.price),
+    optical: p.optical,
+    opticalIR: p.opticalIR,
+    thermal: p.thermal,
+    starlink: p.starlink,
+    lte: p.lte,
+    radioKm: Number(p.radioKm),
+    sensorScore: (toFlag(p.optical) + toFlag(p.opticalIR) + toFlag(p.thermal)) / 3,
   })).filter(x => x.model);
 
   const top5 = (arr, key) => arr
@@ -3808,10 +3824,11 @@ function renderT6Insights() {
       </ul>
     </div>`;
 
-  const buildTopBlock = (title, subset) => `
+  const buildTopBlock = (title, subset, ratingKey, ratingHint) => `
     <div class="insightCard">
       <div class="insightTitle">${title}</div>
       <div class="t6Insights">
+        ${renderList(`ТОП-5 рейтинг <span class="infoHint" title="${ratingHint}">?</span>`, top5(subset, ratingKey), ratingKey, "")}
         ${renderList("ТОП‑5 вантажність", top5(subset, "payload"), "payload", " кг")}
         ${renderList("ТОП‑5 запас ходу", top5(subset, "rangeRoad"), "rangeRoad", " км")}
         ${renderList("ТОП‑5 швидкість", top5(subset, "maxSpeed"), "maxSpeed", " км/год")}
@@ -3830,12 +3847,70 @@ function renderT6Insights() {
     return { ...x, valueScore };
   });
 
-  const logistic = withValue.filter(x => x.func === "Логістичний");
-  const engineering = withValue.filter(x => x.func === "Інженерний");
+  const minMax = (arr, key) => {
+    const vals = arr.map(x => x[key]).filter(v => Number.isFinite(v) && v > 0);
+    if (!vals.length) return [0, 1];
+    return [Math.min(...vals), Math.max(...vals)];
+  };
+  const norm = (v, min, max) => {
+    if (!Number.isFinite(v) || max === min) return 0;
+    return (v - min) / (max - min);
+  };
+  const [pMin, pMax] = minMax(withValue, "payload");
+  const [rMin, rMax] = minMax(withValue, "rangeRoad");
+  const [sMin, sMax] = minMax(withValue, "maxSpeed");
+  const [cMin, cMax] = minMax(withValue, "clearance");
+  const [prMin, prMax] = minMax(withValue, "price");
+  const [rKmMin, rKmMax] = minMax(withValue, "radioKm");
+
+  const withOverall = withValue.map(x => {
+    const nPayload = norm(x.payload, pMin, pMax);
+    const nRange = norm(x.rangeRoad, rMin, rMax);
+    const nSpeed = norm(x.maxSpeed, sMin, sMax);
+    const nClear = norm(x.clearance, cMin, cMax);
+    const nPriceInv = 1 - norm(x.price, prMin, prMax);
+    const nRadio = norm(x.radioKm, rKmMin, rKmMax);
+    const commScore = (toFlag(x.starlink) + toFlag(x.lte) + nRadio) / 3;
+
+    const logisticRating = Math.round((
+      nPayload * 0.22 +
+      nRange * 0.18 +
+      nSpeed * 0.08 +
+      nClear * 0.05 +
+      nPriceInv * 0.12 +
+      commScore * 0.18 +
+      x.sensorScore * 0.17
+    ) * 1000) / 1000;
+
+    const engineeringRating = Math.round((
+      nClear * 0.20 +
+      nSpeed * 0.10 +
+      nRange * 0.10 +
+      nPayload * 0.05 +
+      nPriceInv * 0.10 +
+      commScore * 0.20 +
+      x.sensorScore * 0.25
+    ) * 1000) / 1000;
+
+    return { ...x, logisticRating, engineeringRating };
+  });
+
+  const logistic = withOverall.filter(x => x.func === "Логістичний");
+  const engineering = withOverall.filter(x => x.func === "Інженерний");
 
   topOut.innerHTML = [
-    buildTopBlock("Логістичні", logistic),
-    buildTopBlock("Інженерні", engineering),
+    buildTopBlock(
+      "Логістичні",
+      logistic,
+      "logisticRating",
+      "Рейтинг = вантажність(0.22) + дальність(0.18) + швидкість(0.08) + кліренс(0.05) + ціна(0.12, інверсія) + зв’язок(0.18) + сенсори(0.17). Інверсія ціни: найдешевша=1, найдорожча=0 (напр. 1млн →1, 2млн →0)."
+    ),
+    buildTopBlock(
+      "Інженерні",
+      engineering,
+      "engineeringRating",
+      "Рейтинг = кліренс(0.20) + швидкість(0.10) + дальність(0.10) + вантажність(0.05) + ціна(0.10, інверсія) + зв’язок(0.20) + сенсори(0.25). Інверсія ціни: найдешевша=1, найдорожча=0."
+    ),
   ].join("");
 
   const valueList = items
@@ -3870,8 +3945,8 @@ function renderT6Insights() {
     </div>`;
 
   valOut.innerHTML = [
-    renderValueList("Ціна за кг вантажності (краще)", bestKg, "pricePerKg"),
-    renderValueList("Ціна за км пробігу (краще)", bestKm, "pricePerKm"),
+    renderValueList('Ціна за кг вантажності (краще) <span class="infoHint" title="Формула: ціна / вантажність. Менше = вигідніше. Напр. 1 000 000 / 500 = 2000 грн/кг.">?</span>', bestKg, "pricePerKg"),
+    renderValueList('Ціна за км пробігу (краще) <span class="infoHint" title="Формула: ціна / запас ходу. Менше = вигідніше. Напр. 1 000 000 / 20 = 50 000 грн/км.">?</span>', bestKm, "pricePerKm"),
   ].join("");
 }
 
