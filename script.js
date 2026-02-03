@@ -3718,9 +3718,9 @@ function renderT6Catalog() {
           <th class="numCell">№</th>
           <th>Модель</th>
           <th>Призначення</th>
-          <th>Клас маси</th>
-          <th>Маса</th>
-          <th>Ціна</th>
+          <th>Клас за масою</th>
+          <th>Маса, кг</th>
+          <th>Ціна, грн</th>
           <th>Шасі</th>
           <th>Силова</th>
         </tr>
