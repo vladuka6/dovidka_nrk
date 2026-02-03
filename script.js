@@ -3612,6 +3612,24 @@ function classifyPower(p) {
   return p?.power ? String(p.power) : "—";
 }
 
+function shortChassis(label) {
+  switch (label) {
+    case "Колісне": return "К";
+    case "Гусеничне": return "Г";
+    case "Спеціальне": return "Сп";
+    default: return "—";
+  }
+}
+
+function shortPower(label) {
+  switch (label) {
+    case "Електрична": return "Е";
+    case "ДВЗ": return "Д";
+    case "Комбінована": return "К";
+    default: return "—";
+  }
+}
+
 function funcClassName(func) {
   switch (func) {
     case "Бойовий": return "func-b";
@@ -3634,10 +3652,14 @@ function renderT6Catalog() {
     const massClass = classifyMass(p.mass);
     const chassis = classifyChassis(p);
     const power = classifyPower(p);
+    const chassisShort = shortChassis(chassis);
+    const powerShort = shortPower(power);
     const massNum = Number(p.mass);
     const mass = Number.isFinite(massNum) && massNum > 0 ? `${massNum} кг` : "—";
+    const priceNum = Number(p.price);
+    const price = Number.isFinite(priceNum) && priceNum > 0 ? formatPrice(priceNum) : "—";
     const funcClass = funcClassName(func);
-    return { model, maker, func, funcClass, massClass, chassis, power, mass, massNum };
+    return { model, maker, func, funcClass, massClass, chassis, chassisShort, power, powerShort, mass, massNum, price, priceNum };
   }).sort((a, b) => a.model.localeCompare(b.model, "uk"));
 
   const funcSelect = $("t6FuncFilter");
@@ -3663,6 +3685,10 @@ function renderT6Catalog() {
   const sortItems = (arr) => {
     const copy = arr.slice();
     switch (sort) {
+      case "price_asc":
+        return copy.sort((a, b) => (a.priceNum || Infinity) - (b.priceNum || Infinity) || a.model.localeCompare(b.model, "uk"));
+      case "price_desc":
+        return copy.sort((a, b) => (b.priceNum || -Infinity) - (a.priceNum || -Infinity) || a.model.localeCompare(b.model, "uk"));
       case "mass_asc":
         return copy.sort((a, b) => (a.massNum || Infinity) - (b.massNum || Infinity) || a.model.localeCompare(b.model, "uk"));
       case "mass_desc":
@@ -3687,7 +3713,9 @@ function renderT6Catalog() {
           <th class="numCell">№</th>
           <th>Модель</th>
           <th>Призначення</th>
-          <th>Маса (клас)</th>
+          <th>Клас маси</th>
+          <th>Маса</th>
+          <th>Ціна</th>
           <th>Шасі</th>
           <th>Силова</th>
         </tr>
@@ -3701,14 +3729,11 @@ function renderT6Catalog() {
               </div>
             </td>
             <td><span class="chip ${r.funcClass}">${esc(r.func)}</span></td>
-            <td>
-              <div class="chipGroup">
-                <span class="chip">${esc(r.massClass)}</span>
-                <span class="chip muted">${esc(r.mass)}</span>
-              </div>
-            </td>
-            <td><span class="chip">${esc(r.chassis)}</span></td>
-            <td><span class="chip">${esc(r.power)}</span></td>
+            <td><span class="chip">${esc(r.massClass)}</span></td>
+            <td><span class="chip muted">${esc(r.mass)}</span></td>
+            <td><span class="chip muted">${r.price}</span></td>
+            <td><span class="chip" title="${esc(r.chassis)}">${esc(r.chassisShort)}</span></td>
+            <td><span class="chip" title="${esc(r.power)}">${esc(r.powerShort)}</span></td>
           </tr>
         `).join("")}
       </table>
