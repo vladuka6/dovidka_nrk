@@ -3574,24 +3574,7 @@ function renderInventory() {
       Загальна кількість БеНК за поточним фільтром: <b>${grandTotal}</b>
     </div>
   `;
-
-  // Автоматичне масштабування на мобілці після рендеру
-  if (window.innerWidth <= 980) {
-    setTimeout(() => {
-      // Скидаємо масштаб до 100%
-      document.body.style.zoom = '1.0';
-      // Прокручування до початку таблиці (враховуємо header)
-      const t7 = document.getElementById('t7');
-      if (t7) {
-        window.scrollTo({
-          top: t7.offsetTop - 80,
-          behavior: 'smooth'
-        });
-      }
-    }, 200); // даємо час браузеру намалювати таблицю
-  }
 }
-
 
 function wireInventory() {
   renderInventoryFilters();
@@ -3665,17 +3648,6 @@ function initTheme() {
   // одразу оновлюємо кнопку
   toggleTheme();   // це викличе оновлення іконки/тексту
 }
-function adjustMobileZoomForT7() {
-  if (window.innerWidth <= 980) {
-    const t7 = document.getElementById('t7');
-    if (t7 && !t7.classList.contains('hide')) {
-      // можна спробувати скинути масштаб (працює не на всіх браузерах)
-      document.body.style.zoom = 1.0;
-      // або просто скрол до верху
-      window.scrollTo(0, 0);
-    }
-  }
-}
 document.addEventListener("DOMContentLoaded", () => {
   initTheme();
   document.getElementById("themeToggle")?.addEventListener("click", toggleTheme);
@@ -3735,6 +3707,7 @@ wireHowCalcInline();
   wireReportButtons();
   renderKPI();
   wireCopyButton();
+  initDebugBadge();
 }
 
 document.addEventListener("DOMContentLoaded", init);
@@ -3766,68 +3739,34 @@ function wireCopyButton() {
   });
 }
 
-// Примусовий ресет масштабу при кожному показі вкладки Прикз
-function forceMobileScaleReset() {
-  if (window.innerWidth > 1024) return;
+function initDebugBadge() {
+  const params = new URLSearchParams(window.location.search || "");
+  if (!params.has("debug")) return;
 
-  const t7 = document.getElementById('t7');
-  if (!t7 || t7.classList.contains('hide')) return;
+  let badge = document.getElementById("devDebug");
+  if (!badge) {
+    badge = document.createElement("div");
+    badge.id = "devDebug";
+    document.body.appendChild(badge);
+  }
 
-  // 1. Скидаємо масштаб
-  document.body.style.zoom = '0.85';           // 85% — оптимально для 414px екрану
-  document.documentElement.style.zoom = '0.85';
+  const update = () => {
+    const w = window.innerWidth || 0;
+    const h = window.innerHeight || 0;
+    const dpr = window.devicePixelRatio || 1;
+    const theme = document.body.getAttribute("data-theme") || "dark";
+    const active = document.querySelector("main section:not(.hide)")?.id || "—";
+    const sticky = document.getElementById("invStickyBar")?.classList.contains("isStuck")
+      ? "stuck"
+      : "free";
+    badge.textContent = `${w}x${h} @${dpr} | theme:${theme} | tab:${active} | sticky:${sticky}`;
+  };
 
-  // 2. Прокручуємо до початку таблиці
-  setTimeout(() => {
-    window.scrollTo({
-      top: t7.offsetTop - 100,
-      behavior: 'instant'
-    });
-  }, 300);
-}
-
-// Виклик при перемиканні вкладок
-document.querySelectorAll('.tab').forEach(tab => {
-  tab.addEventListener('click', () => {
-    if (tab.dataset.tab === 't7') {
-      setTimeout(forceMobileScaleReset, 400);
-    }
+  update();
+  window.addEventListener("resize", update, { passive: true });
+  window.addEventListener("scroll", update, { passive: true });
+  document.querySelectorAll(".tab").forEach(tab => {
+    tab.addEventListener("click", () => setTimeout(update, 80));
   });
-});
-
-// Виклик при першому завантаженні, якщо вже на t7
-if (!document.getElementById('t7').classList.contains('hide')) {
-  setTimeout(forceMobileScaleReset, 800);
+  document.getElementById("themeToggle")?.addEventListener("click", () => setTimeout(update, 80));
 }
-// Примусовий ресет масштабу та скрол при перемиканні вкладок (виправляє баг Safari)
-function resetViewportOnTabChange() {
-  if (window.innerWidth > 980) return; // тільки для мобілки
-
-  setTimeout(() => {
-    // 1. Скидаємо масштаб до 92% (оптимально для 414px)
-    document.body.style.zoom = '0.92';
-    document.documentElement.style.zoom = '0.92';
-
-    // 2. Прокручуємо до початку контенту поточної вкладки
-    const activeSection = document.querySelector('main section:not(.hide)');
-    if (activeSection) {
-      window.scrollTo({
-        top: activeSection.offsetTop - 100,
-        behavior: 'instant'
-      });
-    }
-
-    // 3. Примусово перераховуємо layout (Safari любить це)
-    document.body.style.display = 'none';
-    document.body.offsetHeight; // force reflow
-    document.body.style.display = '';
-  }, 300); // затримка, щоб дочекатися рендеру
-}
-
-// Прив'язуємо до всіх табів
-document.querySelectorAll('.tab').forEach(tab => {
-  tab.addEventListener('click', resetViewportOnTabChange);
-});
-
-// Виклик при першому завантаженні
-window.addEventListener('load', resetViewportOnTabChange);
