@@ -210,6 +210,72 @@ body[data-theme="light"] header{
   box-shadow: none;
 }
 .section + .section{ margin-top:12px; }
+.sectionTitle{
+  font-size:13px;
+  font-weight:800;
+  margin:0 0 8px;
+  color: color-mix(in srgb, var(--text) 90%, var(--accent) 10%);
+}
+
+.t6TableWrap{ overflow-x:auto; }
+.t6Table th{ text-align:left; }
+.t6Table td{ text-align:left; vertical-align:top; }
+.vlist{ display:flex; flex-direction:column; gap:4px; }
+@media (max-width: 720px){
+  .t6Table{ font-size:12px; }
+  .t6Table th, .t6Table td{ padding:6px 8px; }
+  .t6Table th:first-child, .t6Table td:first-child{ width:40px; }
+  .vlist{ gap:2px; }
+}
+@media (max-width: 420px){
+  .t6Table{ font-size:11px; }
+  .t6Table th, .t6Table td{ padding:5px 6px; }
+}
+
+.noteBox{
+  margin-top:12px;
+  border:1px solid var(--line);
+  border-radius:12px;
+  padding:10px 12px;
+  background: color-mix(in srgb, var(--card2) 85%, transparent);
+  font-size:12px;
+  line-height:1.4;
+  color:var(--muted);
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+}
+
+.legendGrid{
+  display:grid;
+  gap:8px;
+  grid-template-columns:repeat(auto-fit, minmax(180px, 1fr));
+}
+.legendItem{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  font-size:12.5px;
+  color:var(--muted);
+}
+.legendKey{
+  min-width:34px;
+  text-align:center;
+  padding:4px 8px;
+  border-radius:999px;
+  border:1px solid var(--line);
+  background: color-mix(in srgb, var(--card2) 70%, transparent);
+  color:var(--text);
+  font-weight:700;
+}
+
+.exampleBox{
+  margin-top:12px;
+  border:1px solid var(--line);
+  border-radius:14px;
+  padding:12px;
+  background: color-mix(in srgb, var(--card) 88%, transparent);
+}
 
 /* =========================
    5) FORMS
