@@ -4026,6 +4026,35 @@ document.querySelectorAll('.tab').forEach(tab => {
 
 // Початковий виклик
 setTimeout(handleStickyBar, 300);
+
+function handlePhotoBoxOnScroll() {
+  if (window.innerWidth <= 980) return;
+  const y = window.scrollY || 0;
+  const isHidden = document.body.classList.contains("hidePhotoBox");
+  const showAt = 120;
+  const hideAt = 220;
+  if (!isHidden && y > hideAt) {
+    document.body.classList.add("hidePhotoBox");
+    photoBoxLockUntil = Date.now() + 300;
+  }
+  if (isHidden && y < showAt) {
+    document.body.classList.remove("hidePhotoBox");
+    photoBoxLockUntil = Date.now() + 300;
+  }
+}
+let photoBoxTimer = null;
+let photoBoxLockUntil = 0;
+window.addEventListener("scroll", () => {
+  if (Date.now() < photoBoxLockUntil) return;
+  if (photoBoxTimer) clearTimeout(photoBoxTimer);
+  photoBoxTimer = setTimeout(() => {
+    handlePhotoBoxOnScroll();
+  }, 120);
+}, { passive: true });
+window.addEventListener("resize", () => {
+  if (photoBoxTimer) clearTimeout(photoBoxTimer);
+  handlePhotoBoxOnScroll();
+}, { passive: true });
 /* =========================================================
    INIT
 ========================================================= */
