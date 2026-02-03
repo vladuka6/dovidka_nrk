@@ -2085,6 +2085,10 @@ function formatPrice(n) {
   if (!Number.isFinite(n)) return "—";
   return n.toLocaleString("uk-UA") + " грн";
 }
+function formatPriceNoCurrency(n) {
+  if (!Number.isFinite(n)) return "—";
+  return n.toLocaleString("uk-UA");
+}
 function toNum(v) {
   if (v === "" || v === null || v === undefined) return null;
   const n = Number(v);
@@ -3655,9 +3659,9 @@ function renderT6Catalog() {
     const chassisShort = shortChassis(chassis);
     const powerShort = shortPower(power);
     const massNum = Number(p.mass);
-    const mass = Number.isFinite(massNum) && massNum > 0 ? `${massNum} кг` : "—";
+    const mass = Number.isFinite(massNum) && massNum > 0 ? `${massNum}` : "—";
     const priceNum = Number(p.price);
-    const price = Number.isFinite(priceNum) && priceNum > 0 ? formatPrice(priceNum) : "—";
+    const price = Number.isFinite(priceNum) && priceNum > 0 ? formatPriceNoCurrency(priceNum) : "—";
     const key = presetKey(p);
     const funcClass = funcClassName(func);
     return { key, model, maker, func, funcClass, massClass, chassis, chassisShort, power, powerShort, mass, massNum, price, priceNum };
@@ -3848,62 +3852,45 @@ function buildPresetModalHtml(p) {
     ? `<img src="${esc(photoUrl)}" alt="${esc(p.model || "")}">`
     : "";
 
-  const photoBlock = `
-    <div class="photoBox">
-      <div class="photoFrame">
-        ${imgHtml}
-        <div class="noPhoto"${photoUrl ? ' style="display:none"' : ""}>Фото</div>
+  const priceNum = Number(p.price);
+  const priceText = Number.isFinite(priceNum) ? formatPrice(priceNum) : "—";
+
+  return `
+    <div class="presetModalBody">
+      <div class="presetHero">
+        <div class="presetPhoto">
+          ${imgHtml}
+          <div class="noPhoto"${photoUrl ? ' style="display:none"' : ""}>Фото</div>
+        </div>
+        <div class="presetBadges">
+          <span class="chip"><strong>${esc(p.model || "—")}</strong></span>
+          <span class="chip muted">${esc(p.maker || "—")}</span>
+          <span class="chip">Ціна: <strong>${priceText}</strong></span>
+          <span class="chip">Силова: <strong>${esc(p.power || "—")}</strong></span>
+        </div>
       </div>
-      <div class="photoMeta">
-        <div class="pill"><strong>${esc(p.model || "—")}</strong></div>
-        <div class="pill">${esc(p.maker || "—")}</div>
-        <div class="pill">Ціна: <strong>${formatPrice(Number(p.price))}</strong></div>
-        <div class="pill">Силова: <strong>${esc(p.power || "—")}</strong></div>
+
+      <div class="presetGrid">
+        <div class="presetItem"><b>Маса</b><span>${esc(p.mass ?? "—")}</span></div>
+        <div class="presetItem"><b>Корисне навантаження</b><span>${esc(p.payload ?? "—")}</span></div>
+        <div class="presetItem"><b>Макс швидкість</b><span>${esc(p.maxSpeed ?? "—")}</span></div>
+        <div class="presetItem"><b>Запас ходу</b><span>${esc(p.rangeRoad ?? "—")}</span></div>
+        <div class="presetItem"><b>Кліренс</b><span>${esc(p.clearance ?? "—")}</span></div>
+        <div class="presetItem"><b>Розміри</b><span>${esc(p.dims ?? "—")}</span></div>
+        <div class="presetItem"><b>Оптична</b><span>${esc(p.optical ?? "—")}</span></div>
+        <div class="presetItem"><b>Оптична з ІЧ</b><span>${esc(p.opticalIR ?? "—")}</span></div>
+        <div class="presetItem"><b>Тепловізійна</b><span>${esc(p.thermal ?? "—")}</span></div>
+        <div class="presetItem"><b>Starlink</b><span>${esc(p.starlink ?? "—")}</span></div>
+        <div class="presetItem"><b>LTE</b><span>${esc(p.lte ?? "—")}</span></div>
+        <div class="presetItem"><b>Радіо, км</b><span>${esc(p.radioKm ?? "—")}</span></div>
+      </div>
+
+      <div class="presetFooter">
+        <div><b>Контакт</b>: ${esc(p.contactName ?? "—")}</div>
+        <div><b>Зв’язок</b>: ${esc(p.contactInfo ?? "—")}</div>
       </div>
     </div>
   `;
-
-  const specBlock = `
-    <div class="box">
-      <h2>1) Загальні</h2>
-      <div class="grid">
-        <div class="row"><b>Маса, кг</b><span>${esc(p.mass ?? "—")}</span></div>
-        <div class="row"><b>Розміри</b><span>${esc(p.dims ?? "—")}</span></div>
-        <div class="row"><b>Корисне навантаження, кг</b><span>${esc(p.payload ?? "—")}</span></div>
-        <div class="row"><b>Макс швидкість, км/год</b><span>${esc(p.maxSpeed ?? "—")}</span></div>
-        <div class="row"><b>Запас ходу, км</b><span>${esc(p.rangeRoad ?? "—")}</span></div>
-        <div class="row"><b>Кліренс, мм</b><span>${esc(p.clearance ?? "—")}</span></div>
-        <div class="row"><b>Кут підйому, °</b><span>${esc(p.climb ?? "—")}</span></div>
-        <div class="row"><b>Кут крену, °</b><span>${esc(p.tilt ?? "—")}</span></div>
-      </div>
-    </div>
-  `;
-
-  const sensorsBlock = `
-    <div class="box">
-      <h2>2) Сенсори / зв’язок</h2>
-      <div class="grid">
-        <div class="row"><b>Оптична</b><span>${esc(p.optical ?? "—")}</span></div>
-        <div class="row"><b>Оптична з ІЧ</b><span>${esc(p.opticalIR ?? "—")}</span></div>
-        <div class="row"><b>Тепловізійна</b><span>${esc(p.thermal ?? "—")}</span></div>
-        <div class="row"><b>Радіо, км</b><span>${esc(p.radioKm ?? "—")}</span></div>
-        <div class="row"><b>Starlink</b><span>${esc(p.starlink ?? "—")}</span></div>
-        <div class="row"><b>LTE</b><span>${esc(p.lte ?? "—")}</span></div>
-      </div>
-    </div>
-  `;
-
-  const contactBlock = `
-    <div class="box">
-      <h2>3) Контакти</h2>
-      <div class="grid">
-        <div class="row"><b>Контакт</b><span>${esc(p.contactName ?? "—")}</span></div>
-        <div class="row"><b>Зв’язок</b><span>${esc(p.contactInfo ?? "—")}</span></div>
-      </div>
-    </div>
-  `;
-
-  return `${photoBlock}${specBlock}${sensorsBlock}${contactBlock}`;
 }
 
 function openPresetModalByKey(key) {

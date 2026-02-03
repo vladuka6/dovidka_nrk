@@ -318,6 +318,54 @@ body[data-theme="light"] header{
 }
 .insightItem .muted{ color:var(--muted); }
 
+.presetModalBody{ display:flex; flex-direction:column; gap:12px; }
+.presetHero{
+  display:grid;
+  gap:12px;
+  grid-template-columns:220px 1fr;
+  align-items:start;
+}
+.presetPhoto{
+  position:relative;
+  border:1px solid var(--line);
+  border-radius:14px;
+  overflow:hidden;
+  background: color-mix(in srgb, var(--card2) 80%, transparent);
+  box-shadow: var(--shadow);
+  min-height:170px;
+}
+.presetPhoto img{ width:100%; height:170px; object-fit:cover; display:block; }
+.presetBadges{ display:flex; flex-wrap:wrap; gap:8px; }
+.presetGrid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit, minmax(180px, 1fr));
+  gap:8px 12px;
+  border:1px solid var(--line);
+  border-radius:12px;
+  padding:10px 12px;
+  background: color-mix(in srgb, var(--card2) 85%, transparent);
+}
+.presetItem{
+  display:flex;
+  justify-content:space-between;
+  gap:8px;
+  font-size:12.5px;
+}
+.presetItem b{ color:var(--text); }
+.presetItem span{ color:var(--muted); }
+.presetFooter{
+  font-size:12.5px;
+  color:var(--muted);
+  border:1px solid var(--line);
+  border-radius:12px;
+  padding:10px 12px;
+  background: color-mix(in srgb, var(--card) 88%, transparent);
+}
+@media (max-width: 720px){
+  .presetHero{ grid-template-columns:1fr; }
+  .presetPhoto img{ height:160px; }
+}
+
 .classTableWrap{ overflow-x:auto; }
 .classTable{
   width:100%;
