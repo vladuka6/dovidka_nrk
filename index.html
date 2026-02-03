@@ -6,6 +6,12 @@
   <title>НРК — оцінювання (2026 | порівняння + висновок)</title>
   <link rel="stylesheet" href="styles.css"/>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link
+    rel="stylesheet"
+    href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+    crossorigin=""
+  />
 
 </head>
 <body>
@@ -29,6 +35,9 @@
   </button>
   <button class="tab" data-tab="t5" type="button">
     <i class="fa-solid fa-scale-balanced"></i><span class="tabLabel">Порівняння</span>
+  </button>
+  <button class="tab" data-tab="t8" type="button">
+    <i class="fa-solid fa-map-location-dot"></i><span class="tabLabel">Місії</span>
   </button>
 
   <!-- ✅ ТЕМА — НЕ .tab -->
@@ -342,64 +351,45 @@
 
     <div class="section">
       <div class="sectionTitle">1) Основні характеристики</div>
-      <div class="t6TableWrap">
-        <table class="t6Table">
-          <tr>
-            <th style="width:56px">№</th>
-            <th>Назва характеристики</th>
-            <th>Види</th>
-          </tr>
-          <tr>
-            <td>1</td>
-            <td>За основним функціональним призначенням</td>
-            <td>
-              <div class="vlist">
-                <div>Бойовий</div>
-                <div>*Бойовий (стаціонарний)</div>
-                <div>Логістичний</div>
-                <div>Інженерний</div>
-                <div>Спеціальний</div>
-                <div>*Спеціальний (стаціонарний)</div>
-                <div>Тренажери (навчальні)</div>
-              </div>
-            </td>
-          </tr>
-          <tr>
-            <td>2</td>
-            <td>За спорядженою масою**</td>
-            <td>
-              <div class="vlist">
-                <div>Міні – до 5 кг</div>
-                <div>Легкі – 5–50 кг</div>
-                <div>Середні – 50–500 кг</div>
-                <div>Важкі – 500–5000 кг</div>
-                <div>Надважкі – понад 5000 кг</div>
-              </div>
-            </td>
-          </tr>
-          <tr>
-            <td>3</td>
-            <td>За типом шасі</td>
-            <td>
-              <div class="vlist">
-                <div>Колісне</div>
-                <div>Гусеничне</div>
-                <div>Спеціальне</div>
-              </div>
-            </td>
-          </tr>
-          <tr>
-            <td>4</td>
-            <td>За силовою установкою</td>
-            <td>
-              <div class="vlist">
-                <div>Електрична</div>
-                <div>ДВЗ</div>
-                <div>Комбінована</div>
-              </div>
-            </td>
-          </tr>
-        </table>
+      <div class="t6Cards">
+        <div class="t6Card">
+          <div class="t6CardHead"><span class="t6Num">1</span>Функціональне призначення</div>
+          <div class="t6Chips">
+            <span class="chip">Бойовий</span>
+            <span class="chip muted">*Бойовий (стаціонарний)</span>
+            <span class="chip">Логістичний</span>
+            <span class="chip">Інженерний</span>
+            <span class="chip">Спеціальний</span>
+            <span class="chip muted">*Спеціальний (стаціонарний)</span>
+            <span class="chip">Тренажери</span>
+          </div>
+        </div>
+        <div class="t6Card">
+          <div class="t6CardHead"><span class="t6Num">2</span>Споряджена маса**</div>
+          <div class="t6Chips">
+            <span class="chip">Міні — до 5 кг</span>
+            <span class="chip">Легкі — 5–50 кг</span>
+            <span class="chip">Середні — 50–500 кг</span>
+            <span class="chip">Важкі — 500–5000 кг</span>
+            <span class="chip">Надважкі — понад 5000 кг</span>
+          </div>
+        </div>
+        <div class="t6Card">
+          <div class="t6CardHead"><span class="t6Num">3</span>Тип шасі</div>
+          <div class="t6Chips">
+            <span class="chip">Колісне</span>
+            <span class="chip">Гусеничне</span>
+            <span class="chip">Спеціальне</span>
+          </div>
+        </div>
+        <div class="t6Card">
+          <div class="t6CardHead"><span class="t6Num">4</span>Силова установка</div>
+          <div class="t6Chips">
+            <span class="chip">Електрична</span>
+            <span class="chip">ДВЗ</span>
+            <span class="chip">Комбінована</span>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -458,6 +448,8 @@
             <option value="model_asc">За назвою (А→Я)</option>
             <option value="price_asc">За ціною (зростання)</option>
             <option value="price_desc">За ціною (спадання)</option>
+            <option value="payload_asc">За корисним (зростання)</option>
+            <option value="payload_desc">За корисним (спадання)</option>
             <option value="mass_asc">За масою (зростання)</option>
             <option value="mass_desc">За масою (спадання)</option>
             <option value="chassis_asc">За типом шасі</option>
@@ -472,6 +464,113 @@
       <div id="t6Top5" class="t6Insights"></div>
       <div class="divider"></div>
       <div id="t6Value" class="t6Insights"></div>
+    </div>
+  </div>
+</section>
+<!-- TAB 8 Планування місій -->
+<section id="t8" class="grid hide">
+  <div class="card">
+    <h2>Планування місій</h2>
+    <p class="small">
+      Визначай параметри місії та підбирай БеНК з пресетів. Далі підключимо карту OpenStreetMap.
+    </p>
+
+    <div class="missionLayout">
+      <div class="missionPanel">
+        <div class="section">
+          <div class="sectionTitle">Параметри місії</div>
+          <div class="row">
+            <div>
+              <label>Тип місії</label>
+              <select id="missionType">
+                <option>Логістична</option>
+                <option>Інженерна</option>
+                <option>Спеціальна</option>
+              </select>
+            </div>
+            <div>
+              <label>Тип шасі</label>
+              <select id="missionChassis">
+                <option>Будь‑яке</option>
+                <option>Колісне</option>
+                <option>Гусеничне</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="row">
+            <div>
+              <label>Вантаж, кг</label>
+              <input id="missionPayload" type="number" min="0" placeholder="Напр. 200"/>
+            </div>
+            <div>
+              <label>Дальність, км</label>
+              <input id="missionRange" type="number" min="0" placeholder="Напр. 20"/>
+            </div>
+          </div>
+
+          <div class="row">
+            <div>
+              <label>Кліренс, мм</label>
+              <input id="missionClearance" type="number" min="0" placeholder="Напр. 200"/>
+            </div>
+            <div>
+              <label>Швидкість, км/год</label>
+              <input id="missionSpeed" type="number" min="0" placeholder="Напр. 10"/>
+            </div>
+          </div>
+          <div class="row">
+            <div>
+              <label>Погода</label>
+              <select id="missionWeather">
+                <option value="clear" data-k="1">Ясно (1.0)</option>
+                <option value="rain" data-k="0.85">Дощ (0.85)</option>
+                <option value="snow" data-k="0.7">Сніг (0.7)</option>
+                <option value="wind" data-k="0.9">Вітер (0.9)</option>
+              </select>
+            </div>
+            <div>
+              <label>Тип місцевості</label>
+              <select id="missionTerrain">
+                <option value="road" data-k="1">Дорога/асфальт (1.0)</option>
+                <option value="field" data-k="0.85">Поле (0.85)</option>
+                <option value="forest" data-k="0.7">Ліс/перешкоди (0.7)</option>
+                <option value="sand" data-k="0.65">Пісок/м’який ґрунт (0.65)</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="btnrow">
+            <button class="primary" type="button">Підібрати БеНК</button>
+            <button class="ghost" type="button">Очистити</button>
+          </div>
+        </div>
+
+        <div class="section">
+          <div class="sectionTitle">Оцінка місії</div>
+          <div class="kpiTop">
+            <span class="pill">Довжина маршруту: <strong id="missionDistance">— км</strong></span>
+            <span class="pill">Час виконання: <strong id="missionTime">— хв</strong></span>
+            <span class="pill">Рекомендована група: <strong id="missionGroup">—</strong></span>
+            <span class="pill">Ефективна швидкість: <strong id="missionEffSpeed">— км/год</strong></span>
+            <span class="pill">Ефективна дальність: <strong id="missionEffRange">— км</strong></span>
+          </div>
+          <div id="missionWarnings" class="warnBox hide"></div>
+        </div>
+      </div>
+
+      <div class="missionMapCard">
+        <div class="sectionTitle">Мапа (OSM)</div>
+        <div id="missionMap" class="mapPlaceholder"></div>
+        <div class="small" style="margin-top:6px">Клік по мапі додає точку маршруту. Подвійний клік — скинути маршрут.</div>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="section">
+      <div class="sectionTitle">Рекомендовані моделі</div>
+      <div id="missionCards" class="missionCards"></div>
     </div>
   </div>
 </section>
@@ -557,6 +656,11 @@
   </div>
 </div>
 
+<script
+  src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+  integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+  crossorigin=""
+></script>
 <script src="script.js"></script>
 </body>
 </html>

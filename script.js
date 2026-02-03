@@ -2130,6 +2130,9 @@ function switchTab(id) {
       document.documentElement.style.zoom = "1";
     }
   }
+  if (id === "t8" && window.__missionMap) {
+    setTimeout(() => window.__missionMap.invalidateSize(), 150);
+  }
 }
 function wireTabs() {
   document.querySelectorAll(".tab").forEach((b) => b.addEventListener("click", () => switchTab(b.dataset.tab)));
@@ -3671,9 +3674,11 @@ function renderT6Catalog() {
     const mass = Number.isFinite(massNum) && massNum > 0 ? `${massNum}` : "—";
     const priceNum = Number(p.price);
     const price = Number.isFinite(priceNum) && priceNum > 0 ? formatPriceNoCurrency(priceNum) : "—";
+    const payloadNum = Number(p.payload);
+    const payload = Number.isFinite(payloadNum) && payloadNum > 0 ? `${payloadNum}` : "—";
     const key = presetKey(p);
     const funcClass = funcClassName(func);
-    return { key, model, maker, func, funcClass, massClass, chassis, chassisShort, power, powerShort, mass, massNum, price, priceNum };
+    return { key, model, maker, func, funcClass, massClass, chassis, chassisShort, power, powerShort, mass, massNum, price, priceNum, payload };
   }).sort((a, b) => a.model.localeCompare(b.model, "uk"));
 
   const funcSelect = $("t6FuncFilter");
@@ -3703,6 +3708,10 @@ function renderT6Catalog() {
         return copy.sort((a, b) => (a.priceNum || Infinity) - (b.priceNum || Infinity) || a.model.localeCompare(b.model, "uk"));
       case "price_desc":
         return copy.sort((a, b) => (b.priceNum || -Infinity) - (a.priceNum || -Infinity) || a.model.localeCompare(b.model, "uk"));
+      case "payload_asc":
+        return copy.sort((a, b) => (Number(a.payload) || Infinity) - (Number(b.payload) || Infinity) || a.model.localeCompare(b.model, "uk"));
+      case "payload_desc":
+        return copy.sort((a, b) => (Number(b.payload) || -Infinity) - (Number(a.payload) || -Infinity) || a.model.localeCompare(b.model, "uk"));
       case "mass_asc":
         return copy.sort((a, b) => (a.massNum || Infinity) - (b.massNum || Infinity) || a.model.localeCompare(b.model, "uk"));
       case "mass_desc":
@@ -3723,11 +3732,11 @@ function renderT6Catalog() {
     <div class="classGroup">
       <div class="classGroupTitle">
         ${esc(g.name)} <span class="count">${g.items.length}</span>
-        <span class="count">Гусенічні: ${g.items.filter(x => x.chassis === "Гусеничне").length}</span>
-        <span class="count">Колісні: ${g.items.filter(x => x.chassis === "Колісне").length}</span>
-        <span class="count">Легкі: ${g.items.filter(x => x.massClass === "Легкі").length}</span>
-        <span class="count">Середні: ${g.items.filter(x => x.massClass === "Середні").length}</span>
-        <span class="count">Важкі: ${g.items.filter(x => x.massClass === "Важкі").length}</span>
+        <span class="chip chipBadge">Гусенічні ${g.items.filter(x => x.chassis === "Гусеничне").length}</span>
+        <span class="chip chipBadge">Колісні ${g.items.filter(x => x.chassis === "Колісне").length}</span>
+        <span class="chip chipBadge">Легкі ${g.items.filter(x => x.massClass === "Легкі").length}</span>
+        <span class="chip chipBadge">Середні ${g.items.filter(x => x.massClass === "Середні").length}</span>
+        <span class="chip chipBadge">Важкі ${g.items.filter(x => x.massClass === "Важкі").length}</span>
       </div>
       <table class="classTable">
         <tr>
@@ -3736,6 +3745,7 @@ function renderT6Catalog() {
           <th>Призначення</th>
           <th>Клас за масою</th>
           <th>Маса, кг</th>
+          <th>Корисне</th>
           <th>Ціна, грн</th>
           <th>Шасі</th>
           <th>Силова</th>
@@ -3752,6 +3762,7 @@ function renderT6Catalog() {
             <td><span class="chip ${r.funcClass}">${esc(r.func)}</span></td>
             <td><span class="chip">${esc(r.massClass)}</span></td>
             <td><span class="chip muted">${esc(r.mass)}</span></td>
+            <td><span class="chip muted">${esc(r.payload ?? "—")}</span></td>
             <td><span class="chip muted">${r.price}</span></td>
             <td><span class="chip" title="${esc(r.chassis)}">${esc(r.chassisShort)}</span></td>
             <td><span class="chip" title="${esc(r.power)}">${esc(r.powerShort)}</span></td>
@@ -3804,18 +3815,30 @@ function renderT6Insights() {
         ${renderList("ТОП‑5 вантажність", top5(subset, "payload"), "payload", " кг")}
         ${renderList("ТОП‑5 запас ходу", top5(subset, "rangeRoad"), "rangeRoad", " км")}
         ${renderList("ТОП‑5 швидкість", top5(subset, "maxSpeed"), "maxSpeed", " км/год")}
+        ${renderList('ТОП‑5 ціна/корисність <span class="infoHint" title="Формула: (вантажність × дальність × швидкість) / ціна. Чим більше — тим вигідніше.">?</span>', top5(subset, "valueScore"), "valueScore", "")}
       </div>
     </div>`;
 
-  const logistic = items.filter(x => x.func === "Логістичний");
-  const engineering = items.filter(x => x.func === "Інженерний");
+  const withValue = items.map(x => {
+    const price = Number(x.price) || 0;
+    const payload = Number(x.payload) || 0;
+    const rangeRoad = Number(x.rangeRoad) || 0;
+    const maxSpeed = Number(x.maxSpeed) || 0;
+    const valueScore = (price > 0)
+      ? Math.round(((payload * rangeRoad * maxSpeed) / price) * 1000) / 1000
+      : 0;
+    return { ...x, valueScore };
+  });
+
+  const logistic = withValue.filter(x => x.func === "Логістичний");
+  const engineering = withValue.filter(x => x.func === "Інженерний");
 
   topOut.innerHTML = [
     buildTopBlock("Логістичні", logistic),
     buildTopBlock("Інженерні", engineering),
   ].join("");
 
-  const withValue = items
+  const valueList = items
     .filter(x => Number.isFinite(x.price) && x.price > 0)
     .map(x => ({
       ...x,
@@ -3823,12 +3846,12 @@ function renderT6Insights() {
       pricePerKm: (x.rangeRoad && x.rangeRoad > 0) ? x.price / x.rangeRoad : null,
     }));
 
-  const bestKg = withValue
+  const bestKg = valueList
     .filter(x => x.pricePerKg)
     .sort((a, b) => a.pricePerKg - b.pricePerKg)
     .slice(0, 5);
 
-  const bestKm = withValue
+  const bestKm = valueList
     .filter(x => x.pricePerKm)
     .sort((a, b) => a.pricePerKm - b.pricePerKm)
     .slice(0, 5);
@@ -3949,6 +3972,204 @@ function wirePresetModal() {
       if (e.target === overlay) overlay.style.display = "none";
     });
   }
+}
+
+function initMissionPlanner() {
+  const mapEl = document.getElementById("missionMap");
+  if (!mapEl || typeof L === "undefined") return;
+
+  const map = L.map(mapEl).setView([49.0, 31.0], 6);
+  map.doubleClickZoom.disable();
+  L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+    maxZoom: 19,
+    attribution: "&copy; OpenStreetMap contributors"
+  }).addTo(map);
+
+  let points = [];
+  let markers = [];
+  let line = null;
+
+  const distanceEl = $("missionDistance");
+  const timeEl = $("missionTime");
+  const groupEl = $("missionGroup");
+  const cardsEl = $("missionCards");
+
+  const readNum = (id) => {
+    const v = Number($(id)?.value);
+    return Number.isFinite(v) ? v : 0;
+  };
+
+  const clearRoute = () => {
+    points = [];
+    markers.forEach(m => map.removeLayer(m));
+    markers = [];
+    if (line) { map.removeLayer(line); line = null; }
+    updateRouteStats();
+  };
+
+  const addPoint = (latlng) => {
+    points.push(latlng);
+    const m = L.circleMarker(latlng, { radius: 6, color: "#4da3ff" }).addTo(map);
+    markers.push(m);
+    if (line) map.removeLayer(line);
+    line = L.polyline(points, { color: "#4da3ff" }).addTo(map);
+    updateRouteStats();
+  };
+
+  const haversineKm = (a, b) => {
+    const R = 6371;
+    const dLat = (b.lat - a.lat) * Math.PI / 180;
+    const dLon = (b.lng - a.lng) * Math.PI / 180;
+    const lat1 = a.lat * Math.PI / 180;
+    const lat2 = b.lat * Math.PI / 180;
+    const sin1 = Math.sin(dLat / 2);
+    const sin2 = Math.sin(dLon / 2);
+    const h = sin1 * sin1 + Math.cos(lat1) * Math.cos(lat2) * sin2 * sin2;
+    return 2 * R * Math.asin(Math.sqrt(h));
+  };
+
+  const routeLength = () => {
+    if (points.length < 2) return 0;
+    let sum = 0;
+    for (let i = 1; i < points.length; i++) {
+      sum += haversineKm(points[i - 1], points[i]);
+    }
+    return sum;
+  };
+
+  const updateRouteStats = () => {
+    const km = routeLength();
+    if (distanceEl) distanceEl.textContent = km ? `${km.toFixed(1)} км` : "— км";
+    const speed = readNum("missionSpeed");
+    const hours = (km && speed) ? km / speed : 0;
+    if (timeEl) timeEl.textContent = hours ? `${Math.round(hours * 60)} хв` : "— хв";
+  };
+
+  const recommendModels = () => {
+    if (!cardsEl || typeof PRESETS === "undefined") return;
+    const payload = readNum("missionPayload");
+    const range = readNum("missionRange");
+    const clearance = readNum("missionClearance");
+    const speed = readNum("missionSpeed");
+    const weatherSel = $("missionWeather");
+    const terrainSel = $("missionTerrain");
+    const weatherK = Number(weatherSel?.selectedOptions?.[0]?.dataset?.k || 1);
+    const terrainK = Number(terrainSel?.selectedOptions?.[0]?.dataset?.k || 1);
+    const envK = weatherK * terrainK;
+    const chassis = String($("missionChassis")?.value || "Будь‑яке");
+    const mtype = String($("missionType")?.value || "");
+
+    const candidates = PRESETS.map(p => ({
+      model: String(p.model || ""),
+      maker: String(p.maker || ""),
+      payload: Number(p.payload) || 0,
+      range: Number(p.rangeRoad) || 0,
+      clearance: Number(p.clearance) || 0,
+      speed: Number(p.maxSpeed) || 0,
+      price: Number(p.price) || 0,
+      chassis: classifyChassis(p),
+      func: classifyFunction(p),
+      key: presetKey(p),
+    })).filter(x => x.model);
+
+    const filtered = candidates.filter(c => {
+      const effSpeed = c.speed * envK;
+      const effRange = c.range * envK;
+      const okPayload = payload ? c.payload >= payload : true;
+      const okRange = range ? effRange >= range : true;
+      const okClear = clearance ? c.clearance >= clearance : true;
+      const okSpeed = speed ? effSpeed >= speed : true;
+      const okChassis = (chassis === "Будь‑яке") ? true : c.chassis === chassis;
+      const okFunc = mtype ? (mtype.includes("Логіст") ? c.func === "Логістичний" :
+        mtype.includes("Інжен") ? c.func === "Інженерний" : true) : true;
+      return okPayload && okRange && okClear && okSpeed && okChassis && okFunc;
+    });
+
+    const scored = filtered.map(c => {
+      const score = (c.payload * 1.2) + (c.range * 0.8) + (c.clearance * 0.4) + (c.speed * 0.6);
+      return { ...c, score };
+    }).sort((a, b) => {
+      const pa = Number.isFinite(a.price) ? a.price : Infinity;
+      const pb = Number.isFinite(b.price) ? b.price : Infinity;
+      if (pa !== pb) return pa - pb; // дешевші вище
+      return b.score - a.score; // якщо ціна однакова — кращі характеристики
+    }).slice(0, 3);
+
+    if (groupEl) {
+      const g = mtype ? mtype : "—";
+      groupEl.textContent = g || "—";
+    }
+
+    const warningsEl = $("missionWarnings");
+    if (warningsEl) {
+      if (!filtered.length) {
+        const reasons = [];
+        if (payload) reasons.push(`Навантаження < ${payload} кг`);
+        if (range) reasons.push(`Ефективна дальність < ${range} км (коеф. ${envK.toFixed(2)})`);
+        if (speed) reasons.push(`Ефективна швидкість < ${speed} км/год (коеф. ${envK.toFixed(2)})`);
+        if (clearance) reasons.push(`Кліренс < ${clearance} мм`);
+        if (chassis !== "Будь‑яке") reasons.push(`Тип шасі ≠ ${chassis}`);
+        if (mtype) reasons.push(`Призначення ≠ ${mtype}`);
+        warningsEl.innerHTML = `Не знайдено моделей, що відповідають умовам. Можливі причини: ${reasons.join("; ") || "обмеження занадто жорсткі"}.`;
+        warningsEl.classList.remove("hide");
+      } else {
+        warningsEl.classList.add("hide");
+      }
+    }
+
+    const effSpeedEl = $("missionEffSpeed");
+    const effRangeEl = $("missionEffRange");
+    if (scored.length && (effSpeedEl || effRangeEl)) {
+      const top = scored[0];
+      const effSpeed = top.speed ? (top.speed * envK).toFixed(1) : "—";
+      const effRange = top.range ? (top.range * envK).toFixed(1) : "—";
+      if (effSpeedEl) effSpeedEl.textContent = `${effSpeed} км/год`;
+      if (effRangeEl) effRangeEl.textContent = `${effRange} км`;
+    } else {
+      if (effSpeedEl) effSpeedEl.textContent = "— км/год";
+      if (effRangeEl) effRangeEl.textContent = "— км";
+    }
+
+    cardsEl.innerHTML = scored.map(c => `
+      <div class="missionCard" data-preset="${encodeURIComponent(c.key)}">
+        <div class="missionCardTitle">${esc(c.model)}</div>
+        <div class="missionParams">
+          <span class="paramChip">Вантаж: <strong>${c.payload || "—"}</strong></span>
+          <span class="paramChip">Дальність: <strong>${c.range || "—"}</strong></span>
+          <span class="paramChip">Кліренс: <strong>${c.clearance || "—"}</strong></span>
+          <span class="paramChip">Макс. швидкість: <strong>${c.speed || "—"}</strong></span>
+        </div>
+        <div class="small">Виробник: ${esc(c.maker)}</div>
+      </div>
+    `).join("") || `<div class="small">Немає підходящих моделей за заданими параметрами.</div>`;
+  };
+
+  map.on("click", (e) => addPoint(e.latlng));
+  map.on("dblclick", () => clearRoute());
+
+  // рекомендації показуємо після кліку "Підібрати БеНК"
+
+  const pickBtn = document.querySelector("#t8 .btnrow .primary");
+  const clearBtn = document.querySelector("#t8 .btnrow .ghost");
+  if (pickBtn) pickBtn.addEventListener("click", recommendModels);
+  if (clearBtn) clearBtn.addEventListener("click", () => {
+      ["missionPayload","missionRange","missionClearance","missionSpeed"].forEach(id => { const el = $(id); if (el) el.value = ""; });
+      const ch = $("missionChassis"); if (ch) ch.value = "Будь‑яке";
+      const mt = $("missionType"); if (mt) mt.value = "Логістична";
+      const we = $("missionWeather"); if (we) we.value = "clear";
+      const te = $("missionTerrain"); if (te) te.value = "road";
+      recommendModels();
+    });
+
+  cardsEl?.addEventListener("click", (e) => {
+    const card = e.target.closest(".missionCard[data-preset]");
+    if (!card) return;
+    const key = decodeURIComponent(card.getAttribute("data-preset") || "");
+    if (key) openPresetModalByKey(key);
+  });
+
+  updateRouteStats();
+  window.__missionMap = map;
 }
 
 function wireInventory() {
@@ -4117,6 +4338,7 @@ wireHowCalcInline();
   wireT6CatalogControls();
   wireT6CatalogRowClicks();
   wirePresetModal();
+  initMissionPlanner();
 }
 
 document.addEventListener("DOMContentLoaded", init);
