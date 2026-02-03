@@ -52,6 +52,10 @@ body[data-theme="light"]{
 
 *{box-sizing:border-box}
 html,body{height:100%}
+html{
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
 body{
   margin:0;
   color:var(--text);
@@ -107,20 +111,15 @@ body[data-theme="light"] header{
 .tabs{
   display:flex;
   gap:8px;
-  flex-wrap:wrap;
+  flex-wrap:nowrap;
   margin-top:10px;
   align-items:center;
+  overflow-x:auto;
+  -webkit-overflow-scrolling:touch;
+  scrollbar-width:none;
 }
-@media (max-width: 860px){
-  .tabs{
-    flex-wrap:nowrap;
-    overflow-x:auto;
-    -webkit-overflow-scrolling:touch;
-    scrollbar-width:none;
-  }
-  .tabs::-webkit-scrollbar{ display:none; }
-  .tab, .tabTheme{ flex:0 0 auto; }
-}
+.tabs::-webkit-scrollbar{ display:none; }
+.tab, .tabTheme{ flex:0 0 auto; white-space:nowrap; }
 
 .tab{
   border:1px solid var(--line);
