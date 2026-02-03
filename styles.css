@@ -315,14 +315,27 @@ body[data-theme="light"] header{
 .chipGroup{ display:flex; flex-wrap:wrap; gap:6px; }
 .modelCell{ display:flex; flex-direction:column; gap:4px; }
 .modelCell .muted{ color:var(--muted); font-size:12px; }
-.classGroup{ margin-top:12px; }
+.numCell{ width:48px; text-align:center; color:var(--muted); }
+.t6Controls{ margin:6px 0 12px; align-items:flex-end; }
+.t6Controls input,
+.t6Controls select{ width:100%; }
 .classGroupTitle{
   font-weight:800;
   font-size:13px;
   margin:0 0 8px;
   color: color-mix(in srgb, var(--text) 90%, var(--accent) 10%);
+  display:flex;
+  align-items:center;
+  gap:8px;
 }
-
+.classGroupTitle .count{
+  font-size:12px;
+  color:var(--muted);
+  border:1px solid var(--line);
+  border-radius:999px;
+  padding:2px 8px;
+}
+.classGroup{ margin-top:12px; }
 .chip.func-b{
   border-color: color-mix(in srgb, var(--bad) 45%, transparent);
   background: color-mix(in srgb, var(--bad) 18%, transparent);
@@ -358,6 +371,7 @@ body[data-theme="light"] header{
   .classTable{ font-size:12px; }
   .classTable th, .classTable td{ padding:6px 8px; }
   .chip{ font-size:11px; padding:3px 7px; }
+  .t6Controls{ flex-direction:column; align-items:stretch; }
 }
 @media (max-width: 420px){
   .classTable{ font-size:11px; }

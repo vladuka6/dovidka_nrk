@@ -3634,30 +3634,66 @@ function renderT6Catalog() {
     const massClass = classifyMass(p.mass);
     const chassis = classifyChassis(p);
     const power = classifyPower(p);
-    const mass = (Number(p.mass) || 0) > 0 ? `${p.mass} кг` : "—";
+    const massNum = Number(p.mass);
+    const mass = Number.isFinite(massNum) && massNum > 0 ? `${massNum} кг` : "—";
     const funcClass = funcClassName(func);
-    return { model, maker, func, funcClass, massClass, chassis, power, mass };
+    return { model, maker, func, funcClass, massClass, chassis, power, mass, massNum };
   }).sort((a, b) => a.model.localeCompare(b.model, "uk"));
 
+  const funcSelect = $("t6FuncFilter");
+  if (funcSelect && funcSelect.options.length === 0) {
+    const groupOrder = ["Бойовий", "Логістичний", "Інженерний", "Спеціальний", "Тренажер", "—"];
+    funcSelect.innerHTML = `<option value="Усі">Усі</option>` + groupOrder
+      .filter(g => rows.some(r => r.func === g))
+      .map(g => `<option value="${g}">${g}</option>`).join("");
+  }
+
+  const filter = funcSelect?.value || "Усі";
+  const search = ($("t6Search")?.value || "").trim().toLowerCase();
+  const sort = $("t6Sort")?.value || "model_asc";
+
+  const filtered = rows.filter(r => {
+    const okFilter = (filter === "Усі") ? true : r.func === filter;
+    const hay = `${r.model} ${r.maker}`.toLowerCase();
+    const okSearch = search ? hay.includes(search) : true;
+    return okFilter && okSearch;
+  });
+
   const groupOrder = ["Бойовий", "Логістичний", "Інженерний", "Спеціальний", "Тренажер", "—"];
+  const sortItems = (arr) => {
+    const copy = arr.slice();
+    switch (sort) {
+      case "mass_asc":
+        return copy.sort((a, b) => (a.massNum || Infinity) - (b.massNum || Infinity) || a.model.localeCompare(b.model, "uk"));
+      case "mass_desc":
+        return copy.sort((a, b) => (b.massNum || -Infinity) - (a.massNum || -Infinity) || a.model.localeCompare(b.model, "uk"));
+      case "chassis_asc":
+        return copy.sort((a, b) => a.chassis.localeCompare(b.chassis, "uk") || a.model.localeCompare(b.model, "uk"));
+      default:
+        return copy.sort((a, b) => a.model.localeCompare(b.model, "uk"));
+    }
+  };
+
   const grouped = groupOrder.map(name => ({
     name,
-    items: rows.filter(r => r.func === name)
+    items: sortItems(filtered.filter(r => r.func === name))
   })).filter(g => g.items.length);
 
   const html = grouped.map(g => `
     <div class="classGroup">
-      <div class="classGroupTitle">${esc(g.name)}</div>
+      <div class="classGroupTitle">${esc(g.name)} <span class="count">${g.items.length}</span></div>
       <table class="classTable">
         <tr>
+          <th class="numCell">№</th>
           <th>Модель</th>
           <th>Призначення</th>
           <th>Маса (клас)</th>
           <th>Шасі</th>
           <th>Силова</th>
         </tr>
-        ${g.items.map(r => `
+        ${g.items.map((r, idx) => `
           <tr class="classRow">
+            <td class="numCell">${idx + 1}</td>
             <td>
               <div class="modelCell">
                 <strong>${esc(r.model || "—")}</strong>
@@ -3680,6 +3716,15 @@ function renderT6Catalog() {
   `).join("");
 
   out.innerHTML = html;
+}
+
+function wireT6CatalogControls() {
+  const func = $("t6FuncFilter");
+  const search = $("t6Search");
+  const sort = $("t6Sort");
+  if (func) func.addEventListener("change", renderT6Catalog);
+  if (sort) sort.addEventListener("change", renderT6Catalog);
+  if (search) search.addEventListener("input", renderT6Catalog);
 }
 
 function wireInventory() {
@@ -3815,6 +3860,7 @@ wireHowCalcInline();
   wireCopyButton();
   initDebugBadge();
   renderT6Catalog();
+  wireT6CatalogControls();
 }
 
 document.addEventListener("DOMContentLoaded", init);
