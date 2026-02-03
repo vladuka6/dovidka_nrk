@@ -3799,3 +3799,35 @@ document.querySelectorAll('.tab').forEach(tab => {
 if (!document.getElementById('t7').classList.contains('hide')) {
   setTimeout(forceMobileScaleReset, 800);
 }
+// Примусовий ресет масштабу та скрол при перемиканні вкладок (виправляє баг Safari)
+function resetViewportOnTabChange() {
+  if (window.innerWidth > 980) return; // тільки для мобілки
+
+  setTimeout(() => {
+    // 1. Скидаємо масштаб до 92% (оптимально для 414px)
+    document.body.style.zoom = '0.92';
+    document.documentElement.style.zoom = '0.92';
+
+    // 2. Прокручуємо до початку контенту поточної вкладки
+    const activeSection = document.querySelector('main section:not(.hide)');
+    if (activeSection) {
+      window.scrollTo({
+        top: activeSection.offsetTop - 100,
+        behavior: 'instant'
+      });
+    }
+
+    // 3. Примусово перераховуємо layout (Safari любить це)
+    document.body.style.display = 'none';
+    document.body.offsetHeight; // force reflow
+    document.body.style.display = '';
+  }, 300); // затримка, щоб дочекатися рендеру
+}
+
+// Прив'язуємо до всіх табів
+document.querySelectorAll('.tab').forEach(tab => {
+  tab.addEventListener('click', resetViewportOnTabChange);
+});
+
+// Виклик при першому завантаженні
+window.addEventListener('load', resetViewportOnTabChange);
