@@ -2797,6 +2797,7 @@ function renderCriteria() {
     const validateAndRender = () => {
       const ok = isValidScoreText(el.value);
       setErr(!ok);
+      updateScoreProgress();
 
       // якщо все валідно — перерахувати підсумок
       // якщо не валідно — calcFinal сам покаже помилки в validationBox при потребі
@@ -2815,6 +2816,21 @@ function renderCriteria() {
       validateAndRender();
     });
   });
+}
+
+function updateScoreProgress() {
+  const fill = $("scoreProgressFill");
+  const text = $("scoreProgressText");
+  if (!fill || !text || typeof CRITERIA === "undefined") return;
+  const total = CRITERIA.length;
+  let ok = 0;
+  CRITERIA.forEach((c) => {
+    const v = $("s_" + c.id)?.value ?? "";
+    if (/^[0-5]$/.test(String(v).trim())) ok += 1;
+  });
+  const pct = total ? Math.round((ok / total) * 100) : 0;
+  fill.style.width = `${pct}%`;
+  text.textContent = `${pct}%`;
 }
 
 function openHelp(id) {
@@ -3792,6 +3808,7 @@ function renderT6Insights() {
     model: String(p.model || "").trim(),
     maker: String(p.maker || "").trim(),
     func: classifyFunction(p),
+    massClass: classifyMass(p.mass),
     payload: Number(p.payload),
     rangeRoad: Number(p.rangeRoad),
     maxSpeed: Number(p.maxSpeed),
@@ -3944,10 +3961,37 @@ function renderT6Insights() {
       </ul>
     </div>`;
 
-  valOut.innerHTML = [
-    renderValueList('Ціна за кг вантажності (краще) <span class="infoHint" title="Формула: ціна / вантажність. Менше = вигідніше. Напр. 1 000 000 / 500 = 2000 грн/кг.">?</span>', bestKg, "pricePerKg"),
-    renderValueList('Ціна за км пробігу (краще) <span class="infoHint" title="Формула: ціна / запас ходу. Менше = вигідніше. Напр. 1 000 000 / 20 = 50 000 грн/км.">?</span>', bestKm, "pricePerKm"),
-  ].join("");
+  const massOrder = ["Міні", "Легкі", "Середні", "Важкі", "Надважкі"];
+  const funcOrder = ["Логістичний", "Інженерний"];
+  const topN = (arr, key, n = 3) => arr
+    .filter(x => x[key])
+    .sort((a, b) => a[key] - b[key])
+    .slice(0, n);
+
+  const buildMassBlock = (func) => {
+    const blocks = massOrder.map(massClass => {
+      const subset = valueList.filter(x => x.func === func && x.massClass === massClass);
+      if (!subset.length) return "";
+      const topKg = topN(subset, "pricePerKg");
+      const topKm = topN(subset, "pricePerKm");
+      return `
+        <div class="insightCard">
+          <div class="insightTitle">${func} — ${massClass}</div>
+          <div class="t6Insights">
+            ${renderValueList('Ціна за кг вантажності (краще) <span class="infoHint" title="Формула: ціна / вантажність. Менше = вигідніше. Напр. 1 000 000 / 500 = 2000 грн/кг.">?</span>', topKg, "pricePerKg")}
+            ${renderValueList('Ціна за км пробігу (краще) <span class="infoHint" title="Формула: ціна / запас ходу. Менше = вигідніше. Напр. 1 000 000 / 20 = 50 000 грн/км.">?</span>', topKm, "pricePerKm")}
+          </div>
+        </div>
+      `;
+    }).join("");
+    if (!blocks) return "";
+    return `<div class="t6Block">
+      <div class="sectionTitle">${func}</div>
+      <div class="t6Insights">${blocks}</div>
+    </div>`;
+  };
+
+  valOut.innerHTML = funcOrder.map(buildMassBlock).join("") || `<div class="small">Немає достатньо даних для порівняння.</div>`;
 }
 
 function wireT6CatalogControls() {
@@ -4392,6 +4436,7 @@ function init() {
 
   renderCriteria();
   renderChecklist();
+  updateScoreProgress();
 
   // KPI підтягується при зміні ключових полів
   ["price", "payloadNom", "rangeRoad"].forEach((id) => {

@@ -370,6 +370,34 @@ body[data-theme="light"] header{
   font-size:12.5px;
 }
 .insightItem .muted{ color:var(--muted); }
+.t6Block{ margin-top:10px; }
+
+.progressWrap{
+  margin:8px 0 14px;
+  padding:8px 10px;
+  border:1px solid var(--line);
+  border-radius:12px;
+  background: color-mix(in srgb, var(--card2) 85%, transparent);
+}
+.progressTop{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:6px;
+}
+.progressBar{
+  height:8px;
+  background: color-mix(in srgb, var(--line) 60%, transparent);
+  border-radius:999px;
+  overflow:hidden;
+}
+#scoreProgressFill{
+  height:100%;
+  width:0%;
+  background: linear-gradient(90deg, var(--accent), color-mix(in srgb, var(--accent2) 60%, transparent));
+  border-radius:999px;
+  transition: width .2s ease;
+}
 .infoHint{
   display:inline-flex;
   align-items:center;
