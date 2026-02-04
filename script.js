@@ -44,7 +44,7 @@ const PRESETS = [
     contactName: "Іван Петренко",
 contactInfo: "+380501112233",
 
-    photo: "",
+    photo: "zmiy_logistychnyy.png",
   },
   {
     group: "Важкі логістичні (колісні)",
@@ -69,7 +69,7 @@ contactInfo: "+380501112233",
     contactName: "Іван Петренко",
 contactInfo: "+380501112233",
 
-    photo: "",
+    photo: "dodger.png",
   },
   {
     group: "Важкі логістичні (колісні)",
@@ -94,7 +94,7 @@ contactInfo: "+380501112233",
     contactName: "Іван Петренко",
 contactInfo: "+380501112233",
 
-    photo: "",
+    photo: "morozy_02l.png",
   },
   {
     group: "Важкі логістичні (колісні)",
@@ -119,7 +119,7 @@ contactInfo: "+380501112233",
     contactName: "Іван Петренко",
 contactInfo: "+380501112233",
 
-    photo: "",
+    photo: "ratel_m.png",
   },
   {
     group: "Важкі логістичні (колісні)",
@@ -144,7 +144,7 @@ contactInfo: "+380501112233",
     contactName: "Іван Петренко",
 contactInfo: "+380501112233",
 
-    photo: "",
+    photo: "tor_800.png",
   },
   {
     group: "Важкі логістичні (колісні)",
@@ -169,7 +169,7 @@ contactInfo: "+380501112233",
     contactName: "Іван Петренко",
 contactInfo: "+380501112233",
 
-    photo: "",
+    photo: "tor_1000.png",
   },
   {
     group: "Важкі логістичні (колісні)",
@@ -194,7 +194,7 @@ contactInfo: "+380501112233",
     contactName: "Іван Петренко",
 contactInfo: "+380501112233",
 
-    photo: "",
+    photo: "ratele_h.png",
   },
   {
     group: "Важкі логістичні (колісні)",
@@ -219,7 +219,7 @@ contactInfo: "+380501112233",
     contactName: "Іван Петренко",
 contactInfo: "+380501112233",
 
-    photo: "D-21.png",
+    photo: "d_21.png",
   },
   {
     group: "Важкі логістичні (колісні)",
@@ -244,7 +244,7 @@ contactInfo: "+380501112233",
     contactName: "Іван Петренко",
 contactInfo: "+380501112233",
 
-    photo: "",
+    photo: "umpravlik_2.png",
   },
   {
     group: "Важкі логістичні (колісні)",
@@ -269,7 +269,7 @@ contactInfo: "+380501112233",
     contactName: "Іван Петренко",
 contactInfo: "+380501112233",
 
-    photo: "",
+    photo: "myrotvorets.png",
   },
   {
     group: "Важкі логістичні (колісні)",
@@ -294,7 +294,7 @@ contactInfo: "+380501112233",
     contactName: "Іван Петренко",
 contactInfo: "+380501112233",
 
-    photo: "",
+    photo: "protector.png",
   },
 
   // ВАЖКІ ЛОГІСТИЧНІ ГУСЕНИЧНІ
@@ -321,7 +321,7 @@ contactInfo: "+380501112233",
     contactName: "Іван Петренко",
 contactInfo: "+380501112233",
 
-    photo: "",
+    photo: "termite.png",
   },
   {
     group: "Важкі логістичні (гусеничні)",
@@ -346,7 +346,7 @@ contactInfo: "+380501112233",
     contactName: "Іван Петренко",
 contactInfo: "+380501112233",
 
-    photo: "",
+    photo: "murakha.png",
   },
   {
     group: "Важкі логістичні (гусеничні)",
@@ -569,7 +569,7 @@ contactInfo: "+380501112233",
     starlink: "+",
     lte: "-",
     contactName: "Іван Петренко",
-contactInfo: "+380501112233",
+    contactInfo: "+380501112233",
 
     photo: ""
   },
