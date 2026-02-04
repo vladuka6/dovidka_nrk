@@ -2865,6 +2865,42 @@ function wireHelpModal() {
   });
 }
 
+function openInfoHint(text) {
+  const overlay = $("modalOverlay");
+  if (!overlay) return;
+
+  const title = $("modalTitle");
+  const meta = $("modalMeta");
+  const scale = $("modalScale");
+  const how = $("modalHow");
+  const questions = $("modalQuestions");
+
+  if (title) title.textContent = "Пояснення";
+  if (meta) meta.textContent = "";
+  if (scale) scale.innerHTML = `<b>Пояснення</b><br><br><div class="small">${esc(text)}</div>`;
+  if (how) how.innerHTML = "";
+  if (questions) questions.innerHTML = "";
+
+  overlay.style.display = "flex";
+}
+
+function wireInfoHints() {
+  const isTouch = window.matchMedia("(hover: none)").matches ||
+    window.matchMedia("(pointer: coarse)").matches;
+  if (!isTouch) return;
+
+  document.addEventListener("click", (e) => {
+    const hint = e.target.closest(".infoHint");
+    if (!hint) return;
+
+    const text = hint.getAttribute("title") || hint.dataset.hint;
+    if (!text) return;
+
+    e.preventDefault();
+    openInfoHint(text);
+  });
+}
+
 /* ---------- scoring ---------- */
 function collectScoring() {
   const s = {};
@@ -4432,6 +4468,7 @@ window.addEventListener("resize", () => {
 function init() {
   wireTabs();
   wireHelpModal();
+  wireInfoHints();
   wireInventory();
 
   renderCriteria();

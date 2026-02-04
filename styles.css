@@ -904,6 +904,7 @@ body[data-theme="light"] .noPhoto{ background: rgba(17,24,39,.06); }
   white-space:pre-wrap;
   line-height:1.5;
 }
+.modal .box:empty{ display:none; }
 .modalCloseRow{display:flex;justify-content:flex-end;gap:12px;margin-top:16px}
 
 /* =========================
