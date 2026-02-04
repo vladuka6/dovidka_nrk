@@ -2130,6 +2130,9 @@ function switchTab(id) {
       document.documentElement.style.zoom = "1";
     }
   }
+  if (id === "t2") {
+    setTimeout(renderScoreHeatmap, 120);
+  }
   if (id === "t8" && window.__missionMap) {
     setTimeout(() => window.__missionMap.invalidateSize(), 150);
   }
@@ -2831,6 +2834,56 @@ function updateScoreProgress() {
   const pct = total ? Math.round((ok / total) * 100) : 0;
   fill.style.width = `${pct}%`;
   text.textContent = `${pct}%`;
+  renderScoreHeatmap();
+}
+
+function heatColor(score) {
+  const h = 8 + (score / 5) * 120;
+  return `hsl(${h}, 75%, 45%)`;
+}
+
+function renderScoreHeatmap() {
+  const box = $("scoreHeatmap");
+  if (!box || typeof CRITERIA === "undefined") return;
+
+  const values = CRITERIA.map((c) => {
+    const raw = $("s_" + c.id)?.value ?? "";
+    return /^[0-5]$/.test(String(raw).trim()) ? Number(raw) : null;
+  });
+
+  const html = CRITERIA.map((c, i) => {
+    const score = values[i];
+    const label = String(c.short || c.name || "").trim();
+    const title = `${c.name}: ${score === null ? "—" : `${score}/5`}`;
+    const style = score === null ? "" : ` style="background:${heatColor(score)}"`;
+    return `
+      <button type="button" class="hmCell${score === null ? " hmNone" : ""}" data-crit="${esc(c.id)}"${style} title="${esc(title)}">
+        <div class="hmScore">${score === null ? "—" : score}</div>
+        <div class="hmLabel">${esc(label)}</div>
+      </button>
+    `;
+  }).join("");
+
+  box.innerHTML = html;
+
+  const filled = values.filter((v) => v !== null).length;
+  const hint = $("heatmapHint");
+  if (hint) {
+    hint.textContent = filled
+      ? `Заповнено ${filled}/${CRITERIA.length} критеріїв`
+      : "Заповни бали 0–5, щоб профіль був повним.";
+  }
+}
+
+function wireScoreHeatmap() {
+  const box = $("scoreHeatmap");
+  if (!box) return;
+  box.addEventListener("click", (e) => {
+    const cell = e.target.closest(".hmCell[data-crit]");
+    if (!cell) return;
+    const id = cell.getAttribute("data-crit");
+    if (id) openHelp(id);
+  });
 }
 
 function openHelp(id) {
@@ -4469,6 +4522,7 @@ function init() {
   wireTabs();
   wireHelpModal();
   wireInfoHints();
+  wireScoreHeatmap();
   wireInventory();
 
   renderCriteria();
