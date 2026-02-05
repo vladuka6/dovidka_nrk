@@ -362,8 +362,9 @@
       Узагальнена таблиця характеристик і умовних позначень для швидкої ідентифікації класу БеНК.
     </p>
 
-    <div class="section">
+    <div class="section t6Acc" data-acc="basic">
       <div class="sectionTitle">1) Основні характеристики</div>
+      <div class="t6AccBody">
       <div class="t6Cards">
         <div class="t6Card">
           <div class="t6CardHead"><span class="t6Num">1</span>Функціональне призначення</div>
@@ -404,17 +405,18 @@
           </div>
         </div>
       </div>
-    </div>
-
-    <div class="noteBox">
-      <div><strong>*</strong> Зазначений вид класифікується виключно за масою.</div>
-      <div><strong>**</strong> Під спорядженою масою розуміється маса зразка БеНК, приведеного у готовність до використання за призначенням, без урахування боєкомплекту (для бойових зразків) або без корисного навантаження (для логістичних зразків).</div>
+      <div class="noteBox">
+        <div><strong>*</strong> Зазначений вид класифікується виключно за масою.</div>
+        <div><strong>**</strong> Під спорядженою масою розуміється маса зразка БеНК, приведеного у готовність до використання за призначенням, без урахування боєкомплекту (для бойових зразків) або без корисного навантаження (для логістичних зразків).</div>
+      </div>
+      </div>
     </div>
 
     <div class="divider"></div>
 
-    <div class="section">
+    <div class="section t6Acc" data-acc="legend">
       <div class="sectionTitle">2) Умовні позначення</div>
+      <div class="t6AccBody">
       <div class="legendGrid">
         <div class="legendItem"><span class="legendKey">Б</span> бойове призначення</div>
         <div class="legendItem"><span class="legendKey">Л</span> логістичне призначення</div>
@@ -428,6 +430,7 @@
         <div class="legendItem"><span class="legendKey">Е</span> електрична силова установка</div>
         <div class="legendItem"><span class="legendKey">Д</span> двигун внутрішнього згоряння</div>
         <div class="legendItem"><span class="legendKey">Кб</span> комбінована силова установка</div>
+      </div>
       </div>
     </div>
 
@@ -447,26 +450,9 @@
         Сформовано автоматично з довідника моделей. Класи маси й тип шасі визначаються за характеристиками.
       </div>
       <div class="row t6Controls">
-        <div style="flex:1; min-width:200px">
-          <label>Фільтр за призначенням</label>
-          <select id="t6FuncFilter"></select>
-        </div>
         <div style="flex:1; min-width:220px">
           <label>Пошук (модель або виробник)</label>
           <input id="t6Search" placeholder="Напр. D-21, ГУЛІВЕР, RATEL..." />
-        </div>
-        <div style="flex:0 0 220px; min-width:200px">
-          <label>Сортування</label>
-          <select id="t6Sort">
-            <option value="model_asc">За назвою (А→Я)</option>
-            <option value="price_asc">За ціною (зростання)</option>
-            <option value="price_desc">За ціною (спадання)</option>
-            <option value="payload_asc">За корисним (зростання)</option>
-            <option value="payload_desc">За корисним (спадання)</option>
-            <option value="mass_asc">За масою (зростання)</option>
-            <option value="mass_desc">За масою (спадання)</option>
-            <option value="chassis_asc">За типом шасі</option>
-          </select>
         </div>
       </div>
       <div id="t6Catalog" class="classTableWrap"></div>

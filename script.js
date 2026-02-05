@@ -3769,6 +3769,7 @@ function funcClassName(func) {
 function renderT6Catalog() {
   const out = $("t6Catalog");
   if (!out || typeof PRESETS === "undefined") return;
+  window.__t6CatalogCollapsed = window.__t6CatalogCollapsed || {};
 
   const rows = PRESETS.map(p => {
     const model = String(p.model || "").trim();
@@ -3787,49 +3788,58 @@ function renderT6Catalog() {
     const payload = Number.isFinite(payloadNum) && payloadNum > 0 ? `${payloadNum}` : "—";
     const key = presetKey(p);
     const funcClass = funcClassName(func);
-    return { key, model, maker, func, funcClass, massClass, chassis, chassisShort, power, powerShort, mass, massNum, price, priceNum, payload };
+    return { key, model, maker, func, funcClass, massClass, chassis, chassisShort, power, powerShort, mass, massNum, price, priceNum, payload, payloadNum };
   }).sort((a, b) => a.model.localeCompare(b.model, "uk"));
-
-  const funcSelect = $("t6FuncFilter");
-  if (funcSelect && funcSelect.options.length === 0) {
-    const groupOrder = ["Бойовий", "Логістичний", "Інженерний", "Спеціальний", "Тренажер", "—"];
-    funcSelect.innerHTML = `<option value="Усі">Усі</option>` + groupOrder
-      .filter(g => rows.some(r => r.func === g))
-      .map(g => `<option value="${g}">${g}</option>`).join("");
-  }
-
-  const filter = funcSelect?.value || "Усі";
   const search = ($("t6Search")?.value || "").trim().toLowerCase();
-  const sort = $("t6Sort")?.value || "model_asc";
+  const sortKey = window.__t6SortKey || "model";
+  const sortDir = window.__t6SortDir || "asc";
 
   const filtered = rows.filter(r => {
-    const okFilter = (filter === "Усі") ? true : r.func === filter;
     const hay = `${r.model} ${r.maker}`.toLowerCase();
-    const okSearch = search ? hay.includes(search) : true;
-    return okFilter && okSearch;
+    return search ? hay.includes(search) : true;
   });
 
   const groupOrder = ["Бойовий", "Логістичний", "Інженерний", "Спеціальний", "Тренажер", "—"];
   const sortItems = (arr) => {
     const copy = arr.slice();
-    switch (sort) {
-      case "price_asc":
-        return copy.sort((a, b) => (a.priceNum || Infinity) - (b.priceNum || Infinity) || a.model.localeCompare(b.model, "uk"));
-      case "price_desc":
-        return copy.sort((a, b) => (b.priceNum || -Infinity) - (a.priceNum || -Infinity) || a.model.localeCompare(b.model, "uk"));
-      case "payload_asc":
-        return copy.sort((a, b) => (Number(a.payload) || Infinity) - (Number(b.payload) || Infinity) || a.model.localeCompare(b.model, "uk"));
-      case "payload_desc":
-        return copy.sort((a, b) => (Number(b.payload) || -Infinity) - (Number(a.payload) || -Infinity) || a.model.localeCompare(b.model, "uk"));
-      case "mass_asc":
-        return copy.sort((a, b) => (a.massNum || Infinity) - (b.massNum || Infinity) || a.model.localeCompare(b.model, "uk"));
-      case "mass_desc":
-        return copy.sort((a, b) => (b.massNum || -Infinity) - (a.massNum || -Infinity) || a.model.localeCompare(b.model, "uk"));
-      case "chassis_asc":
-        return copy.sort((a, b) => a.chassis.localeCompare(b.chassis, "uk") || a.model.localeCompare(b.model, "uk"));
-      default:
-        return copy.sort((a, b) => a.model.localeCompare(b.model, "uk"));
-    }
+    const isDesc = sortDir === "desc";
+    const byText = (a, b, k) => a[k].localeCompare(b[k], "uk");
+    const byNum = (a, b, k) => {
+      const av = Number.isFinite(a[k]) ? a[k] : (isDesc ? -Infinity : Infinity);
+      const bv = Number.isFinite(b[k]) ? b[k] : (isDesc ? -Infinity : Infinity);
+      return av - bv;
+    };
+    copy.sort((a, b) => {
+      let diff = 0;
+      switch (sortKey) {
+        case "price":
+          diff = byNum(a, b, "priceNum");
+          break;
+        case "payload":
+          diff = byNum(a, b, "payloadNum");
+          break;
+        case "mass":
+          diff = byNum(a, b, "massNum");
+          break;
+        case "func":
+          diff = byText(a, b, "func");
+          break;
+        case "massClass":
+          diff = byText(a, b, "massClass");
+          break;
+        case "chassis":
+          diff = byText(a, b, "chassis");
+          break;
+        case "power":
+          diff = byText(a, b, "power");
+          break;
+        default:
+          diff = byText(a, b, "model");
+      }
+      if (diff === 0) diff = a.model.localeCompare(b.model, "uk");
+      return isDesc ? -diff : diff;
+    });
+    return copy;
   };
 
   const grouped = groupOrder.map(name => ({
@@ -3837,8 +3847,17 @@ function renderT6Catalog() {
     items: sortItems(filtered.filter(r => r.func === name))
   })).filter(g => g.items.length);
 
-  const html = grouped.map(g => `
-    <div class="classGroup">
+  const th = (label, key) => {
+    const is = sortKey === key;
+    const dirAttr = is ? ` data-dir="${sortDir}"` : "";
+    const cls = `sortTh${is ? " isSorted" : ""}`;
+    return `<th class="${cls}" data-sort="${key}"${dirAttr}>${label}</th>`;
+  };
+
+  const html = grouped.map(g => {
+    const collapsed = window.__t6CatalogCollapsed[g.name] ? " isCollapsed" : "";
+    return `
+    <div class="classGroup${collapsed}" data-group="${esc(g.name)}">
       <div class="classGroupTitle">
         ${esc(g.name)} <span class="count">${g.items.length}</span>
         <span class="chip chipBadge">Гусенічні ${g.items.filter(x => x.chassis === "Гусеничне").length}</span>
@@ -3850,14 +3869,14 @@ function renderT6Catalog() {
       <table class="classTable">
         <tr>
           <th class="numCell">№</th>
-          <th>Модель</th>
-          <th>Призначення</th>
-          <th>Клас за масою</th>
-          <th>Маса, кг</th>
-          <th>Корисне</th>
-          <th>Ціна, грн</th>
-          <th>Шасі</th>
-          <th>Силова</th>
+          ${th("Модель", "model")}
+          ${th("Призначення", "func")}
+          ${th("Клас за масою", "massClass")}
+          ${th("Маса, кг", "mass")}
+          ${th("Корисне", "payload")}
+          ${th("Ціна, грн", "price")}
+          ${th("Шасі", "chassis")}
+          ${th("Силова", "power")}
         </tr>
         ${g.items.map((r, idx) => `
           <tr class="classRow" data-preset="${encodeURIComponent(r.key)}">
@@ -3879,7 +3898,8 @@ function renderT6Catalog() {
         `).join("")}
       </table>
     </div>
-  `).join("");
+  `;
+  }).join("");
 
   out.innerHTML = html;
 }
@@ -3889,6 +3909,7 @@ function renderT6Insights() {
   const valOut = $("t6Value");
   if (!topOut || !valOut || typeof PRESETS === "undefined") return;
   window.__t6MassState = window.__t6MassState || { "Логістичний": "Важкі", "Інженерний": "Важкі" };
+  const PRICE_CAP = 2000000;
 
   const toFlag = (v) => {
     const s = String(v ?? "").trim();
@@ -3911,6 +3932,7 @@ function renderT6Insights() {
     climb: Number(p.climb),
     tilt: Number(p.tilt),
     price: Number(p.price),
+    key: presetKey(p),
     optical: p.optical,
     opticalIR: p.opticalIR,
     thermal: p.thermal,
@@ -3918,7 +3940,7 @@ function renderT6Insights() {
     lte: p.lte,
     radioKm: Number(p.radioKm),
     sensorScore: (toFlag(p.optical) + toFlag(p.opticalIR) + toFlag(p.thermal)) / 3,
-  })).filter(x => x.model);
+  })).filter(x => x.model && (!Number.isFinite(x.price) || x.price <= PRICE_CAP));
 
   const top7Desc = (arr, key) => arr
     .filter(x => Number.isFinite(x[key]) && x[key] > 0)
@@ -3947,7 +3969,7 @@ function renderT6Insights() {
       <div class="insightTitle">${title}</div>
       <ul class="insightList">
         ${list.map(x => `
-          <li class="insightItem ${x.chassis === "Колісне" ? "isWheel" : ""}">
+          <li class="insightItem ${x.chassis === "Колісне" ? "isWheel" : ""}" data-preset="${encodeURIComponent(x.key || "")}">
             <span>${esc(x.model)}</span>
             <span class="muted">${valueFn(x)}</span>
           </li>
@@ -4065,7 +4087,16 @@ function renderT6Insights() {
           <div class="insightCard">
             <div class="insightTitle">${massClass}</div>
             <div class="t6Insights">
-              ${renderList(`ТОП-7 рейтинг <span class="infoHint" title="${ratingHint}">?</span>`, top7Desc(subset, ratingKey), x => Number.isFinite(x[ratingKey]) ? x[ratingKey].toFixed(3) : "0.000", "rating")}
+              ${renderList(
+                `ТОП-7 рейтинг <span class="infoHint" title="${ratingHint}">?</span>`,
+                top7Desc(subset, ratingKey),
+                x => {
+                  const r = Number.isFinite(x[ratingKey]) ? x[ratingKey].toFixed(3) : "0.000";
+                  const p = Number.isFinite(x.price) ? formatPrice(Math.round(x.price)) : "—";
+                  return `${r} • ${p}`;
+                },
+                "rating"
+              )}
               ${renderList("ТОП‑7 вантажність", top7Desc(subset, "payload"), x => `${x.payload} кг`, "payload")}
               ${renderList("ТОП‑7 запас ходу", top7Desc(subset, "rangeRoad"), x => `${x.rangeRoad} км`, "range")}
               ${renderList("ТОП‑7 швидкість", top7Desc(subset, "maxSpeed"), x => `${x.maxSpeed} км/год`, "speed")}
@@ -4147,11 +4178,7 @@ function wireT6RatingHelp() {
 }
 
 function wireT6CatalogControls() {
-  const func = $("t6FuncFilter");
   const search = $("t6Search");
-  const sort = $("t6Sort");
-  if (func) func.addEventListener("change", renderT6Catalog);
-  if (sort) sort.addEventListener("change", renderT6Catalog);
   if (search) search.addEventListener("input", renderT6Catalog);
 }
 
@@ -4164,6 +4191,73 @@ function wireT6CatalogRowClicks() {
     const key = decodeURIComponent(row.getAttribute("data-preset") || "");
     if (!key) return;
     openPresetModalByKey(key);
+  });
+}
+
+function wireT6CatalogAccordion() {
+  const wrap = $("t6Catalog");
+  if (!wrap) return;
+  wrap.addEventListener("click", (e) => {
+    const title = e.target.closest(".classGroupTitle");
+    if (!title) return;
+    const group = title.closest(".classGroup");
+    if (!group) return;
+
+    const key = group.getAttribute("data-group") || "";
+    const isCollapsed = group.classList.contains("isCollapsed");
+
+    wrap.querySelectorAll(".classGroup").forEach((g) => {
+      if (g !== group) {
+        g.classList.add("isCollapsed");
+        const k = g.getAttribute("data-group");
+        if (k) window.__t6CatalogCollapsed[k] = true;
+      }
+    });
+
+    if (isCollapsed) {
+      group.classList.remove("isCollapsed");
+      if (key) window.__t6CatalogCollapsed[key] = false;
+    } else {
+      group.classList.add("isCollapsed");
+      if (key) window.__t6CatalogCollapsed[key] = true;
+    }
+  });
+}
+
+function wireT6SectionAccordions() {
+  const tab = document.getElementById("t6");
+  if (!tab) return;
+  const sections = Array.from(tab.querySelectorAll(".t6Acc"));
+  if (!sections.length) return;
+  sections.forEach((sec) => {
+    const title = sec.querySelector(".sectionTitle");
+    if (!title) return;
+    title.addEventListener("click", () => {
+      const isCollapsed = sec.classList.contains("isCollapsed");
+      sections.forEach((s) => {
+        if (s !== sec) s.classList.add("isCollapsed");
+      });
+      sec.classList.toggle("isCollapsed", !isCollapsed);
+    });
+  });
+}
+
+function wireT6SortHeaders() {
+  const wrap = $("t6Catalog");
+  if (!wrap) return;
+  window.__t6SortKey = window.__t6SortKey || "model";
+  window.__t6SortDir = window.__t6SortDir || "asc";
+  wrap.addEventListener("click", (e) => {
+    const th = e.target.closest("th[data-sort]");
+    if (!th) return;
+    const key = th.getAttribute("data-sort") || "model";
+    if (window.__t6SortKey === key) {
+      window.__t6SortDir = window.__t6SortDir === "asc" ? "desc" : "asc";
+    } else {
+      window.__t6SortKey = key;
+      window.__t6SortDir = "asc";
+    }
+    renderT6Catalog();
   });
 }
 
@@ -4188,6 +4282,17 @@ function wireT6TopFilter() {
     const key = btn.getAttribute("data-top") || "rating";
     window.__t6TopType = key;
     applyT6TopFilter();
+  });
+}
+
+function wireT6TopCardsClicks() {
+  const topOut = $("t6Top5");
+  if (!topOut) return;
+  topOut.addEventListener("click", (e) => {
+    const item = e.target.closest(".insightItem[data-preset]");
+    if (!item) return;
+    const key = decodeURIComponent(item.getAttribute("data-preset") || "");
+    if (key) openPresetModalByKey(key);
   });
 }
 
@@ -4635,9 +4740,13 @@ wireHowCalcInline();
   renderT6Insights();
   wireT6CatalogControls();
   wireT6CatalogRowClicks();
+  wireT6CatalogAccordion();
+  wireT6SectionAccordions();
+  wireT6SortHeaders();
   wireT6RatingControls();
   wireT6RatingHelp();
   wireT6TopFilter();
+  wireT6TopCardsClicks();
   wirePresetModal();
   initMissionPlanner();
 }
