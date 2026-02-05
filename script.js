@@ -2930,7 +2930,11 @@ function openInfoHint(text) {
 
   if (title) title.textContent = "Пояснення";
   if (meta) meta.textContent = "";
-  if (scale) scale.innerHTML = `<b>Пояснення</b><br><br><div class="small">${esc(text)}</div>`;
+  if (scale) {
+    const normalized = String(text).replace(/\\n/g, "\n");
+    const safe = esc(normalized).replace(/\n/g, "<br>");
+    scale.innerHTML = `<b>Пояснення</b><br><br><div class="small">${safe}</div>`;
+  }
   if (how) how.innerHTML = "";
   if (questions) questions.innerHTML = "";
 
@@ -3904,6 +3908,8 @@ function renderT6Insights() {
     rangeRoad: Number(p.rangeRoad),
     maxSpeed: Number(p.maxSpeed),
     clearance: Number(p.clearance),
+    climb: Number(p.climb),
+    tilt: Number(p.tilt),
     price: Number(p.price),
     optical: p.optical,
     opticalIR: p.opticalIR,
@@ -3973,6 +3979,8 @@ function renderT6Insights() {
   const [rMin, rMax] = minMax(withValue, "rangeRoad");
   const [sMin, sMax] = minMax(withValue, "maxSpeed");
   const [cMin, cMax] = minMax(withValue, "clearance");
+  const [clMin, clMax] = minMax(withValue, "climb");
+  const [tMin, tMax] = minMax(withValue, "tilt");
   const [prMin, prMax] = minMax(withValue, "price");
   const [rKmMin, rKmMax] = minMax(withValue, "radioKm");
 
@@ -3981,6 +3989,8 @@ function renderT6Insights() {
     const nRange = norm(x.rangeRoad, rMin, rMax);
     const nSpeed = norm(x.maxSpeed, sMin, sMax);
     const nClear = norm(x.clearance, cMin, cMax);
+    const nClimb = norm(x.climb, clMin, clMax);
+    const nTilt = norm(x.tilt, tMin, tMax);
     const nPriceInv = 1 - norm(x.price, prMin, prMax);
     const nRadio = norm(x.radioKm, rKmMin, rKmMax);
     const commScore = (toFlag(x.starlink) + toFlag(x.lte) + nRadio) / 3;
@@ -3990,6 +4000,8 @@ function renderT6Insights() {
       range: $("t6RateRange")?.checked ?? true,
       speed: $("t6RateSpeed")?.checked ?? true,
       clear: $("t6RateClear")?.checked ?? true,
+      climb: $("t6RateClimb")?.checked ?? true,
+      tilt: $("t6RateTilt")?.checked ?? true,
       price: $("t6RatePrice")?.checked ?? true,
       comm: $("t6RateComm")?.checked ?? true,
       sensor: $("t6RateSensor")?.checked ?? true,
@@ -4000,6 +4012,8 @@ function renderT6Insights() {
     if (ratingFlags.range) ratingParts.push(nRange);
     if (ratingFlags.speed) ratingParts.push(nSpeed);
     if (ratingFlags.clear) ratingParts.push(nClear);
+    if (ratingFlags.climb) ratingParts.push(nClimb);
+    if (ratingFlags.tilt) ratingParts.push(nTilt);
     if (ratingFlags.price) ratingParts.push(nPriceInv);
     if (ratingFlags.comm) ratingParts.push(commScore);
     if (ratingFlags.sensor) ratingParts.push(x.sensorScore);
@@ -4024,6 +4038,8 @@ function renderT6Insights() {
       nPayload,
       nRange,
       nSpeed,
+      nClimb,
+      nTilt,
       nPriceInv,
       sumScore,
       pricePerKg,
@@ -4117,6 +4133,16 @@ function applyT6TopFilter() {
   topOut.querySelectorAll(".t6TopCard").forEach(card => {
     const key = card.getAttribute("data-top");
     card.classList.toggle("isHidden", key !== topKey);
+  });
+}
+
+function wireT6RatingHelp() {
+  const hint = $("t6RatingHelp");
+  if (!hint) return;
+  hint.addEventListener("click", (e) => {
+    e.preventDefault();
+    const text = hint.getAttribute("data-hint") || hint.getAttribute("title");
+    if (text) openInfoHint(text);
   });
 }
 
@@ -4610,6 +4636,7 @@ wireHowCalcInline();
   wireT6CatalogControls();
   wireT6CatalogRowClicks();
   wireT6RatingControls();
+  wireT6RatingHelp();
   wireT6TopFilter();
   wirePresetModal();
   initMissionPlanner();
