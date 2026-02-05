@@ -478,7 +478,34 @@
         Ціна враховується як інверсія: дешевше = більше балів
         <span class="infoHint" title="Формула: 1 − (ціна − min) / (max − min). Приклад (min=98 000, max=3 000 000): 98 000→1.00, 300 000→0.93, 1 000 000→0.69, 3 000 000→0.00.">?</span>
       </div>
+      <div class="t6RatingControls" id="t6RatingControls">
+        <div class="t6RatingHead">
+          <div class="t6RatingTitle">
+            Параметри для рейтингу
+            <span class="infoHint" title="Рейтинг = середнє вибраних параметрів (усі нормовані 0–1). Сенсори: (оптична + ІЧ + тепловізійна)/3, де кожен сенсор дає 1 якщо є, і 0 якщо немає. Зв’язок: (Starlink + LTE + нормована радіо‑дальність)/3. Якщо сенсори або зв’язок однакові між моделями й вибраний лише цей параметр, то рейтинг буде однаковий (різниці немає). Приклад: Модель A має оптична+ІЧ, без тепловізора → (1+1+0)/3=0.667. Модель B має ті самі сенсори → теж 0.667, отже при виборі лише ‘Сенсори’ вони рівні. Для зв’язку: A має Starlink+LTE і 5 км радіо, B має Starlink+LTE і 5 км — оцінка однакова.">?</span>
+          </div>
+          <div class="small">Обери, що враховувати</div>
+        </div>
+        <div class="t6RatingGrid">
+          <label class="t6Switch"><input type="checkbox" id="t6RatePayload" checked><span class="t6Slider"></span><span class="t6Label">Вантажність</span></label>
+          <label class="t6Switch"><input type="checkbox" id="t6RateRange" checked><span class="t6Slider"></span><span class="t6Label">Запас ходу</span></label>
+          <label class="t6Switch"><input type="checkbox" id="t6RateSpeed" checked><span class="t6Slider"></span><span class="t6Label">Швидкість</span></label>
+          <label class="t6Switch"><input type="checkbox" id="t6RateClear" checked><span class="t6Slider"></span><span class="t6Label">Кліренс</span></label>
+          <label class="t6Switch"><input type="checkbox" id="t6RatePrice" checked><span class="t6Slider"></span><span class="t6Label">Ціна (інверсія)</span></label>
+          <label class="t6Switch"><input type="checkbox" id="t6RateComm" checked><span class="t6Slider"></span><span class="t6Label">Зв’язок</span></label>
+          <label class="t6Switch"><input type="checkbox" id="t6RateSensor" checked><span class="t6Slider"></span><span class="t6Label">Сенсори</span></label>
+        </div>
+      </div>
       <div id="t6Top5" class="t6Insights"></div>
+      <div class="t6TopFilter" id="t6TopFilter" role="tablist">
+        <button class="t6TopBtn active" type="button" data-top="rating">Рейтинг</button>
+        <button class="t6TopBtn" type="button" data-top="payload">Вантажність</button>
+        <button class="t6TopBtn" type="button" data-top="range">Запас</button>
+        <button class="t6TopBtn" type="button" data-top="speed">Швидкість</button>
+        <button class="t6TopBtn" type="button" data-top="value">Ціна/корисність</button>
+        <button class="t6TopBtn" type="button" data-top="pricekg">Ціна за кг</button>
+        <button class="t6TopBtn" type="button" data-top="pricekm">Ціна за км</button>
+      </div>
       <div class="divider"></div>
       <div id="t6Value" class="t6Insights"></div>
     </div>

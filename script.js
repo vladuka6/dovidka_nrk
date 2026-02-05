@@ -3884,6 +3884,7 @@ function renderT6Insights() {
   const topOut = $("t6Top5");
   const valOut = $("t6Value");
   if (!topOut || !valOut || typeof PRESETS === "undefined") return;
+  window.__t6MassState = window.__t6MassState || { "Логістичний": "Важкі", "Інженерний": "Важкі" };
 
   const toFlag = (v) => {
     const s = String(v ?? "").trim();
@@ -3898,6 +3899,7 @@ function renderT6Insights() {
     maker: String(p.maker || "").trim(),
     func: classifyFunction(p),
     massClass: classifyMass(p.mass),
+    chassis: classifyChassis(p),
     payload: Number(p.payload),
     rangeRoad: Number(p.rangeRoad),
     maxSpeed: Number(p.maxSpeed),
@@ -3912,34 +3914,39 @@ function renderT6Insights() {
     sensorScore: (toFlag(p.optical) + toFlag(p.opticalIR) + toFlag(p.thermal)) / 3,
   })).filter(x => x.model);
 
-  const top5 = (arr, key) => arr
+  const top7Desc = (arr, key) => arr
     .filter(x => Number.isFinite(x[key]) && x[key] > 0)
-    .sort((a, b) => b[key] - a[key])
-    .slice(0, 5);
+    .sort((a, b) => {
+      const diff = b[key] - a[key];
+      if (diff !== 0) return diff;
+      const pa = Number.isFinite(a.price) ? a.price : Infinity;
+      const pb = Number.isFinite(b.price) ? b.price : Infinity;
+      return pa - pb; // при рівності — дешевші вище
+    })
+    .slice(0, 7);
 
-  const renderList = (title, list, key, suffix) => `
-    <div class="insightCard">
+  const top7Asc = (arr, key) => arr
+    .filter(x => Number.isFinite(x[key]) && x[key] > 0)
+    .sort((a, b) => {
+      const diff = a[key] - b[key];
+      if (diff !== 0) return diff;
+      const pa = Number.isFinite(a.price) ? a.price : Infinity;
+      const pb = Number.isFinite(b.price) ? b.price : Infinity;
+      return pa - pb; // при рівності — дешевші вище
+    })
+    .slice(0, 7);
+
+  const renderList = (title, list, valueFn, topKey) => `
+    <div class="insightCard t6TopCard" data-top="${topKey}">
       <div class="insightTitle">${title}</div>
       <ul class="insightList">
         ${list.map(x => `
-          <li class="insightItem">
+          <li class="insightItem ${x.chassis === "Колісне" ? "isWheel" : ""}">
             <span>${esc(x.model)}</span>
-            <span class="muted">${x[key]}${suffix}</span>
+            <span class="muted">${valueFn(x)}</span>
           </li>
         `).join("")}
       </ul>
-    </div>`;
-
-  const buildTopBlock = (title, subset, ratingKey, ratingHint) => `
-    <div class="insightCard">
-      <div class="insightTitle">${title}</div>
-      <div class="t6Insights">
-        ${renderList(`ТОП-5 рейтинг <span class="infoHint" title="${ratingHint}">?</span>`, top5(subset, ratingKey), ratingKey, "")}
-        ${renderList("ТОП‑5 вантажність", top5(subset, "payload"), "payload", " кг")}
-        ${renderList("ТОП‑5 запас ходу", top5(subset, "rangeRoad"), "rangeRoad", " км")}
-        ${renderList("ТОП‑5 швидкість", top5(subset, "maxSpeed"), "maxSpeed", " км/год")}
-        ${renderList('ТОП‑5 ціна/корисність <span class="infoHint" title="Формула: (вантажність × дальність × швидкість) / ціна. Чим більше — тим вигідніше.">?</span>', top5(subset, "valueScore"), "valueScore", "")}
-      </div>
     </div>`;
 
   const withValue = items.map(x => {
@@ -3978,109 +3985,139 @@ function renderT6Insights() {
     const nRadio = norm(x.radioKm, rKmMin, rKmMax);
     const commScore = (toFlag(x.starlink) + toFlag(x.lte) + nRadio) / 3;
 
-    const logisticRating = Math.round((
-      nPayload * 0.22 +
-      nRange * 0.18 +
-      nSpeed * 0.08 +
-      nClear * 0.05 +
-      nPriceInv * 0.12 +
-      commScore * 0.18 +
-      x.sensorScore * 0.17
+    const ratingFlags = {
+      payload: $("t6RatePayload")?.checked ?? true,
+      range: $("t6RateRange")?.checked ?? true,
+      speed: $("t6RateSpeed")?.checked ?? true,
+      clear: $("t6RateClear")?.checked ?? true,
+      price: $("t6RatePrice")?.checked ?? true,
+      comm: $("t6RateComm")?.checked ?? true,
+      sensor: $("t6RateSensor")?.checked ?? true,
+    };
+
+    const ratingParts = [];
+    if (ratingFlags.payload) ratingParts.push(nPayload);
+    if (ratingFlags.range) ratingParts.push(nRange);
+    if (ratingFlags.speed) ratingParts.push(nSpeed);
+    if (ratingFlags.clear) ratingParts.push(nClear);
+    if (ratingFlags.price) ratingParts.push(nPriceInv);
+    if (ratingFlags.comm) ratingParts.push(commScore);
+    if (ratingFlags.sensor) ratingParts.push(x.sensorScore);
+    const ratingScore = ratingParts.length
+      ? Math.round((ratingParts.reduce((a, b) => a + b, 0) / ratingParts.length) * 1000) / 1000
+      : 0;
+
+    const sumScore = Math.round((
+      nPayload +
+      nRange +
+      nSpeed +
+      nPriceInv
     ) * 1000) / 1000;
 
-    const engineeringRating = Math.round((
-      nClear * 0.20 +
-      nSpeed * 0.10 +
-      nRange * 0.10 +
-      nPayload * 0.05 +
-      nPriceInv * 0.10 +
-      commScore * 0.20 +
-      x.sensorScore * 0.25
-    ) * 1000) / 1000;
+    const pricePerKg = (x.price > 0 && x.payload > 0) ? x.price / x.payload : null;
+    const pricePerKm = (x.price > 0 && x.rangeRoad > 0) ? x.price / x.rangeRoad : null;
 
-    return { ...x, logisticRating, engineeringRating };
+    return {
+      ...x,
+      ratingScore,
+      commScore,
+      nPayload,
+      nRange,
+      nSpeed,
+      nPriceInv,
+      sumScore,
+      pricePerKg,
+      pricePerKm
+    };
   });
 
-  const logistic = withOverall.filter(x => x.func === "Логістичний");
-  const engineering = withOverall.filter(x => x.func === "Інженерний");
+  const massTargets = ["Важкі", "Середні", "Легкі"];
+  const ratingHintLog = "Рейтинг = середнє вибраних параметрів (нормовані 0–1). Інверсія ціни: дешевше = більше.";
+  const ratingHintEng = ratingHintLog;
+  const valueHint = "Формула: (вантажність × дальність × швидкість) / ціна. Чим більше — тим вигідніше.";
+  const priceKgHint = "Формула: ціна / вантажність. Менше = вигідніше.";
+  const priceKmHint = "Формула: ціна / запас ходу. Менше = вигідніше.";
 
-  topOut.innerHTML = [
-    buildTopBlock(
-      "Логістичні",
-      logistic,
-      "logisticRating",
-      "Рейтинг = вантажність(0.22) + дальність(0.18) + швидкість(0.08) + кліренс(0.05) + ціна(0.12, інверсія) + зв’язок(0.18) + сенсори(0.17). Інверсія ціни: найдешевша=1, найдорожча=0 (напр. 1млн →1, 2млн →0)."
-    ),
-    buildTopBlock(
-      "Інженерні",
-      engineering,
-      "engineeringRating",
-      "Рейтинг = кліренс(0.20) + швидкість(0.10) + дальність(0.10) + вантажність(0.05) + ціна(0.10, інверсія) + зв’язок(0.20) + сенсори(0.25). Інверсія ціни: найдешевша=1, найдорожча=0."
-    ),
-  ].join("");
-
-  const valueList = items
-    .filter(x => Number.isFinite(x.price) && x.price > 0)
-    .map(x => ({
-      ...x,
-      pricePerKg: (x.payload && x.payload > 0) ? x.price / x.payload : null,
-      pricePerKm: (x.rangeRoad && x.rangeRoad > 0) ? x.price / x.rangeRoad : null,
-    }));
-
-  const bestKg = valueList
-    .filter(x => x.pricePerKg)
-    .sort((a, b) => a.pricePerKg - b.pricePerKg)
-    .slice(0, 5);
-
-  const bestKm = valueList
-    .filter(x => x.pricePerKm)
-    .sort((a, b) => a.pricePerKm - b.pricePerKm)
-    .slice(0, 5);
-
-  const renderValueList = (title, list, key) => `
-    <div class="insightCard">
-      <div class="insightTitle">${title}</div>
-      <ul class="insightList">
-        ${list.map(x => `
-          <li class="insightItem">
-            <span>${esc(x.model)}</span>
-            <span class="muted">${formatPrice(Math.round(x[key]))}</span>
-          </li>
-        `).join("")}
-      </ul>
-    </div>`;
-
-  const massOrder = ["Міні", "Легкі", "Середні", "Важкі", "Надважкі"];
-  const funcOrder = ["Логістичний", "Інженерний"];
-  const topN = (arr, key, n = 3) => arr
-    .filter(x => x[key])
-    .sort((a, b) => a[key] - b[key])
-    .slice(0, n);
-
-  const buildMassBlock = (func) => {
-    const blocks = massOrder.map(massClass => {
-      const subset = valueList.filter(x => x.func === func && x.massClass === massClass);
+  const buildFuncBlock = (funcLabel, funcTitle, ratingKey, ratingHint) => {
+    const preferred = window.__t6MassState?.[funcLabel] || massTargets[0];
+    const panels = massTargets.map((massClass, idx) => {
+      const subset = withOverall.filter(x => x.func === funcLabel && x.massClass === massClass);
       if (!subset.length) return "";
-      const topKg = topN(subset, "pricePerKg");
-      const topKm = topN(subset, "pricePerKm");
+      const activeClass = massClass === preferred ? "active" : "";
       return `
-        <div class="insightCard">
-          <div class="insightTitle">${func} — ${massClass}</div>
-          <div class="t6Insights">
-            ${renderValueList('Ціна за кг вантажності (краще) <span class="infoHint" title="Формула: ціна / вантажність. Менше = вигідніше. Напр. 1 000 000 / 500 = 2000 грн/кг.">?</span>', topKg, "pricePerKg")}
-            ${renderValueList('Ціна за км пробігу (краще) <span class="infoHint" title="Формула: ціна / запас ходу. Менше = вигідніше. Напр. 1 000 000 / 20 = 50 000 грн/км.">?</span>', topKm, "pricePerKm")}
+        <div class="t6SubPanel ${activeClass}" data-mass="${massClass}">
+          <div class="insightCard">
+            <div class="insightTitle">${massClass}</div>
+            <div class="t6Insights">
+              ${renderList(`ТОП-7 рейтинг <span class="infoHint" title="${ratingHint}">?</span>`, top7Desc(subset, ratingKey), x => Number.isFinite(x[ratingKey]) ? x[ratingKey].toFixed(3) : "0.000", "rating")}
+              ${renderList("ТОП‑7 вантажність", top7Desc(subset, "payload"), x => `${x.payload} кг`, "payload")}
+              ${renderList("ТОП‑7 запас ходу", top7Desc(subset, "rangeRoad"), x => `${x.rangeRoad} км`, "range")}
+              ${renderList("ТОП‑7 швидкість", top7Desc(subset, "maxSpeed"), x => `${x.maxSpeed} км/год`, "speed")}
+              ${renderList(`ТОП‑7 ціна/корисність <span class="infoHint" title="${valueHint}">?</span>`, top7Desc(subset, "valueScore"), x => Number.isFinite(x.valueScore) ? x.valueScore.toFixed(3) : "0.000", "value")}
+              ${renderList(`Ціна за кг вантажності <span class="infoHint" title="${priceKgHint}">?</span>`, top7Asc(subset, "pricePerKg"), x => formatPrice(Math.round(x.pricePerKg)), "pricekg")}
+              ${renderList(`Ціна за км пробігу <span class="infoHint" title="${priceKmHint}">?</span>`, top7Asc(subset, "pricePerKm"), x => formatPrice(Math.round(x.pricePerKm)), "pricekm")}
+            </div>
           </div>
         </div>
       `;
     }).join("");
-    if (!blocks) return "";
-    return `<div class="t6Block">
-      <div class="sectionTitle">${func}</div>
-      <div class="t6Insights">${blocks}</div>
-    </div>`;
+    if (!panels) return "";
+    const tabs = massTargets.map((massClass) => {
+      const activeClass = massClass === preferred ? "active" : "";
+      return `<button class="t6SubTab ${activeClass}" type="button" data-mass="${massClass}">${massClass}</button>`;
+    }).join("");
+    return `
+      <div class="t6Block" data-func="${funcLabel}">
+        <div class="sectionTitle">${funcTitle}</div>
+        <div class="t6SubTabs" role="tablist">${tabs}</div>
+        <div class="t6SubPanels">${panels}</div>
+      </div>
+    `;
   };
 
-  valOut.innerHTML = funcOrder.map(buildMassBlock).join("") || `<div class="small">Немає достатньо даних для порівняння.</div>`;
+  topOut.innerHTML = [
+    buildFuncBlock("Логістичний", "Логістичні", "ratingScore", ratingHintLog),
+    buildFuncBlock("Інженерний", "Інженерні", "ratingScore", ratingHintEng),
+  ].join("") || `<div class="small">Немає достатньо даних для порівняння.</div>`;
+
+  valOut.innerHTML = "";
+
+  topOut.querySelectorAll(".t6SubTabs").forEach(tabBar => {
+    tabBar.addEventListener("click", (e) => {
+      const btn = e.target.closest(".t6SubTab");
+      if (!btn) return;
+      const mass = btn.getAttribute("data-mass");
+      const block = tabBar.closest(".t6Block");
+      if (!block) return;
+      const func = block.getAttribute("data-func");
+      if (func) {
+        window.__t6MassState[func] = mass;
+      }
+      block.querySelectorAll(".t6SubTab").forEach(b => b.classList.remove("active"));
+      btn.classList.add("active");
+      block.querySelectorAll(".t6SubPanel").forEach(p => {
+        p.classList.toggle("active", p.getAttribute("data-mass") === mass);
+      });
+    });
+  });
+
+  applyT6TopFilter();
+}
+
+function applyT6TopFilter() {
+  const topKey = window.__t6TopType || "rating";
+  const filter = $("t6TopFilter");
+  if (filter) {
+    filter.querySelectorAll(".t6TopBtn").forEach(btn => {
+      btn.classList.toggle("active", btn.getAttribute("data-top") === topKey);
+    });
+  }
+  const topOut = $("t6Top5");
+  if (!topOut) return;
+  topOut.querySelectorAll(".t6TopCard").forEach(card => {
+    const key = card.getAttribute("data-top");
+    card.classList.toggle("isHidden", key !== topKey);
+  });
 }
 
 function wireT6CatalogControls() {
@@ -4101,6 +4138,30 @@ function wireT6CatalogRowClicks() {
     const key = decodeURIComponent(row.getAttribute("data-preset") || "");
     if (!key) return;
     openPresetModalByKey(key);
+  });
+}
+
+function wireT6RatingControls() {
+  const box = $("t6RatingControls");
+  if (!box) return;
+  box.addEventListener("change", (e) => {
+    const target = e.target;
+    if (target && target.matches("input[type='checkbox']")) {
+      renderT6Insights();
+    }
+  });
+}
+
+function wireT6TopFilter() {
+  const filter = $("t6TopFilter");
+  if (!filter) return;
+  window.__t6TopType = window.__t6TopType || "rating";
+  filter.addEventListener("click", (e) => {
+    const btn = e.target.closest(".t6TopBtn");
+    if (!btn) return;
+    const key = btn.getAttribute("data-top") || "rating";
+    window.__t6TopType = key;
+    applyT6TopFilter();
   });
 }
 
@@ -4548,6 +4609,8 @@ wireHowCalcInline();
   renderT6Insights();
   wireT6CatalogControls();
   wireT6CatalogRowClicks();
+  wireT6RatingControls();
+  wireT6TopFilter();
   wirePresetModal();
   initMissionPlanner();
 }
