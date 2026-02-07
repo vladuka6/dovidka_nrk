@@ -1,19 +1,15 @@
-const KEY = "nrk_app_v2026";
+﻿const KEY = "nrk_app_v2026";
 
 
 /* ---------- ВАГИ / КЛЮЧОВІ ---------- */
-const WEIGHTS = {
-  payload: 0.12,
-  mob: 0.10,
-  end: 0.10,
-  link: 0.16,
-  reb: 0.14,
-  sens: 0.08,
-  deploy: 0.06,
-  ops: 0.08,
-  value: 0.16,
-};
-const KEY_CRITERIA = ["link", "reb"];
+const KEY_CRITERIA = [
+  "s1_range",
+  "s1_terrain",
+  "s1_protect",
+  "s1_fail_safe",
+  "s1_latency",
+  "s5_ew",
+];
 
 /* ---------- ДОВІДНИК МОДЕЛЕЙ (PRESETS) ----------
    ДОДАЙ сюди поле photo (URL або шлях) коли буде.
@@ -1893,160 +1889,745 @@ const INVENTORY = {
 
 
 
-/* ---------- КРИТЕРІЇ (поки як було; розширимо у твоєму наступному кроці) ---------- */
-const CRITERIA = [
+/* ---------- КРИТЕРІЇ (розділи + внутрішні ваги) ---------- */
+const CRIT_WEIGHTS = {
+  // Розділ 1 — управління та зв’язок
+  s1_range: 3,
+  s1_terrain: 2,
+  s1_arch: 1,
+  s1_protect: 3,
+  s1_fail_safe: 3,
+  s1_hijack: 2,
+  s1_latency: 3,
+  s1_ergonomics: 1,
+  s1_integration: 1,
+
+  // Розділ 2 — мобільність і прохідність
+  s2_chassis: 2,
+  s2_speed: 1,
+  s2_offroad: 3,
+  s2_obstacles: 2,
+  s2_clearance: 2,
+  s2_maneuver: 1,
+  s2_noise: 1,
+  s2_stability: 2,
+
+  // Розділ 3 — енергосистема та автономність
+  s3_power: 2,
+  s3_range: 3,
+  s3_duration: 2,
+  s3_charge: 1,
+  s3_swap: 1,
+  s3_reliability: 2,
+  s3_reserve: 1,
+  s3_payload_power: 1,
+
+  // Розділ 4 — корисне навантаження та гнучкість
+  s4_payload: 3,
+  s4_evac: 2,
+  s4_sensors: 2,
+  s4_modules: 1,
+  s4_mounts: 1,
+
+  // Розділ 5 — захищеність і живучість
+  s5_nodes: 2,
+  s5_damage: 2,
+  s5_signature: 2,
+  s5_ew: 3,
+  s5_survival: 2,
+  s5_repair: 2,
+
+  // Розділ 6 — експлуатація та логістика
+  s6_crew: 2,
+  s6_deploy: 2,
+  s6_training: 1,
+  s6_transport: 1,
+  s6_service: 1,
+  s6_resource: 1,
+  s6_docs: 1,
+};
+
+function buildCriteriaFlat(sections) {
+  const out = [];
+  sections.forEach((sec) => {
+    const sumW = sec.criteria.reduce((a, c) => a + (c.weight ?? CRIT_WEIGHTS[c.id] ?? 1), 0) || 1;
+    sec.criteria.forEach((c) => {
+      const relW = c.weight ?? CRIT_WEIGHTS[c.id] ?? 1;
+      out.push({
+        ...c,
+        sectionId: sec.id,
+        sectionName: sec.name,
+        sectionCode: sec.code,
+        sectionWeight: sec.weight,
+        weight: sec.weight * (relW / sumW),
+      });
+    });
+  });
+  return out;
+}
+
+const EVAL_SECTIONS = [
   {
-    id: "payload",
-    name: "Навантаження",
-    short: "скільки реально везе і як стабільно",
-    weight: WEIGHTS.payload,
-    scale: [
-      "0 — <50% від потреб або нестабільно під вантажем",
-      "3 — тягне/везе типові вантажі стабільно",
-      "5 — має запас + стабільний рух/поворот з вантажем",
-    ],
-    how: "Оцінюй на демо: рух 200–300 м з вантажем, поворот, старт/стоп, чи не просідає швидкість/керованість.",
-    questions: [
-      "Який номінал/максимум (підтверджено де)?",
-      "Покажіть рух з номінальним вантажем 2 рази підряд.",
-      "Що при перевищенні: захист/обмеження?",
+    id: "sec1",
+    code: "1",
+    name: "Оцінювання системи управління та зв’язку БеНК",
+    weight: 0.25,
+    desc: "Ключове — надійне керування рухом у бойових умовах.",
+    criteria: [
+      {
+        id: "s1_range",
+        code: "1.2",
+        name: "Тактична дальність управління",
+        short: "дальність керування",
+        scale: [
+          "0 — керування відсутнє",
+          "1 — < 0,5 км",
+          "2 — 0,5–0,8 км",
+          "3 — 0,8–1,2 км",
+          "4 — 1,5–3 км",
+          "5 — ≥ 3 км",
+        ],
+        how: "Враховується лише канал керування рухом. Відео/телеметрія/Starlink/LTE не визначають тактичну дальність.",
+      },
+      {
+        id: "s1_terrain",
+        code: "1.3",
+        name: "Стійкість керування в умовах місцевості",
+        short: "стійкість у місцевості",
+        scale: [
+          "0 — непридатне",
+          "1 — нестабільне",
+          "2 — часті втрати керування",
+          "3 — керування з обмеженнями",
+          "4 — деградація без втрати керування",
+          "5 — стабільне керування у всіх умовах",
+        ],
+      },
+      {
+        id: "s1_arch",
+        code: "1.4",
+        name: "Радіоспектральна архітектура каналу керування",
+        short: "архітектура каналу",
+        scale: [
+          "0 — не визначено",
+          "1 — Wi-Fi або цивільні протоколи",
+          "2 — фіксовані ISM-діапазони без hopping",
+          "3 — адаптивні RC/telemetry системи (ELRS, Crossfire)",
+          "4 — спеціалізовані тактичні системи (Silvus, DTC, Sine.link тощо)",
+          "5 — військові SDR / MANET / FHSS з активним керуванням спектром",
+        ],
+      },
+      {
+        id: "s1_protect",
+        code: "1.5",
+        name: "Захищеність та завадостійкість каналу керування",
+        short: "захищеність каналу",
+        scale: [
+          "0 — відсутній",
+          "1 — формальний",
+          "2 — мінімальний захист",
+          "3 — базове шифрування",
+          "4 — сильне шифрування + hopping",
+          "5 — активний anti-EW з адаптацією в реальному часі",
+        ],
+      },
+      {
+        id: "s1_fail_safe",
+        code: "1.6",
+        name: "Поведінка БеНК при втраті зв’язку (Fail safe)",
+        short: "fail-safe",
+        scale: [
+          "0 — небезпечна",
+          "1 — хаотична поведінка",
+          "2 — неконтрольований рух",
+          "3 — контрольована зупинка / очікування",
+          "4 — повернення за маршрутом",
+          "5 — автономна навігація або повернення",
+        ],
+      },
+      {
+        id: "s1_hijack",
+        code: "1.7",
+        name: "Захист від перехоплення управління",
+        short: "захист від перехоплення",
+        scale: [
+          "0 — відсутній",
+          "1 — формальний",
+          "2 — слабкий",
+          "3 — базовий захист",
+          "4 — сильне криптографічне шифрування",
+          "5 — військові протоколи керування",
+        ],
+      },
+      {
+        id: "s1_latency",
+        code: "1.8",
+        name: "Затримка управління (Latency)",
+        short: "затримка",
+        scale: [
+          "0 — непридатна",
+          "1 — критична",
+          "2 — > 400 мс",
+          "3 — 200–400 мс",
+          "4 — 100–200 мс",
+          "5 — < 100 мс",
+        ],
+        how: "Оцінюється затримка каналу керування рухом, а не відеопотоку.",
+      },
+      {
+        id: "s1_ergonomics",
+        code: "1.9",
+        name: "Ергономіка та навантаження на оператора",
+        short: "ергономіка",
+        scale: [
+          "0 — непридатне",
+          "1 — перевантажене",
+          "2 — складне",
+          "3 — потребує навчання",
+          "4 — 2 оператори, просте",
+          "5 — 1 оператор, інтуїтивне керування",
+        ],
+      },
+      {
+        id: "s1_integration",
+        code: "1.10",
+        name: "Масштабованість та інтеграція",
+        short: "інтеграція",
+        scale: [
+          "0 — відсутня",
+          "1 — закрита",
+          "2 — обмежена",
+          "3 — автономна система",
+          "4 — часткова інтеграція",
+          "5 — повна інтеграція C2 / swarm",
+        ],
+      },
     ],
   },
   {
-    id: "mob",
-    name: "Прохідність",
-    short: "реальний ґрунт/ухили/колія",
-    weight: WEIGHTS.mob,
-    scale: [
-      "0 — застрягає/зриває керування",
-      "3 — долає типові перешкоди",
-      "5 — стабільно на ухилах/багнюці/піску з вантажем",
-    ],
-    how: "Проси ділянку з колією/ухилом. Важлива повторюваність (2–3 проходи).",
-    questions: [
-      "Який кут підйому/крену підтверджено?",
-      "Покажіть колію/багнюку (2 проходи).",
-      "Є обмеження по швидкості на бездоріжжі?",
+    id: "sec2",
+    code: "2",
+    name: "Оцінювання мобільності та прохідності БеНК",
+    weight: 0.2,
+    desc: "Мобільність визначає реальну прохідність у бойових умовах.",
+    criteria: [
+      {
+        id: "s2_chassis",
+        code: "2.2",
+        name: "Тип ходової частини",
+        short: "тип шасі",
+        scale: [
+          "0 — непридатний",
+          "1 — дорожній",
+          "2 — комбінований",
+          "3 — колісний 4×2",
+          "4 — колісний 4×4",
+          "5 — гусеничний",
+        ],
+      },
+      {
+        id: "s2_speed",
+        code: "2.3",
+        name: "Максимальна швидкість руху",
+        short: "швидкість",
+        scale: [
+          "0 — нерухомий",
+          "1 — < 3 км/год",
+          "2 — 3–6 км/год",
+          "3 — 6–10 км/год",
+          "4 — 10–15 км/год",
+          "5 — > 15 км/год",
+        ],
+      },
+      {
+        id: "s2_offroad",
+        code: "2.4",
+        name: "Прохідність по бездоріжжю",
+        short: "бездоріжжя",
+        scale: [
+          "0 — непридатний",
+          "1 — майже непридатний",
+          "2 — часті застрягання",
+          "3 — вибірковий рух",
+          "4 — рух з обмеженнями",
+          "5 — стабільний рух",
+        ],
+      },
+      {
+        id: "s2_obstacles",
+        code: "2.5",
+        name: "Подолання перешкод",
+        short: "перешкоди",
+        scale: [
+          "0 — не долає",
+          "1 — мінімально",
+          "2 — обмежено",
+          "3 — основні",
+          "4 — більшість",
+          "5 — всі типи",
+        ],
+      },
+      {
+        id: "s2_clearance",
+        code: "2.6",
+        name: "Кліренс та геометрична прохідність",
+        short: "кліренс",
+        scale: [
+          "0 — критичний",
+          "1 — < 80 мм",
+          "2 — 80–120 мм",
+          "3 — 120–160 мм",
+          "4 — 160–200 мм",
+          "5 — > 200 мм",
+        ],
+      },
+      {
+        id: "s2_maneuver",
+        code: "2.7",
+        name: "Маневреність",
+        short: "маневреність",
+        scale: [
+          "0 — відсутня",
+          "1 — низька",
+          "2 — обмежена",
+          "3 — середня",
+          "4 — достатня",
+          "5 — висока",
+        ],
+      },
+      {
+        id: "s2_noise",
+        code: "2.8",
+        name: "Шумність під час руху",
+        short: "шумність",
+        scale: [
+          "0 — критичний",
+          "1 — > 85 дБ",
+          "2 — 70–85 дБ",
+          "3 — 55–70 дБ",
+          "4 — 40–55 дБ",
+          "5 — < 40 дБ",
+        ],
+      },
+      {
+        id: "s2_stability",
+        code: "2.9",
+        name: "Стійкість під час руху",
+        short: "стійкість",
+        scale: [
+          "0 — непридатна",
+          "1 — небезпечна",
+          "2 — нестійка",
+          "3 — задовільна",
+          "4 — достатня",
+          "5 — висока",
+        ],
+      },
     ],
   },
   {
-    id: "end",
-    name: "Автономність",
-    short: "час/дистанція в реальному режимі",
-    weight: WEIGHTS.end,
-    scale: [
-      "0 — <1 год або <5 км (або нема підтвердження)",
-      "3 — 2–3 год або 10–20 км (підтверджено)",
-      "5 — ≥4 год або ≥30 км (підтверджено з вантажем)",
-    ],
-    how: "Не плутай паспорт і практику. Проси режим: вантаж+середня швидкість+температура.",
-    questions: [
-      "Реальний час з вантажем X кг при температурі Y?",
-      "Ресурс АКБ/цикли/час зарядки?",
-      "Захист при розряді/відсікання?",
+    id: "sec3",
+    code: "3",
+    name: "Оцінювання енергосистеми та автономності БеНК",
+    weight: 0.15,
+    desc: "Автономність — це гарантований час роботи в реальних умовах.",
+    criteria: [
+      {
+        id: "s3_power",
+        code: "3.2",
+        name: "Тип силової установки",
+        short: "тип установки",
+        scale: [
+          "0 — відсутня",
+          "1 — нестабільна",
+          "2 — стандартний ДВЗ",
+          "3 — ДВЗ з шумопоглинанням",
+          "4 — гібридна",
+          "5 — електрична",
+        ],
+      },
+      {
+        id: "s3_range",
+        code: "3.3",
+        name: "Запас ходу",
+        short: "запас ходу",
+        scale: [
+          "0 — відсутній",
+          "1 — < 5 км",
+          "2 — 5–10 км",
+          "3 — 10–20 км",
+          "4 — 20–30 км",
+          "5 — > 30 км",
+        ],
+      },
+      {
+        id: "s3_duration",
+        code: "3.4",
+        name: "Тривалість безперервної роботи",
+        short: "тривалість роботи",
+        scale: [
+          "0 — відсутня",
+          "1 — < 1 год",
+          "2 — 1–2 год",
+          "3 — 2–4 год",
+          "4 — 4–6 год",
+          "5 — > 6 год",
+        ],
+      },
+      {
+        id: "s3_charge",
+        code: "3.5",
+        name: "Час заряджання / відновлення енергії",
+        short: "час заряджання",
+        scale: [
+          "0 — не визначено",
+          "1 — > 6 год",
+          "2 — 4–6 год",
+          "3 — 2–4 год",
+          "4 — 1–2 год",
+          "5 — < 1 год",
+        ],
+      },
+      {
+        id: "s3_swap",
+        code: "3.6",
+        name: "Можливість швидкої заміни джерела живлення",
+        short: "заміна живлення",
+        scale: [
+          "0 — відсутня",
+          "1 — можлива лише в сервісі",
+          "2 — складна",
+          "3 — заміна з інструментом",
+          "4 — заміна 5–10 хв",
+          "5 — повна заміна < 5 хв",
+        ],
+      },
+      {
+        id: "s3_reliability",
+        code: "3.7",
+        name: "Надійність енергосистеми",
+        short: "надійність",
+        scale: [
+          "0 — непридатна",
+          "1 — критична",
+          "2 — нестабільна",
+          "3 — задовільна",
+          "4 — підтверджена випробуваннями",
+          "5 — підтверджена бойовою експлуатацією",
+        ],
+      },
+      {
+        id: "s3_reserve",
+        code: "3.8",
+        name: "Резервування енергосистеми",
+        short: "резервування",
+        scale: [
+          "0 — небезпечне",
+          "1 — відсутнє",
+          "2 — формальне",
+          "3 — мінімальне",
+          "4 — часткове",
+          "5 — повне",
+        ],
+      },
+      {
+        id: "s3_payload_power",
+        code: "3.9",
+        name: "Енергоспоживання корисного навантаження",
+        short: "живлення навантаження",
+        scale: [
+          "0 — відсутнє",
+          "1 — непридатний",
+          "2 — критичний",
+          "3 — обмежений",
+          "4 — достатній",
+          "5 — значний резерв",
+        ],
+      },
     ],
   },
   {
-    id: "link",
-    name: "Зв’язок/керування",
-    short: "стабільність керування і резерв",
-    weight: WEIGHTS.link,
-    scale: [
-      "0 — один канал, нестабільний",
-      "3 — 1–2 канали, але слабкий резерв/перемикання",
-      "5 — ≥2 канали + резерв + зрозуміле перемикання + прийнятна затримка",
-    ],
-    how: "Ключовий критерій: дальність, latency, поведінка при втраті сигналу, відновлення керування.",
-    questions: [
-      "Які канали (основний/резервний) і як перемикається?",
-      "Покажіть втрату каналу і відновлення 2 рази.",
-      "Яка затримка і як міряли?",
-    ],
-  },
-  {
-    id: "reb",
-    name: "РЕБ / Fail-safe",
-    short: "поведінка при завадах/втраті",
-    weight: WEIGHTS.reb,
-    scale: [
-      "0 — небезпечно: продовжує рух/не реагує",
-      "3 — безпечна зупинка при втраті зв’язку",
-      "5 — зупинка + відновлення/перехід на резерв + прозора логіка",
-    ],
-    how: "Вимагай демонстрацію: що через 1–3 секунди після втрати керування.",
-    questions: [
-      "Логіка fail-safe: стоп/режим очікування/повернення?",
-      "Час спрацювання?",
-      "Є лог подій?",
-    ],
-  },
-  {
-    id: "sens",
-    name: "Сенсори",
-    short: "камери/ніч/тепло + стабільність",
-    weight: WEIGHTS.sens,
-    scale: [
-      "0 — мінімальна камера/поганий огляд",
-      "3 — 2+ камери або ІЧ",
-      "5 — огляд + тепловіз (за потреби) + стабільне відео в русі",
-    ],
-    how: "Оцінюй користь: огляд під колеса, перемикання камер, лаги.",
-    questions: [
-      "Де камери? Є огляд під колеса?",
-      "Перемикання камер під час руху?",
-      "Ніч/ІЧ/тепло (як заявлено) підтвердити.",
-    ],
-  },
-  {
-    id: "deploy",
-    name: "Розгортання",
-    short: "час і простота підготовки",
-    weight: WEIGHTS.deploy,
-    scale: ["0 — >20 хв", "3 — 5–10 хв", "5 — ≤3 хв після транспортування"],
-    how: "Реально: витягли з авто → ввімкнули → поїхали. Таймер.",
-    questions: [
-      "Покажіть запуск з нуля з таймером.",
-      "Скільки людей потрібно?",
-      "Що в комплекті для швидкого розгортання?",
-    ],
-  },
-  {
-    id: "ops",
-    name: "Експлуатація/сервіс",
-    short: "ремонтопридатність і підтримка",
-    weight: WEIGHTS.ops,
-    scale: [
-      "0 — ремонт тільки у виробника, нема ЗІП",
-      "3 — базовий ЗІП, частковий ремонт",
-      "5 — польовий ремонт ≤30 хв, документація/гарантія/запчастини",
-    ],
-    how: "Для 1–2 лінії важливо швидко відновити після дрібних пошкоджень.",
-    questions: [
-      "Який ЗІП/витратники в комплекті?",
-      "Гарантія, SLA, склад запчастин?",
-      "Час відновлення типових поломок?",
+    id: "sec4",
+    code: "4",
+    name: "Оцінювання корис.наван та функц. гнучкості БеНК",
+    weight: 0.15,
+    desc: "Корисне навантаження та гнучкість визначають функціональну цінність платформи.",
+    criteria: [
+      {
+        id: "s4_payload",
+        code: "4.2",
+        name: "Вантажопідйомність",
+        short: "вантажопідйомність",
+        scale: [
+          "0 — відсутня",
+          "1 — < 100 кг",
+          "2 — 100–200 кг",
+          "3 — 200–300 кг",
+          "4 — 300–500 кг",
+          "5 — > 500 кг",
+        ],
+      },
+      {
+        id: "s4_evac",
+        code: "4.3",
+        name: "Можливість евакуації поранених",
+        short: "евакуація",
+        scale: [
+          "0 — неможливо",
+          "1 — мінімальна",
+          "2 — часткова евакуація",
+          "3 — 1 поранений, ноші",
+          "4 — 1–2 поранених, безпечне кріплення",
+          "5 — > 2 поранених, автономно",
+        ],
+      },
+      {
+        id: "s4_sensors",
+        code: "4.4",
+        name: "Наявність інтегрованих розвідувальних систем",
+        short: "сенсори",
+        scale: [
+          "0 — відсутні",
+          "1 — базова камера",
+          "2 — часткові модулі",
+          "3 — денна або ІЧ",
+          "4 — денна + ІЧ",
+          "5 — повний комплект з денним/нічним ІЧ",
+        ],
+      },
+      {
+        id: "s4_modules",
+        code: "4.5",
+        name: "Можливість монтажу додаткового обладнання",
+        short: "модульність",
+        scale: [
+          "0 — відсутня",
+          "1 — формальна можливість",
+          "2 — лише стандартні",
+          "3 — обмежений вибір",
+          "4 — більшість модулів",
+          "5 — універсальна, будь-які модулі",
+        ],
+      },
+      {
+        id: "s4_mounts",
+        code: "4.6",
+        name: "Наявність засобів кріплення вантажу",
+        short: "кріплення",
+        scale: [
+          "0 — відсутні",
+          "1 — обмежені",
+          "2 — частково надійні",
+          "3 — базові",
+          "4 — стандартні, надійні",
+          "5 — універсальні та регульовані",
+        ],
+      },
     ],
   },
   {
-    id: "value",
-    name: "Ціна/ефект",
-    short: "чи не переплачуємо",
-    weight: WEIGHTS.value,
-    scale: [
-      "0 — ціна явно завищена",
-      "3 — ринкова при підтверджених ТТХ",
-      "5 — найкраща ціна за підтверджені можливості + прозора комплектація",
+    id: "sec5",
+    code: "5",
+    name: "Оцінювання захищеності та живучості БеНК",
+    weight: 0.15,
+    desc: "Малопомітність і живучість критичні в умовах ураження та РЕБ.",
+    criteria: [
+      {
+        id: "s5_nodes",
+        code: "5.2",
+        name: "Захист критично важливих вузлів",
+        short: "захист вузлів",
+        scale: [
+          "0 — відсутній",
+          "1 — формальний",
+          "2 — мінімальний",
+          "3 — частковий",
+          "4 — захист ключових вузлів",
+          "5 — комплексний захист",
+        ],
+      },
+      {
+        id: "s5_damage",
+        code: "5.3",
+        name: "Стійкість до уражаючих факторів",
+        short: "стійкість до уражень",
+        scale: [
+          "0 — повна втрата",
+          "1 — критичні пошкодження",
+          "2 — швидка втрата функцій",
+          "3 — працездатний частково",
+          "4 — обмежена деградація",
+          "5 — збереження функцій",
+        ],
+      },
+      {
+        id: "s5_signature",
+        code: "5.4",
+        name: "Демаскуючі ознаки (акустичні, теплові, візуальні)",
+        short: "помітність",
+        scale: [
+          "0 — критична",
+          "1 — висока",
+          "2 — підвищена",
+          "3 — середня",
+          "4 — низька",
+          "5 — мінімальна",
+        ],
+      },
+      {
+        id: "s5_ew",
+        code: "5.5",
+        name: "Стійкість до засобів РЕБ",
+        short: "стійкість до РЕБ",
+        scale: [
+          "0 — відсутня",
+          "1 — формальна",
+          "2 — слабка",
+          "3 — базова",
+          "4 — адаптивна",
+          "5 — активна протидія",
+        ],
+      },
+      {
+        id: "s5_survival",
+        code: "5.6",
+        name: "Живучість при часткових пошкодженнях",
+        short: "живучість",
+        scale: [
+          "0 — відсутня",
+          "1 — практично відсутня",
+          "2 — мінімальна",
+          "3 — часткова",
+          "4 — обмежена",
+          "5 — повна",
+        ],
+      },
+      {
+        id: "s5_repair",
+        code: "5.7",
+        name: "Відновлюваність у польових умовах",
+        short: "польовий ремонт",
+        scale: [
+          "0 — неможливе",
+          "1 — тільки сервіс",
+          "2 — складне",
+          "3 — обмежене",
+          "4 — з інструментом",
+          "5 — модульне, швидке",
+        ],
+      },
     ],
-    how: "Порівнюй не паспорт, а підтверджене на демо (зв’язок, fail-safe, прохідність, вантаж).",
-    questions: [
-      "Що входить у базову ціну?",
-      "Які опції платні?",
-      "Вартість експлуатації (АКБ/шини/сервіс)?",
+  },
+  {
+    id: "sec6",
+    code: "6",
+    name: "Оцінювання обслуговування БеНК",
+    weight: 0.1,
+    desc: "Експлуатація має бути простою й швидкою у полі.",
+    criteria: [
+      {
+        id: "s6_crew",
+        code: "6.2",
+        name: "Кількість обслуги",
+        short: "обслуга",
+        scale: [
+          "0 — не визначено",
+          "1 — > 5 осіб",
+          "2 — 4–5 осіб",
+          "3 — 3 особи",
+          "4 — 2 особи",
+          "5 — 1 особа",
+        ],
+      },
+      {
+        id: "s6_deploy",
+        code: "6.3",
+        name: "Час розгортання та згортання",
+        short: "час розгортання",
+        scale: [
+          "0 — непридатно",
+          "1 — > 20 хв",
+          "2 — 10–20 хв",
+          "3 — 5–10 хв",
+          "4 — 2–5 хв",
+          "5 — < 2 хв",
+        ],
+      },
+      {
+        id: "s6_training",
+        code: "6.4",
+        name: "Простота навчання операторів",
+        short: "навчання",
+        scale: [
+          "0 — неможливе",
+          "1 — складне",
+          "2 — > 7 діб",
+          "3 — 3–7 діб",
+          "4 — 1–3 доби",
+          "5 — < 1 доби",
+        ],
+      },
+      {
+        id: "s6_transport",
+        code: "6.5",
+        name: "Транспортабельність",
+        short: "транспортабельність",
+        scale: [
+          "0 — неможливе",
+          "1 — складне",
+          "2 — обмежене",
+          "3 — спецавто",
+          "4 — пікап / причеп",
+          "5 — будь-яким авто",
+        ],
+      },
+      {
+        id: "s6_service",
+        code: "6.6",
+        name: "Технічне обслуговування",
+        short: "обслуговування",
+        scale: [
+          "0 — непридатне",
+          "1 — сервісне",
+          "2 — складне",
+          "3 — середнє",
+          "4 — просте",
+          "5 — мінімальне",
+        ],
+      },
+      {
+        id: "s6_resource",
+        code: "6.7",
+        name: "Ресурс та гарантійні показники",
+        short: "ресурс/гарантія",
+        scale: [
+          "0 — не визначено",
+          "1 — < 1000",
+          "2 — 1000–2000",
+          "3 — 2000–3000",
+          "4 — 3000–5000",
+          "5 — > 5000 м/г",
+        ],
+      },
+      {
+        id: "s6_docs",
+        code: "6.8",
+        name: "Документація та комплектність",
+        short: "документація",
+        scale: [
+          "0 — відсутня",
+          "1 — формальна",
+          "2 — мінімальний",
+          "3 — базовий",
+          "4 — достатній",
+          "5 — повний комплект",
+        ],
+      },
     ],
   },
 ];
 
-/* ---------- ЧЕК-ЛИСТ (розширимо далі; зараз базовий) ---------- */
+const CRITERIA = buildCriteriaFlat(EVAL_SECTIONS);
 const checklistItems = [
   { k: "link_main", t: "Основний канал керування стабільний (200–500 м)" },
   { k: "link_res", t: "Резервний канал керування наявний і перевірений" },
@@ -2738,44 +3319,102 @@ function initCompare() {
 function renderCriteria() {
   const box = $("criteriaList");
   if (!box) return;
-  box.innerHTML = "";
+  let html = "";
 
-  CRITERIA.forEach((c) => {
-    box.insertAdjacentHTML(
-      "beforeend",
-      `
-      <div class="crit">
-        <div class="critTop">
-          <div class="critName">
-            <b>${esc(c.name)}</b>
-            <span>${esc(c.short)}</span>
+  EVAL_SECTIONS.forEach((sec) => {
+    const sumW = sec.criteria.reduce((a, c) => a + (c.weight ?? CRIT_WEIGHTS[c.id] ?? 1), 0) || 1;
+    const secTitle = `${sec.code ? `РОЗДІЛ ${sec.code}. ` : ""}${sec.name}`;
+    const bodyId = `sec_body_${sec.id}`;
+
+    html += `
+      <div class="critSection collapsed" data-sec="${esc(sec.id)}">
+        <div class="critSectionHead">
+          <div>
+            <div class="critSectionTitle">${esc(secTitle)}</div>
           </div>
-          <div class="critActions">
-            <span class="weightTag">вага ${(c.weight * 100).toFixed(0)}%</span>
-            <button class="helpBtn" type="button" data-help="${esc(c.id)}">Довідка</button>
+          <div class="critSectionActions">
+            <span class="weightTag">${(sec.weight * 100).toFixed(0)}%</span>
+            <button class="sectionToggle" type="button" data-sec="${esc(sec.id)}" aria-expanded="false" aria-controls="${esc(bodyId)}" aria-label="Розгорнути" title="Розгорнути">
+              <i class="fa-solid fa-chevron-down"></i>
+            </button>
           </div>
         </div>
+        <div class="critSectionBody" id="${esc(bodyId)}">
+    `;
 
-        <label>Оцінка 0–5</label>
-        <input
-          id="s_${esc(c.id)}"
-          type="text"
-          inputmode="numeric"
-          placeholder="0..5"
-          aria-label="Оцінка ${esc(c.name)}"
-        />
-        <div class="fieldError hide" id="e_${esc(c.id)}">Дозволено лише одну цифру 0–5</div>
+    sec.criteria.forEach((c) => {
+      const relW = c.weight ?? CRIT_WEIGHTS[c.id] ?? 1;
+      const gWeight = sec.weight * (relW / sumW);
+      const title = `${c.code ? `${c.code} ` : ""}${c.name}`;
 
-        <label>Коментар / зауваження</label>
-        <textarea id="c_${esc(c.id)}" placeholder="Що не підтверджено, що потрібно доопрацювати..."></textarea>
+      html += `
+        <div class="crit collapsed">
+          <div class="critTop">
+            <div class="critName">
+              <b>${esc(title)}</b>
+            </div>
+            <div class="critActions">
+              <span class="weightTag">${(gWeight * 100).toFixed(1)}%</span>
+              <button class="helpBtn" type="button" data-help="${esc(c.id)}">Довідка</button>
+              <button class="critToggle" type="button" aria-expanded="false" aria-controls="crit_body_${esc(c.id)}" title="Розгорнути">
+                <i class="fa-solid fa-chevron-down"></i>
+              </button>
+            </div>
+          </div>
+
+          <div class="critBody" id="crit_body_${esc(c.id)}">
+            <label>Оцінка 0–5</label>
+            <input
+              id="s_${esc(c.id)}"
+              type="text"
+              inputmode="numeric"
+              placeholder="0..5"
+              aria-label="Оцінка ${esc(c.name)}"
+            />
+            <div class="fieldError hide" id="e_${esc(c.id)}">Дозволено лише одну цифру 0–5</div>
+
+            <label>Коментар / зауваження</label>
+            <textarea id="c_${esc(c.id)}" placeholder="Що не підтверджено, що потрібно доопрацювати..."></textarea>
+          </div>
+        </div>
+      `;
+    });
+
+    html += `
+        </div>
       </div>
-      `
-    );
+    `;
   });
+
+  box.innerHTML = html;
 
   // довідка
   document.querySelectorAll("[data-help]").forEach((btn) => {
     btn.addEventListener("click", (e) => openHelp(e.currentTarget.dataset.help));
+  });
+
+  // акордеон розділів (за замовчуванням згорнуті)
+  document.querySelectorAll(".sectionToggle").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const sec = btn.closest(".critSection");
+      if (!sec) return;
+      const isCollapsed = sec.classList.toggle("collapsed");
+      btn.setAttribute("aria-expanded", String(!isCollapsed));
+      const nextLabel = isCollapsed ? "Розгорнути" : "Згорнути";
+      btn.setAttribute("aria-label", nextLabel);
+      btn.setAttribute("title", nextLabel);
+    });
+  });
+
+  // акордеон підрозділів (кожен критерій)
+  document.querySelectorAll(".critToggle").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const crit = btn.closest(".crit");
+      if (!crit) return;
+      const isCollapsed = crit.classList.toggle("collapsed");
+      btn.setAttribute("aria-expanded", String(!isCollapsed));
+      btn.setAttribute("title", isCollapsed ? "Розгорнути" : "Згорнути");
+    });
   });
 
   // ✅ Валідація БЕЗ clamp і БЕЗ відкату:
@@ -2853,8 +3492,8 @@ function renderScoreHeatmap() {
 
   const html = CRITERIA.map((c, i) => {
     const score = values[i];
-    const label = String(c.short || c.name || "").trim();
-    const title = `${c.name}: ${score === null ? "—" : `${score}/5`}`;
+    const label = String(c.code || c.short || c.name || "").trim();
+    const title = `${c.code ? `${c.code} ` : ""}${c.name}: ${score === null ? "—" : `${score}/5`}`;
     const style = score === null ? "" : ` style="background:${heatColor(score)}"`;
     return `
       <button type="button" class="hmCell${score === null ? " hmNone" : ""}" data-crit="${esc(c.id)}"${style} title="${esc(title)}">
@@ -2893,16 +3532,36 @@ function openHelp(id) {
   const overlay = $("modalOverlay");
   if (!overlay) return;
 
-  if ($("modalTitle")) $("modalTitle").textContent = `${c.name} — як оцінювати`;
-  if ($("modalMeta")) $("modalMeta").textContent = `Вага ${(c.weight * 100).toFixed(0)}%. ${c.short}`;
+  const title = `${c.code ? `${c.code} ` : ""}${c.name}`;
+  if ($("modalTitle")) $("modalTitle").textContent = `${title} — як оцінювати`;
 
-  if ($("modalScale"))
-    $("modalScale").innerHTML = `<b>Шкала</b><br><br><div class="small">${c.scale.map((s) => `• ${esc(s)}`).join("<br>")}</div>`;
+  const secLabel = c.sectionName
+    ? `${c.sectionCode ? `РОЗДІЛ ${c.sectionCode}. ` : ""}${c.sectionName}`
+    : "";
+  const weightInfo = `Секція ${(c.sectionWeight * 100).toFixed(0)}%, критерій ${(c.weight * 100).toFixed(1)}%`;
+  if ($("modalMeta")) $("modalMeta").textContent = `${secLabel}${secLabel ? " · " : ""}${weightInfo}${c.short ? ` · ${c.short}` : ""}`;
 
-  if ($("modalHow")) $("modalHow").innerHTML = `<b>Як оцінювати</b><br><br><div class="small">${esc(c.how)}</div>`;
+  if ($("modalScale")) {
+    const scale = Array.isArray(c.scale) && c.scale.length
+      ? c.scale.map((s) => `• ${esc(s)}`).join("<br>")
+      : "—";
+    $("modalScale").innerHTML = `<b>Шкала</b><br><br><div class="small">${scale}</div>`;
+  }
 
-  if ($("modalQuestions"))
-    $("modalQuestions").innerHTML = `<b>Що просити на демо</b><br><br><div class="small">${c.questions.map((q) => `• ${esc(q)}`).join("<br>")}</div>`;
+  if ($("modalHow")) {
+    $("modalHow").innerHTML = c.how
+      ? `<b>Як оцінювати</b><br><br><div class="small">${esc(c.how)}</div>`
+      : "";
+  }
+
+  if ($("modalQuestions")) {
+    const qs = Array.isArray(c.questions) && c.questions.length
+      ? c.questions.map((q) => `• ${esc(q)}`).join("<br>")
+      : "";
+    $("modalQuestions").innerHTML = qs
+      ? `<b>Що просити на демо</b><br><br><div class="small">${qs}</div>`
+      : "";
+  }
 
   overlay.style.display = "flex";
 }
@@ -3030,8 +3689,21 @@ function calcFinal(showAlert = true) {
   }
   if (vbox) vbox.textContent = "";
 
+  const sectionScores = {};
+  EVAL_SECTIONS.forEach((sec) => {
+    const sumW = sec.criteria.reduce((a, c) => a + (c.weight ?? CRIT_WEIGHTS[c.id] ?? 1), 0) || 1;
+    let secSum = 0;
+    sec.criteria.forEach((c) => {
+      const w = c.weight ?? CRIT_WEIGHTS[c.id] ?? 1;
+      secSum += w * (sc[c.id] || 0);
+    });
+    sectionScores[sec.id] = secSum / sumW;
+  });
+
   let total = 0;
-  CRITERIA.forEach((c) => (total += c.weight * (sc[c.id] || 0)));
+  EVAL_SECTIONS.forEach((sec) => {
+    total += sec.weight * (sectionScores[sec.id] || 0);
+  });
   total = Math.round(total * 100) / 100;
 
   let decision = "Умовно рекомендовано";
@@ -3047,6 +3719,137 @@ function calcFinal(showAlert = true) {
 
   setSummary(total, decision, { risk, keyMin });
   return { total, decision, risk };
+}
+
+function computePresetScores(p) {
+  const toNum = (v) => {
+    if (v === null || v === undefined) return null;
+    const s = String(v).trim().replace(",", ".");
+    if (!s) return null;
+    const n = Number(s);
+    return Number.isFinite(n) ? n : null;
+  };
+  const isPlus = (v) => String(v ?? "").trim() === "+";
+  const isSensor = (v) => {
+    const n = toNum(v);
+    return isPlus(v) || (n !== null && n > 0);
+  };
+
+  const scoreRangeControl = (km) => {
+    if (km === null) return null;
+    if (km >= 3) return 5;
+    if (km >= 1.5) return 4;
+    if (km >= 0.8) return 3;
+    if (km >= 0.5) return 2;
+    if (km > 0) return 1;
+    return 0;
+  };
+
+  const scoreSpeed = (v) => {
+    if (v === null) return null;
+    if (v > 15) return 5;
+    if (v >= 10) return 4;
+    if (v >= 6) return 3;
+    if (v >= 3) return 2;
+    if (v > 0) return 1;
+    return 0;
+  };
+
+  const scoreClearance = (mm) => {
+    if (mm === null) return null;
+    if (mm > 200) return 5;
+    if (mm >= 160) return 4;
+    if (mm >= 120) return 3;
+    if (mm >= 80) return 2;
+    if (mm > 0) return 1;
+    return 0;
+  };
+
+  const scoreRangeRoad = (km) => {
+    if (km === null) return null;
+    if (km > 30) return 5;
+    if (km >= 20) return 4;
+    if (km >= 10) return 3;
+    if (km >= 5) return 2;
+    if (km > 0) return 1;
+    return 0;
+  };
+
+  const scorePayload = (kg) => {
+    if (kg === null) return null;
+    if (kg > 500) return 5;
+    if (kg >= 300) return 4;
+    if (kg >= 200) return 3;
+    if (kg >= 100) return 2;
+    if (kg > 0) return 1;
+    return 0;
+  };
+
+  const scorePower = (power) => {
+    const t = String(power || "").toLowerCase();
+    if (!t) return null;
+    if (t.includes("електр")) return 5;
+    if (t.includes("гібрид") || t.includes("комб")) return 4;
+    if (t.includes("шумопогл") || t.includes("тих")) return 3;
+    if (t.includes("двз") || t.includes("диз") || t.includes("бенз")) return 2;
+    return null;
+  };
+
+  const scoreSensors = () => {
+    const hasOpt = isSensor(p.optical);
+    const hasOptIR = isSensor(p.opticalIR);
+    const hasThermal = isSensor(p.thermal);
+    if (hasThermal && (hasOpt || hasOptIR)) return 5;
+    if (hasOptIR) return 4;
+    if (hasOpt || hasThermal) return 3;
+    return 0;
+  };
+
+  return {
+    s1_range: scoreRangeControl(toNum(p.radioKm)),
+    s2_speed: scoreSpeed(toNum(p.maxSpeed)),
+    s2_clearance: scoreClearance(toNum(p.clearance)),
+    s3_power: scorePower(p.power),
+    s3_range: scoreRangeRoad(toNum(p.rangeRoad)),
+    s4_payload: scorePayload(toNum(p.payload)),
+    s4_sensors: scoreSensors(),
+  };
+}
+
+function applyDemoScoresFromPreset() {
+  const key = $("selectedPresetKey")?.value;
+  if (!key) {
+    alert("Спочатку обери модель у довіднику (вкладка «Довідник»), потім натисни «Демо-оцінка».");
+    return;
+  }
+
+  const p = PRESETS.find((x) => presetKey(x) === key);
+  if (!p) {
+    alert("Модель не знайдена у пресетах.");
+    return;
+  }
+
+  const scores = computePresetScores(p);
+  let applied = 0;
+  let skipped = 0;
+
+  Object.entries(scores).forEach(([id, score]) => {
+    if (score === null || score === undefined) return;
+    const el = $("s_" + id);
+    if (!el) return;
+    const current = String(el.value || "").trim();
+    if (current !== "" && /^[0-5]$/.test(current)) {
+      skipped += 1;
+      return;
+    }
+    el.value = String(score);
+    applied += 1;
+  });
+
+  updateScoreProgress();
+  calcFinal(false);
+
+  alert(`Демо-оцінка: заповнено ${applied} полів. Пропущено ${skipped} (вже заповнені).`);
 }
 
 /* =========================================================
@@ -3147,17 +3950,23 @@ function downloadBlob(content, filename, mime) {
 function collectCriteriaDump() {
   const lines = [];
 
-  CRITERIA.forEach((c) => {
-    const scoreEl = document.getElementById("s_" + c.id);
-    const commEl  = document.getElementById("c_" + c.id);
+  EVAL_SECTIONS.forEach((sec) => {
+    const secTitle = `${sec.code ? `РОЗДІЛ ${sec.code}. ` : ""}${sec.name}`;
+    lines.push(secTitle);
 
-    const rawScore = (scoreEl ? scoreEl.value : "").trim();
-    const score = /^[0-5]$/.test(rawScore) ? rawScore : "—";
+    sec.criteria.forEach((c) => {
+      const scoreEl = document.getElementById("s_" + c.id);
+      const commEl  = document.getElementById("c_" + c.id);
 
-    const comm = (commEl ? commEl.value : "").trim();
+      const rawScore = (scoreEl ? scoreEl.value : "").trim();
+      const score = /^[0-5]$/.test(rawScore) ? rawScore : "—";
 
-    // формат: Навантаження(5):все чудово
-    lines.push(`${c.name}(${score}):${comm ? comm : "—"}`);
+      const comm = (commEl ? commEl.value : "").trim();
+      const title = `${c.code ? `${c.code} ` : ""}${c.name}`;
+      lines.push(`${title} (${score}): ${comm ? comm : "—"}`);
+    });
+
+    lines.push("");
   });
 
   return lines.join("\n").trim();
@@ -3227,15 +4036,21 @@ function toggleHowCalcInline(forceOpen = null) {
 
   // якщо відкриваємо — будуємо HTML один раз / або перебудовуємо (зручно, якщо ваги зміняться)
   if (willOpen) {
-    const weights = CRITERIA
-      .map(c => `<li><b>${esc(c.name)}</b> — ${(c.weight * 100).toFixed(0)}%</li>`)
+    const weights = EVAL_SECTIONS
+      .map(sec => {
+        const label = `${sec.code ? `Розділ ${sec.code}. ` : ""}${sec.name}`;
+        return `<li><b>${esc(label)}</b> — ${(sec.weight * 100).toFixed(0)}%</li>`;
+      })
       .join("");
 
     // ВАЖЛИВО: використовуємо KEY_CRITERIA з твого коду
     const keyNames = KEY_CRITERIA
-      .map(k => CRITERIA.find(c => c.id === k)?.name)
+      .map(k => CRITERIA.find(c => c.id === k))
       .filter(Boolean)
-      .map(n => `<span class="tag">${esc(n)}</span>`)
+      .map(c => {
+        const label = `${c.code ? `${c.code} ` : ""}${c.name}`;
+        return `<span class="tag">${esc(label)}</span>`;
+      })
       .join(" ");
 
     box.innerHTML = `
@@ -3254,9 +4069,10 @@ function toggleHowCalcInline(forceOpen = null) {
         <div class="howcalcCard">
           <div class="howcalcH">1) Формула</div>
           <div class="howcalcText">
-            <div><b>Підсумковий бал</b> = Σ (<b>вага критерію</b> × <b>оцінка</b>).</div>
-            <div class="muted">Оцінка кожного критерію — лише <b>одна цифра 0–5</b>.</div>
-            <div class="muted">Ваги в сумі дають 100% — це “важливість” критерію у підсумку.</div>
+            <div><b>Підсумковий бал</b> = Σ (<b>вага розділу</b> × <b>середній бал розділу</b>).</div>
+            <div class="muted">Середній бал розділу — це зважене середнє його підкритеріїв (0–5).</div>
+            <div class="muted">Ваги в сумі дають 100% — це “важливість” розділу у підсумку.</div>
+            <div class="muted">Всередині розділу діють власні ваги підкритеріїв.</div>
           </div>
         </div>
 
@@ -3284,9 +4100,9 @@ function toggleHowCalcInline(forceOpen = null) {
         </div>
 
         <div class="howcalcCard">
-          <div class="howcalcH">4) Ваги критеріїв</div>
+          <div class="howcalcH">4) Ваги розділів</div>
           <ul class="howcalcList">${weights}</ul>
-          <div class="muted">Більша вага = критерій сильніше впливає на фінальний бал.</div>
+          <div class="muted">Більша вага = розділ сильніше впливає на фінальний бал.</div>
         </div>
 
       </div>
@@ -4727,6 +5543,8 @@ function init() {
     if (el) el.addEventListener("input", renderKPI);
   });
 wireHowCalcInline();
+  const demoBtn = $("demoScoreBtn");
+  if (demoBtn) demoBtn.addEventListener("click", applyDemoScoresFromPreset);
 
   // Автокомпліт
   wireAutocomplete();
@@ -4811,3 +5629,4 @@ function initDebugBadge() {
   });
   document.getElementById("themeToggle")?.addEventListener("click", () => setTimeout(update, 80));
 }
+
