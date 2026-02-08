@@ -4801,7 +4801,9 @@ function renderT6Insights() {
     const valueScore = (price > 0)
       ? Math.round(((payload * rangeRoad * maxSpeed) / price) * 1000) / 1000
       : 0;
-    return { ...x, valueScore };
+    const pricePerKg = (price > 0 && payload > 0) ? price / payload : null;
+    const pricePerKm = (price > 0 && rangeRoad > 0) ? price / rangeRoad : null;
+    return { ...x, valueScore, pricePerKg, pricePerKm };
   });
 
   const minMax = (arr, key) => {
@@ -4813,80 +4815,66 @@ function renderT6Insights() {
     if (!Number.isFinite(v) || max === min) return 0;
     return (v - min) / (max - min);
   };
-  const [pMin, pMax] = minMax(withValue, "payload");
-  const [rMin, rMax] = minMax(withValue, "rangeRoad");
-  const [sMin, sMax] = minMax(withValue, "maxSpeed");
-  const [cMin, cMax] = minMax(withValue, "clearance");
-  const [clMin, clMax] = minMax(withValue, "climb");
-  const [tMin, tMax] = minMax(withValue, "tilt");
-  const [prMin, prMax] = minMax(withValue, "price");
-  const [rKmMin, rKmMax] = minMax(withValue, "radioKm");
 
-  const withOverall = withValue.map(x => {
-    const nPayload = norm(x.payload, pMin, pMax);
-    const nRange = norm(x.rangeRoad, rMin, rMax);
-    const nSpeed = norm(x.maxSpeed, sMin, sMax);
-    const nClear = norm(x.clearance, cMin, cMax);
-    const nClimb = norm(x.climb, clMin, clMax);
-    const nTilt = norm(x.tilt, tMin, tMax);
-    const nPriceInv = 1 - norm(x.price, prMin, prMax);
-    const nRadio = norm(x.radioKm, rKmMin, rKmMax);
-    const commScore = (toFlag(x.starlink) + toFlag(x.lte) + nRadio) / 3;
+  const ratingFlags = {
+    payload: $("t6RatePayload")?.checked ?? true,
+    range: $("t6RateRange")?.checked ?? true,
+    speed: $("t6RateSpeed")?.checked ?? true,
+    clear: $("t6RateClear")?.checked ?? true,
+    climb: $("t6RateClimb")?.checked ?? true,
+    tilt: $("t6RateTilt")?.checked ?? true,
+    price: $("t6RatePrice")?.checked ?? true,
+    comm: $("t6RateComm")?.checked ?? true,
+    sensor: $("t6RateSensor")?.checked ?? true,
+  };
 
-    const ratingFlags = {
-      payload: $("t6RatePayload")?.checked ?? true,
-      range: $("t6RateRange")?.checked ?? true,
-      speed: $("t6RateSpeed")?.checked ?? true,
-      clear: $("t6RateClear")?.checked ?? true,
-      climb: $("t6RateClimb")?.checked ?? true,
-      tilt: $("t6RateTilt")?.checked ?? true,
-      price: $("t6RatePrice")?.checked ?? true,
-      comm: $("t6RateComm")?.checked ?? true,
-      sensor: $("t6RateSensor")?.checked ?? true,
-    };
+  const rateSubset = (subset) => {
+    if (!subset.length) return [];
+    const [pMin, pMax] = minMax(subset, "payload");
+    const [rMin, rMax] = minMax(subset, "rangeRoad");
+    const [sMin, sMax] = minMax(subset, "maxSpeed");
+    const [cMin, cMax] = minMax(subset, "clearance");
+    const [clMin, clMax] = minMax(subset, "climb");
+    const [tMin, tMax] = minMax(subset, "tilt");
+    const [prMin, prMax] = minMax(subset, "price");
+    const [rKmMin, rKmMax] = minMax(subset, "radioKm");
 
-    const ratingParts = [];
-    if (ratingFlags.payload) ratingParts.push(nPayload);
-    if (ratingFlags.range) ratingParts.push(nRange);
-    if (ratingFlags.speed) ratingParts.push(nSpeed);
-    if (ratingFlags.clear) ratingParts.push(nClear);
-    if (ratingFlags.climb) ratingParts.push(nClimb);
-    if (ratingFlags.tilt) ratingParts.push(nTilt);
-    if (ratingFlags.price) ratingParts.push(nPriceInv);
-    if (ratingFlags.comm) ratingParts.push(commScore);
-    if (ratingFlags.sensor) ratingParts.push(x.sensorScore);
-    const ratingScore = ratingParts.length
-      ? Math.round((ratingParts.reduce((a, b) => a + b, 0) / ratingParts.length) * 1000) / 1000
-      : 0;
+    return subset.map(x => {
+      const nPayload = norm(x.payload, pMin, pMax);
+      const nRange = norm(x.rangeRoad, rMin, rMax);
+      const nSpeed = norm(x.maxSpeed, sMin, sMax);
+      const nClear = norm(x.clearance, cMin, cMax);
+      const nClimb = norm(x.climb, clMin, clMax);
+      const nTilt = norm(x.tilt, tMin, tMax);
+      const nPriceInv = 1 - norm(x.price, prMin, prMax);
+      const nRadio = norm(x.radioKm, rKmMin, rKmMax);
+      const commScore = (toFlag(x.starlink) + toFlag(x.lte) + nRadio) / 3;
 
-    const sumScore = Math.round((
-      nPayload +
-      nRange +
-      nSpeed +
-      nPriceInv
-    ) * 1000) / 1000;
+      const ratingParts = [];
+      if (ratingFlags.payload) ratingParts.push(nPayload);
+      if (ratingFlags.range) ratingParts.push(nRange);
+      if (ratingFlags.speed) ratingParts.push(nSpeed);
+      if (ratingFlags.clear) ratingParts.push(nClear);
+      if (ratingFlags.climb) ratingParts.push(nClimb);
+      if (ratingFlags.tilt) ratingParts.push(nTilt);
+      if (ratingFlags.price) ratingParts.push(nPriceInv);
+      if (ratingFlags.comm) ratingParts.push(commScore);
+      if (ratingFlags.sensor) ratingParts.push(x.sensorScore);
 
-    const pricePerKg = (x.price > 0 && x.payload > 0) ? x.price / x.payload : null;
-    const pricePerKm = (x.price > 0 && x.rangeRoad > 0) ? x.price / x.rangeRoad : null;
+      const ratingScore = ratingParts.length
+        ? Math.round((ratingParts.reduce((a, b) => a + b, 0) / ratingParts.length) * 1000) / 1000
+        : 0;
 
-    return {
-      ...x,
-      ratingScore,
-      commScore,
-      nPayload,
-      nRange,
-      nSpeed,
-      nClimb,
-      nTilt,
-      nPriceInv,
-      sumScore,
-      pricePerKg,
-      pricePerKm
-    };
-  });
+      return {
+        ...x,
+        ratingScore,
+        commScore
+      };
+    });
+  };
 
   const massTargets = ["Важкі", "Середні", "Легкі"];
-  const ratingHintLog = "Рейтинг = середнє вибраних параметрів (нормовані 0–1). Інверсія ціни: дешевше = більше.";
+  const ratingHintLog = "Рейтинг = середнє вибраних параметрів (нормовані 0–1) в межах класу маси. Інверсія ціни: дешевше = більше.";
   const ratingHintEng = ratingHintLog;
   const valueHint = "Формула: (вантажність × дальність × швидкість) / ціна. Чим більше — тим вигідніше.";
   const priceKgHint = "Формула: ціна / вантажність. Менше = вигідніше.";
@@ -4895,7 +4883,8 @@ function renderT6Insights() {
   const buildFuncBlock = (funcLabel, funcTitle, ratingKey, ratingHint) => {
     const preferred = window.__t6MassState?.[funcLabel] || massTargets[0];
     const panels = massTargets.map((massClass, idx) => {
-      const subset = withOverall.filter(x => x.func === funcLabel && x.massClass === massClass);
+      const subset = withValue.filter(x => x.func === funcLabel && x.massClass === massClass);
+      const rated = rateSubset(subset);
       if (!subset.length) return "";
       const activeClass = massClass === preferred ? "active" : "";
       return `
@@ -4905,7 +4894,7 @@ function renderT6Insights() {
             <div class="t6Insights">
               ${renderList(
                 `ТОП-7 рейтинг <span class="infoHint" title="${ratingHint}">?</span>`,
-                top7Desc(subset, ratingKey),
+                top7Desc(rated, ratingKey),
                 x => {
                   const r = Number.isFinite(x[ratingKey]) ? x[ratingKey].toFixed(3) : "0.000";
                   const p = Number.isFinite(x.price) ? formatPrice(Math.round(x.price)) : "—";
@@ -4913,12 +4902,12 @@ function renderT6Insights() {
                 },
                 "rating"
               )}
-              ${renderList("ТОП‑7 вантажність", top7Desc(subset, "payload"), x => `${x.payload} кг`, "payload")}
-              ${renderList("ТОП‑7 запас ходу", top7Desc(subset, "rangeRoad"), x => `${x.rangeRoad} км`, "range")}
-              ${renderList("ТОП‑7 швидкість", top7Desc(subset, "maxSpeed"), x => `${x.maxSpeed} км/год`, "speed")}
-              ${renderList(`ТОП‑7 ціна/корисність <span class="infoHint" title="${valueHint}">?</span>`, top7Desc(subset, "valueScore"), x => Number.isFinite(x.valueScore) ? x.valueScore.toFixed(3) : "0.000", "value")}
-              ${renderList(`Ціна за кг вантажності <span class="infoHint" title="${priceKgHint}">?</span>`, top7Asc(subset, "pricePerKg"), x => formatPrice(Math.round(x.pricePerKg)), "pricekg")}
-              ${renderList(`Ціна за км пробігу <span class="infoHint" title="${priceKmHint}">?</span>`, top7Asc(subset, "pricePerKm"), x => formatPrice(Math.round(x.pricePerKm)), "pricekm")}
+              ${renderList("ТОП‑7 вантажність", top7Desc(rated, "payload"), x => `${x.payload} кг`, "payload")}
+              ${renderList("ТОП‑7 запас ходу", top7Desc(rated, "rangeRoad"), x => `${x.rangeRoad} км`, "range")}
+              ${renderList("ТОП‑7 швидкість", top7Desc(rated, "maxSpeed"), x => `${x.maxSpeed} км/год`, "speed")}
+              ${renderList(`ТОП‑7 ціна/корисність <span class="infoHint" title="${valueHint}">?</span>`, top7Desc(rated, "valueScore"), x => Number.isFinite(x.valueScore) ? x.valueScore.toFixed(3) : "0.000", "value")}
+              ${renderList(`Ціна за кг вантажності <span class="infoHint" title="${priceKgHint}">?</span>`, top7Asc(rated, "pricePerKg"), x => formatPrice(Math.round(x.pricePerKg)), "pricekg")}
+              ${renderList(`Ціна за км пробігу <span class="infoHint" title="${priceKmHint}">?</span>`, top7Asc(rated, "pricePerKm"), x => formatPrice(Math.round(x.pricePerKm)), "pricekm")}
             </div>
           </div>
         </div>
