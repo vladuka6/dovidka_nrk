@@ -388,9 +388,14 @@ body[data-theme="light"] header{
 }
 .insightItem{
   display:flex;
+  flex-direction:column;
+  gap:4px;
+  font-size:12.5px;
+}
+.insightRow{
+  display:flex;
   justify-content:space-between;
   gap:10px;
-  font-size:12.5px;
 }
 .insightItem.isWheel{
   color:var(--wheel);
@@ -419,6 +424,30 @@ body[data-theme="light"] header{
   justify-content:space-between;
   gap:10px;
 }
+.t6WeightBar{
+  display:flex;
+  flex-wrap:wrap;
+  gap:10px;
+  align-items:flex-end;
+}
+.t6WeightGroup{
+  flex:0 1 170px;
+  min-width:150px;
+}
+.t6WeightGroup label{
+  font-size:12px;
+}
+.t6WeightGroup select{
+  width:140px;
+}
+.t6WeightSum{
+  font-size:12px;
+  color:var(--muted);
+  white-space:nowrap;
+}
+.t6WeightHint{
+  margin-top:-4px;
+}
 .t6RatingTitle{
   font-weight:800;
   font-size:13px;
@@ -428,6 +457,25 @@ body[data-theme="light"] header{
   display:grid;
   grid-template-columns:repeat(auto-fit, minmax(180px, 1fr));
   gap:8px 12px;
+}
+.t6WeightRow{
+  display:flex;
+  align-items:center;
+  gap:8px;
+}
+.t6WeightRow .t6Switch{
+  flex:1;
+  min-width:0;
+}
+.t6WeightInput{
+  width:64px;
+  padding:4px 6px;
+  border-radius:8px;
+  border:1px solid var(--line);
+  background: color-mix(in srgb, var(--card) 70%, transparent);
+  color:var(--text);
+  font-size:12px;
+  text-align:right;
 }
 .t6Switch{
   display:flex;
@@ -441,6 +489,7 @@ body[data-theme="light"] header{
   cursor:pointer;
   user-select:none;
   transition: transform .08s ease, border-color .15s ease, background .15s ease;
+  min-width:0;
 }
 .t6Switch:hover{ transform: translateY(-1px); }
 .t6Switch input{ display:none; }
@@ -472,7 +521,12 @@ body[data-theme="light"] header{
   transform: translateX(14px);
   background: #fff;
 }
-.t6Label{ font-weight:600; }
+.t6Label{
+  font-weight:600;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
 .t6SubTabs{
   display:flex;
   gap:8px;

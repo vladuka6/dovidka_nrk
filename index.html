@@ -1,4 +1,4 @@
-<!doctype html>
+﻿<!doctype html>
 <html lang="uk">
 <head>
   <meta charset="utf-8"/>
@@ -366,7 +366,7 @@
       Узагальнена таблиця характеристик і умовних позначень для швидкої ідентифікації класу БеНК.
     </p>
 
-    <div class="section t6Acc" data-acc="basic">
+    <div class="section t6Acc isCollapsed" data-acc="basic">
       <div class="sectionTitle">1) Основні характеристики</div>
       <div class="t6AccBody">
       <div class="t6Cards">
@@ -418,7 +418,7 @@
 
     <div class="divider"></div>
 
-    <div class="section t6Acc" data-acc="legend">
+    <div class="section t6Acc isCollapsed" data-acc="legend">
       <div class="sectionTitle">2) Умовні позначення</div>
       <div class="t6AccBody">
       <div class="legendGrid">
@@ -450,9 +450,7 @@
 
     <div class="section">
       <div class="sectionTitle">3) Наявні БеНК (з пресетів)</div>
-      <div class="small" style="margin-bottom:8px">
-        Сформовано автоматично з довідника моделей. Класи маси й тип шасі визначаються за характеристиками.
-      </div>
+      <div class="small" style="margin-bottom:8px"></div>
       <div class="row t6Controls">
         <div style="flex:1; min-width:220px">
           <label>Пошук (модель або виробник)</label>
@@ -462,12 +460,10 @@
       <div id="t6Catalog" class="classTableWrap"></div>
     </div>
 
-    <div class="section">
+    <div class="section t6Acc isCollapsed" data-acc="analytics">
       <div class="sectionTitle">4) Аналітика з пресетів</div>
-      <div class="small" style="margin-bottom:8px">
-        Ціна враховується як інверсія: дешевше = більше балів
-        <span class="infoHint" title="Формула: 1 − (ціна − min) / (max − min). Приклад (min=98 000, max=3 000 000): 98 000→1.00, 300 000→0.93, 1 000 000→0.69, 3 000 000→0.00.">?</span>
-      </div>
+      <div class="t6AccBody">
+      <div class="small" style="margin-bottom:8px"></div>
       <div class="t6RatingControls" id="t6RatingControls">
         <div class="t6RatingHead">
           <div class="t6RatingTitle">
@@ -476,16 +472,27 @@
           </div>
           <div class="small">Обери, що враховувати</div>
         </div>
+        <div class="t6WeightBar">
+          <div class="t6WeightGroup">
+            <label>Ваги для</label>
+            <select id="t6WeightGroup">
+              <option value="Логістичний">Логістичні</option>
+              <option value="Інженерний">Інженерні</option>
+            </select>
+          </div>
+          <button class="ghost" type="button" id="t6WeightReset">Скинути</button>
+        </div>
+        <div class="small t6WeightHint">Ваги автоматично нормалізуються до 1.00.</div>
         <div class="t6RatingGrid">
-          <label class="t6Switch"><input type="checkbox" id="t6RatePayload" checked><span class="t6Slider"></span><span class="t6Label">Вантажність</span></label>
-          <label class="t6Switch"><input type="checkbox" id="t6RateRange" checked><span class="t6Slider"></span><span class="t6Label">Запас ходу</span></label>
-          <label class="t6Switch"><input type="checkbox" id="t6RateSpeed" checked><span class="t6Slider"></span><span class="t6Label">Швидкість</span></label>
-          <label class="t6Switch"><input type="checkbox" id="t6RateClear" checked><span class="t6Slider"></span><span class="t6Label">Кліренс</span></label>
-          <label class="t6Switch"><input type="checkbox" id="t6RatePrice" checked><span class="t6Slider"></span><span class="t6Label">Ціна (інверсія)</span></label>
-          <label class="t6Switch"><input type="checkbox" id="t6RateComm" checked><span class="t6Slider"></span><span class="t6Label">Зв’язок</span></label>
-          <label class="t6Switch"><input type="checkbox" id="t6RateSensor" checked><span class="t6Slider"></span><span class="t6Label">Сенсори</span></label>
-          <label class="t6Switch"><input type="checkbox" id="t6RateClimb" checked><span class="t6Slider"></span><span class="t6Label">Кут підйому</span></label>
-          <label class="t6Switch"><input type="checkbox" id="t6RateTilt" checked><span class="t6Slider"></span><span class="t6Label">Кут крену</span></label>
+          <div class="t6WeightRow"><label class="t6Switch"><input type="checkbox" id="t6RatePayload" checked><span class="t6Slider"></span><span class="t6Label">Вантажність</span></label><input class="t6WeightInput" data-weight="payload" type="number" min="0" max="1" step="0.01"></div>
+          <div class="t6WeightRow"><label class="t6Switch"><input type="checkbox" id="t6RateRange" checked><span class="t6Slider"></span><span class="t6Label">Запас ходу</span></label><input class="t6WeightInput" data-weight="range" type="number" min="0" max="1" step="0.01"></div>
+          <div class="t6WeightRow"><label class="t6Switch"><input type="checkbox" id="t6RateSpeed" checked><span class="t6Slider"></span><span class="t6Label">Швидкість</span></label><input class="t6WeightInput" data-weight="speed" type="number" min="0" max="1" step="0.01"></div>
+          <div class="t6WeightRow"><label class="t6Switch"><input type="checkbox" id="t6RateClear" checked><span class="t6Slider"></span><span class="t6Label">Кліренс</span></label><input class="t6WeightInput" data-weight="clear" type="number" min="0" max="1" step="0.01"></div>
+          <div class="t6WeightRow"><label class="t6Switch"><input type="checkbox" id="t6RatePrice" checked><span class="t6Slider"></span><span class="t6Label">Ціна (інверсія)</span></label><input class="t6WeightInput" data-weight="price" type="number" min="0" max="1" step="0.01"></div>
+          <div class="t6WeightRow"><label class="t6Switch"><input type="checkbox" id="t6RateComm" checked><span class="t6Slider"></span><span class="t6Label">Зв’язок</span></label><input class="t6WeightInput" data-weight="comm" type="number" min="0" max="1" step="0.01"></div>
+          <div class="t6WeightRow"><label class="t6Switch"><input type="checkbox" id="t6RateSensor" checked><span class="t6Slider"></span><span class="t6Label">Сенсори</span></label><input class="t6WeightInput" data-weight="sensor" type="number" min="0" max="1" step="0.01"></div>
+          <div class="t6WeightRow"><label class="t6Switch"><input type="checkbox" id="t6RateClimb" checked><span class="t6Slider"></span><span class="t6Label">Кут підйому</span></label><input class="t6WeightInput" data-weight="climb" type="number" min="0" max="1" step="0.01"></div>
+          <div class="t6WeightRow"><label class="t6Switch"><input type="checkbox" id="t6RateTilt" checked><span class="t6Slider"></span><span class="t6Label">Кут крену</span></label><input class="t6WeightInput" data-weight="tilt" type="number" min="0" max="1" step="0.01"></div>
         </div>
       </div>
       <div id="t6Top5" class="t6Insights"></div>
@@ -500,6 +507,7 @@
       </div>
       <div class="divider"></div>
       <div id="t6Value" class="t6Insights"></div>
+      </div>
     </div>
   </div>
 </section>
@@ -700,3 +708,8 @@
 <script src="script.js"></script>
 </body>
 </html>
+
+
+
+
+

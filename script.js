@@ -11,6 +11,108 @@ const KEY_CRITERIA = [
   "s5_ew",
 ];
 
+/* ---------- T6 DYNAMIC WEIGHTS ---------- */
+const T6_WEIGHT_KEYS = ["payload", "range", "speed", "clear", "climb", "tilt", "price", "comm", "sensor"];
+const T6_WEIGHT_STORAGE_KEY = "t6_weight_settings_v1";
+const T6_WEIGHT_DEFAULTS = {
+  "Логістичний": {
+    payload: 0.28,
+    range: 0.22,
+    price: 0.20,
+    speed: 0.10,
+    comm: 0.10,
+    clear: 0.04,
+    climb: 0.03,
+    tilt: 0.02,
+    sensor: 0.01,
+  },
+  "Інженерний": {
+    clear: 0.18,
+    climb: 0.12,
+    tilt: 0.08,
+    range: 0.15,
+    price: 0.15,
+    payload: 0.12,
+    speed: 0.08,
+    comm: 0.07,
+    sensor: 0.05,
+  },
+  "default": {
+    payload: 0.25,
+    range: 0.20,
+    price: 0.15,
+    speed: 0.10,
+    comm: 0.10,
+    clear: 0.05,
+    climb: 0.05,
+    tilt: 0.05,
+    sensor: 0.05,
+  }
+};
+
+function ensureT6Weights() {
+  if (!window.__t6Weights) {
+    let stored = null;
+    try {
+      stored = JSON.parse(localStorage.getItem(T6_WEIGHT_STORAGE_KEY));
+    } catch (e) {
+      stored = null;
+    }
+    const base = JSON.parse(JSON.stringify(T6_WEIGHT_DEFAULTS));
+    if (stored && typeof stored === "object") {
+      Object.keys(base).forEach((group) => {
+        if (stored[group] && typeof stored[group] === "object") {
+          base[group] = { ...base[group], ...stored[group] };
+        }
+      });
+    }
+    window.__t6Weights = base;
+  }
+  return window.__t6Weights;
+}
+
+function saveT6Weights() {
+  try {
+    localStorage.setItem(T6_WEIGHT_STORAGE_KEY, JSON.stringify(window.__t6Weights || {}));
+  } catch (e) {
+    // ignore storage errors
+  }
+}
+
+function getT6WeightFlags() {
+  return {
+    payload: $("t6RatePayload")?.checked ?? true,
+    range: $("t6RateRange")?.checked ?? true,
+    speed: $("t6RateSpeed")?.checked ?? true,
+    clear: $("t6RateClear")?.checked ?? true,
+    climb: $("t6RateClimb")?.checked ?? true,
+    tilt: $("t6RateTilt")?.checked ?? true,
+    price: $("t6RatePrice")?.checked ?? true,
+    comm: $("t6RateComm")?.checked ?? true,
+    sensor: $("t6RateSensor")?.checked ?? true,
+  };
+}
+
+function normalizeT6Weights(weights, flags) {
+  const out = { ...weights };
+  const activeKeys = T6_WEIGHT_KEYS.filter(k => flags[k]);
+  let sum = activeKeys.reduce((acc, k) => acc + (Number(out[k]) || 0), 0);
+  if (!sum && activeKeys.length) {
+    const equal = 1 / activeKeys.length;
+    activeKeys.forEach(k => { out[k] = equal; });
+    sum = 1;
+  } else if (sum > 0) {
+    activeKeys.forEach(k => { out[k] = (Number(out[k]) || 0) / sum; });
+  }
+  return out;
+}
+
+function getT6WeightsForFunc(funcLabel, flags) {
+  const base = ensureT6Weights();
+  const raw = base[funcLabel] || base.default || {};
+  return normalizeT6Weights(raw, flags);
+}
+
 /* ---------- ДОВІДНИК МОДЕЛЕЙ (PRESETS) ----------
    ДОДАЙ сюди поле photo (URL або шлях) коли буде.
    Якщо photo немає — показуємо "Фото".
@@ -4663,6 +4765,15 @@ function renderT6Catalog() {
     items: sortItems(filtered.filter(r => r.func === name))
   })).filter(g => g.items.length);
 
+  if (!window.__t6CatalogCollapsedInit) {
+    grouped.forEach(g => {
+      if (window.__t6CatalogCollapsed[g.name] === undefined) {
+        window.__t6CatalogCollapsed[g.name] = true;
+      }
+    });
+    window.__t6CatalogCollapsedInit = true;
+  }
+
   const th = (label, key) => {
     const is = sortKey === key;
     const dirAttr = is ? ` data-dir="${sortDir}"` : "";
@@ -4786,8 +4897,10 @@ function renderT6Insights() {
       <ul class="insightList">
         ${list.map(x => `
           <li class="insightItem ${x.chassis === "Колісне" ? "isWheel" : ""}" data-preset="${encodeURIComponent(x.key || "")}">
-            <span>${esc(x.model)}</span>
-            <span class="muted">${valueFn(x)}</span>
+            <div class="insightRow">
+              <span>${esc(x.model)}</span>
+              <span class="muted">${valueFn(x)}</span>
+            </div>
           </li>
         `).join("")}
       </ul>
@@ -4816,20 +4929,23 @@ function renderT6Insights() {
     return (v - min) / (max - min);
   };
 
-  const ratingFlags = {
-    payload: $("t6RatePayload")?.checked ?? true,
-    range: $("t6RateRange")?.checked ?? true,
-    speed: $("t6RateSpeed")?.checked ?? true,
-    clear: $("t6RateClear")?.checked ?? true,
-    climb: $("t6RateClimb")?.checked ?? true,
-    tilt: $("t6RateTilt")?.checked ?? true,
-    price: $("t6RatePrice")?.checked ?? true,
-    comm: $("t6RateComm")?.checked ?? true,
-    sensor: $("t6RateSensor")?.checked ?? true,
+  const ratingFlags = getT6WeightFlags();
+  const ratingWeightsByFunc = ensureT6Weights();
+  const ratingLabels = {
+    payload: "вантажність",
+    range: "запас ходу",
+    speed: "швидкість",
+    clear: "кліренс",
+    climb: "кут підйому",
+    tilt: "кут крену",
+    price: "ціна",
+    comm: "зв’язок",
+    sensor: "сенсори",
   };
 
-  const rateSubset = (subset) => {
+  const rateSubset = (subset, funcLabel) => {
     if (!subset.length) return [];
+    const ratingWeights = getT6WeightsForFunc(funcLabel, ratingFlags);
     const [pMin, pMax] = minMax(subset, "payload");
     const [rMin, rMax] = minMax(subset, "rangeRoad");
     const [sMin, sMax] = minMax(subset, "maxSpeed");
@@ -4850,19 +4966,26 @@ function renderT6Insights() {
       const nRadio = norm(x.radioKm, rKmMin, rKmMax);
       const commScore = (toFlag(x.starlink) + toFlag(x.lte) + nRadio) / 3;
 
-      const ratingParts = [];
-      if (ratingFlags.payload) ratingParts.push(nPayload);
-      if (ratingFlags.range) ratingParts.push(nRange);
-      if (ratingFlags.speed) ratingParts.push(nSpeed);
-      if (ratingFlags.clear) ratingParts.push(nClear);
-      if (ratingFlags.climb) ratingParts.push(nClimb);
-      if (ratingFlags.tilt) ratingParts.push(nTilt);
-      if (ratingFlags.price) ratingParts.push(nPriceInv);
-      if (ratingFlags.comm) ratingParts.push(commScore);
-      if (ratingFlags.sensor) ratingParts.push(x.sensorScore);
-
-      const ratingScore = ratingParts.length
-        ? Math.round((ratingParts.reduce((a, b) => a + b, 0) / ratingParts.length) * 1000) / 1000
+      const weighted = {
+        payload: nPayload,
+        range: nRange,
+        speed: nSpeed,
+        clear: nClear,
+        climb: nClimb,
+        tilt: nTilt,
+        price: nPriceInv,
+        comm: commScore,
+        sensor: x.sensorScore,
+      };
+      const weightSum = Object.keys(weighted).reduce((acc, k) => {
+        return acc + ((ratingFlags[k] ? ratingWeights[k] : 0) || 0);
+      }, 0);
+      const weightedSum = Object.keys(weighted).reduce((acc, k) => {
+        const w = (ratingFlags[k] ? ratingWeights[k] : 0) || 0;
+        return acc + w * (weighted[k] ?? 0);
+      }, 0);
+      const ratingScore = weightSum
+        ? Math.round(((weightedSum / weightSum)) * 1000) / 1000
         : 0;
 
       return {
@@ -4874,17 +4997,24 @@ function renderT6Insights() {
   };
 
   const massTargets = ["Важкі", "Середні", "Легкі"];
-  const ratingHintLog = "Рейтинг = середнє вибраних параметрів (нормовані 0–1) в межах класу маси. Інверсія ціни: дешевше = більше.";
-  const ratingHintEng = ratingHintLog;
+  const ratingHintBase = "Рейтинг = зважена сума вибраних параметрів (нормовані 0-1) в межах класу маси. Інверсія ціни: дешевше = більше. Параметри, що вимкнені, не враховуються, ваги автоматично нормалізуються.";
   const valueHint = "Формула: (вантажність × дальність × швидкість) / ціна. Чим більше — тим вигідніше.";
   const priceKgHint = "Формула: ціна / вантажність. Менше = вигідніше.";
   const priceKmHint = "Формула: ціна / запас ходу. Менше = вигідніше.";
+  const formatWeightsHint = (funcLabel) => {
+    const w = getT6WeightsForFunc(funcLabel, ratingFlags);
+    const parts = Object.keys(w)
+      .filter(k => (w[k] || 0) > 0)
+      .map(k => `${ratingLabels[k] || k} ${w[k].toFixed(2)}`);
+    return `${ratingHintBase}\nВаги для ${funcLabel.toLowerCase()}: ${parts.join(", ")}.\nСортування: за рейтингом, при рівності — дешевші вище.`;
+  };
 
-  const buildFuncBlock = (funcLabel, funcTitle, ratingKey, ratingHint) => {
+  const buildFuncBlock = (funcLabel, funcTitle, ratingKey) => {
+    const ratingHint = formatWeightsHint(funcLabel);
     const preferred = window.__t6MassState?.[funcLabel] || massTargets[0];
     const panels = massTargets.map((massClass, idx) => {
       const subset = withValue.filter(x => x.func === funcLabel && x.massClass === massClass);
-      const rated = rateSubset(subset);
+      const rated = rateSubset(subset, funcLabel);
       if (!subset.length) return "";
       const activeClass = massClass === preferred ? "active" : "";
       return `
@@ -4928,8 +5058,8 @@ function renderT6Insights() {
   };
 
   topOut.innerHTML = [
-    buildFuncBlock("Логістичний", "Логістичні", "ratingScore", ratingHintLog),
-    buildFuncBlock("Інженерний", "Інженерні", "ratingScore", ratingHintEng),
+    buildFuncBlock("Логістичний", "Логістичні", "ratingScore"),
+    buildFuncBlock("Інженерний", "Інженерні", "ratingScore"),
   ].join("") || `<div class="small">Немає достатньо даних для порівняння.</div>`;
 
   valOut.innerHTML = "";
@@ -5069,12 +5199,93 @@ function wireT6SortHeaders() {
 function wireT6RatingControls() {
   const box = $("t6RatingControls");
   if (!box) return;
-  box.addEventListener("change", (e) => {
+  const groupSel = $("t6WeightGroup");
+  const sumEl = $("t6WeightSum");
+  const resetBtn = $("t6WeightReset");
+
+  const getGroup = () => (groupSel?.value || "Логістичний");
+  const readInputs = () => {
+    const out = {};
+    box.querySelectorAll(".t6WeightInput").forEach(input => {
+      const key = input.getAttribute("data-weight");
+      if (!key) return;
+      const v = Number(input.value);
+      out[key] = Number.isFinite(v) ? Math.max(0, v) : 0;
+    });
+    return out;
+  };
+  const writeInputs = (weights) => {
+    box.querySelectorAll(".t6WeightInput").forEach(input => {
+      const key = input.getAttribute("data-weight");
+      if (!key) return;
+      const v = Number(weights?.[key]);
+      input.value = Number.isFinite(v) ? v.toFixed(2) : "";
+    });
+  };
+  const updateSum = (weights, flags) => {
+    if (!sumEl) return;
+    const sum = T6_WEIGHT_KEYS
+      .filter(k => flags[k])
+      .reduce((acc, k) => acc + (Number(weights?.[k]) || 0), 0);
+    sumEl.textContent = sum.toFixed(2);
+  };
+  const syncFromState = () => {
+    const group = getGroup();
+    const flags = getT6WeightFlags();
+    const state = ensureT6Weights();
+    const base = state[group] || state.default || {};
+    const norm = normalizeT6Weights(base, flags);
+    state[group] = norm;
+    saveT6Weights();
+    writeInputs(norm);
+    updateSum(norm, flags);
+  };
+  const normalizeFromInputs = () => {
+    const group = getGroup();
+    const flags = getT6WeightFlags();
+    const state = ensureT6Weights();
+    const merged = { ...(state[group] || {}), ...readInputs() };
+    const norm = normalizeT6Weights(merged, flags);
+    state[group] = norm;
+    saveT6Weights();
+    writeInputs(norm);
+    updateSum(norm, flags);
+  };
+
+  if (groupSel) {
+    groupSel.addEventListener("change", () => {
+      syncFromState();
+      renderT6Insights();
+    });
+  }
+
+  if (resetBtn) {
+    resetBtn.addEventListener("click", () => {
+      const group = getGroup();
+      const state = ensureT6Weights();
+      state[group] = JSON.parse(JSON.stringify(T6_WEIGHT_DEFAULTS[group] || T6_WEIGHT_DEFAULTS.default));
+      saveT6Weights();
+      syncFromState();
+      renderT6Insights();
+    });
+  }
+
+  box.addEventListener("input", (e) => {
     const target = e.target;
-    if (target && target.matches("input[type='checkbox']")) {
+    if (target && target.matches(".t6WeightInput")) {
+      normalizeFromInputs();
       renderT6Insights();
     }
   });
+  box.addEventListener("change", (e) => {
+    const target = e.target;
+    if (target && target.matches("input[type='checkbox']")) {
+      normalizeFromInputs();
+      renderT6Insights();
+    }
+  });
+
+  syncFromState();
 }
 
 function wireT6TopFilter() {
